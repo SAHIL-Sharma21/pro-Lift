@@ -2,14 +2,11 @@
 'use client';
 
 import {configureStore} from '@reduxjs/toolkit';
-import {counterSice} from './slices/counterslice';
-
+import {allReducers} from './allReducers';
 
 export const store = configureStore({
-    reducer: {
-        counter: counterSice.reducer
-
-    },
+    reducer: allReducers,
+    devTools: process.env.NODE_ENV !== 'production',
 });
 
 
