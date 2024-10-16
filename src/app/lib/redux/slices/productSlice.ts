@@ -3,7 +3,6 @@
 import { createSlice, createAsyncThunk } from "@reduxjs/toolkit";
 import { Product } from "@/app/types/products.types";
 
-
 interface ProductState {
   products: Product[];
   loading: boolean;
