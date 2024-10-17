@@ -4,9 +4,12 @@
 import { counterSice } from "./slices/counterslice";
 import { productSlice } from "./slices/productSlice";
 import {cartSlice} from './slices/cartSlice';
+import {authSlice} from './slices/authSlice';
+
 
 export const allReducers = {
     counter: counterSice.reducer,
     product: productSlice.reducer,
-    cart: cartSlice.reducer
+    cart: cartSlice.reducer,
+    auth: authSlice.reducer
 }

@@ -119,7 +119,7 @@ export const logoutUser = createAsyncThunk('auth/logoutUser', async(_,{getState,
 });
 
 
-const authSlice = createSlice({
+export const authSlice = createSlice({
     name: "auth",
     initialState,
     reducers: {},
@@ -152,7 +152,7 @@ const authSlice = createSlice({
                 state.loading = false;
                 state.error = action.error.message as string || "Failed to login user";
             })
-            .addCase(logoutUser.fulfilled, (state, action) => {
+            .addCase(logoutUser.fulfilled, (state) => {
                 state.user = null;
                 state.accessToken = null;
                 state.refreshToken = null;
@@ -160,7 +160,7 @@ const authSlice = createSlice({
             .addCase(getLoggedInUser.fulfilled, (state, action) => {
                 state.user = action.payload.data; //gotcha moment will have to look what response is comming from the backend
             })
-            .addCase(getLoggedInUser.rejected, (state, action) => {
+            .addCase(getLoggedInUser.rejected, (state) => {
                 state.user = null;
                 state.accessToken = null;
                 state.refreshToken = null;
