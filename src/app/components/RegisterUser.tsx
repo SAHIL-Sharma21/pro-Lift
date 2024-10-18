@@ -10,8 +10,7 @@ import { useAuth } from '../hooks/useAuth'
 import { AlertCircle } from 'lucide-react'
 import Link from 'next/link'
 import { useRouter } from 'next/navigation'
-
-
+import PasswordStrengthIndicator from '@/app/components/PasswordStrengthIndicator';
 
 const RegisterUser = () => {
     const [firstName, setFirstName] = useState('');
@@ -89,6 +88,7 @@ const RegisterUser = () => {
                             onChange={(e) => setPassword(e.target.value)}
                             required
                             />
+                            <PasswordStrengthIndicator password={password} />
                         </div>
                         <div className='flex flex-col space-y-1.5"'>
                             <Label htmlFor='phoneNumber'>Phone Number</Label>
