@@ -41,9 +41,6 @@ const apiCall = async(credentials: ApiCallCredentials) => {
     return response.json();
 }
 
-
-
-
 //asyn thunk method for api calls
 export const registerUser = createAsyncThunk('auth/registerUser', async(userData: RegisterUserCredentials, {rejectWithValue}) => {
     try {
@@ -119,6 +116,27 @@ export const logoutUser = createAsyncThunk('auth/logoutUser', async(_,{getState,
 });
 
 
+//implementing google login
+export const googlLogin = createAsyncThunk('auth/googleLogin', async(token: string, {rejectWithValue}) => {
+    try {
+        const response = await fetch(`${process.env.NEXT_BACKEND_URI}/users/google-login`, {
+            method: "POST",
+            headers: {'Content-Type': 'application/json'},
+            body: JSON.stringify({token})
+        });
+
+        if(!response.ok){
+            throw new Error("Failed to login with google");
+        }
+        const data = await response.json();
+        return data;
+    } catch (error: any) {
+        console.log("Error logging in with google: ", error?.message)
+        return rejectWithValue(error?.message);
+    }
+});
+
+
 export const authSlice = createSlice({
     name: "auth",
     initialState,
@@ -164,6 +182,21 @@ export const authSlice = createSlice({
                 state.user = null;
                 state.accessToken = null;
                 state.refreshToken = null;
+            })
+            .addCase(googlLogin.pending, (state) => {
+                state.loading = true;
+                state.error = null;
+            })
+            .addCase(googlLogin.fulfilled, (state, action) => {
+                state.loading = false;
+                state.user = action.payload.user, //gotcha moment will have to look what response is comming from the backend
+                state.accessToken = action.payload.accessToken,
+                state.refreshToken = action.payload.refreshToken
+                state.error = null;
+            })
+            .addCase(googlLogin.rejected, (state, action) => {
+                state.loading = false;
+                state.error = action.error.message as string || "Failed to login with google";
             })
     }
 });
