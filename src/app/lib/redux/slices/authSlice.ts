@@ -74,12 +74,19 @@ export const loginUser = createAsyncThunk("auth/loginUser", async(credentials: L
         if(!response.ok){
             throw new Error("Failed to login user");
         }
-
         const data = await response.json();
+
+        //if data is there then i can store token in localstorage
+        //will havbe to see how the data is coming from the backend
+        if(data.accessToken){
+            localStorage.setItem("accessToken", data.accessToken);
+            localStorage.setItem("refreshToken", data.refreshToken);
+        }
+
         return data;
     } catch (error: any) {
         console.log("Error logging in user: ", error?.message)
-        return;
+        return rejectWithValue(error?.message);
     }
 });
 
@@ -107,6 +114,11 @@ export const logoutUser = createAsyncThunk('auth/logoutUser', async(_,{getState,
         if(state.auth.accessToken){
             const data = await apiCall({url: `${process.env.NEXT_BACKEND_URI}/users/logout`, method: "POST", token: state.auth.accessToken, body: undefined});
             return data;
+        }
+        //another way to logout but have to look into it....
+        if(localStorage.getItem("accessToken")){
+            localStorage.removeItem("accessToken");
+            localStorage.removeItem("refreshToken");
         }
         throw new Error("No access token provided to logout user")
     } catch (error: any) {
