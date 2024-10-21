@@ -178,7 +178,7 @@ export const categorySlice = createSlice({
     },
 });
 
-export const selectAllCourse = (state: {category: CategoryState}) => state.category.categories;
+export const selectAllCategories = (state: {category: CategoryState}) => state.category.categories;
 export const selectSelectedCategory = (state: {category: CategoryState}) => state.category.selectedCategory;
 export const selectCategoryLoading = (state: {category: CategoryState}) => state.category.loading;
 export const selectCategoryError = (state: {category: CategoryState}) => state.category.error;  
