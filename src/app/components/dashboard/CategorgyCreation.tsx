@@ -8,11 +8,15 @@ import {Textarea} from '@/components/ui/textarea';
 import { Button } from '@/components/ui/button';
 import { Alert, AlertDescription, AlertTitle } from '@/components/ui/alert';
 import { AlertCircle } from 'lucide-react';
+import { Dialog, DialogContent, DialogHeader, DialogTitle } from '@/components/ui/dialog';
+import ProductForm from './ProductForm';
 
 const CategorgyCreation = () => {
 
     const [name, setName] = useState<string>('');
     const [description, setDescription] = useState('');
+    const [showProductDialog, setShowProductDialog] = useState(false);
+    const [createdCategoryId, setCreatedCategoryId] = useState<string>('');
 
     const {create, error,loading} = useCreateCategory();
 
@@ -22,6 +26,8 @@ const CategorgyCreation = () => {
             const data = create({name, description});
             console.log(data);
             //if categriy is created successfully then go to product creation page
+            // setCreatedCategoryId(data.payload.id); //gotcha moment here
+            setShowProductDialog(true);
         } catch (error: any) {
             console.log("category creation failed: ", error); // can show notification or some ui components
             return;
@@ -55,7 +61,7 @@ const CategorgyCreation = () => {
             type='submit'
             disabled={loading}
             >
-                {loading ? " Creating..." :"Create Category"}
+                {loading ? "Creating..." :"Create Category"}
             </Button>
             {error && (
                 <Alert variant="destructive" className='mt-4'>
@@ -65,6 +71,14 @@ const CategorgyCreation = () => {
                 </Alert>
             )}
         </form>
+        <Dialog open={showProductDialog} onOpenChange={setShowProductDialog}>
+            <DialogContent>
+                <DialogHeader>
+                    <DialogTitle>Create Product</DialogTitle>
+                </DialogHeader>
+                <ProductForm categoryId={createdCategoryId} onComplete={() => setShowProductDialog(false)} />
+            </DialogContent>
+        </Dialog>
     </>
   )
 }
