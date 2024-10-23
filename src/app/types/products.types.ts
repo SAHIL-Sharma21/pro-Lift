@@ -11,3 +11,21 @@ export interface Product {
     createdAt: string;
     updatedAt: string;
 }
+
+export interface ProductCreate {
+    name: string;
+    description: string;
+    price: number;
+    categoryId: string;
+    image: string;
+    quantity: number;
+}
+
+export interface ProductUpdate {
+    name?: string;
+    description?: string;
+    price?: number;
+    categoryId?: string;
+    image?: string;
+    quantity?: number;
+}
