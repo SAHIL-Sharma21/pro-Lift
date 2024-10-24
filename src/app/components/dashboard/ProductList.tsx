@@ -2,7 +2,9 @@
 
 import React, { use, useEffect } from 'react'
 import {useProduct} from '@/app/hooks/useProduct'
-import {Table, TableBody, TableHead, TableHeader, TableRow} from '@/components/ui/table'
+import {Table, TableBody, TableCell, TableHead, TableHeader, TableRow} from '@/components/ui/table'
+import { Button } from '@/components/ui/button'
+import { Pencil, Trash2 } from 'lucide-react'
 
 const ProductList = () => {
 
@@ -34,7 +36,20 @@ const ProductList = () => {
           <TableBody>
             {products.map((product) => (
               <TableRow key={product.id}>
-
+                <TableCell>{product.name}</TableCell>
+                <TableCell>Rs.{product.price.toFixed(2)}</TableCell>
+                <TableCell>{product.quantity}</TableCell>
+                <TableCell>{product.categoryId}</TableCell> {/* TODO: add category name here no id*/}
+                <TableCell>
+                  <div className='flex space-x-2'>
+                    <Button variant="outline" size="icon">
+                      <Pencil className='h-4 w-4' />
+                    </Button>
+                    <Button variant="outline" size="icon">
+                      <Trash2 className='h-4 w-4' />
+                    </Button>
+                  </div>
+                </TableCell>
               </TableRow>
             ))}
           </TableBody>
@@ -44,4 +59,4 @@ const ProductList = () => {
   )
 }
 
-export default ProductList
+export default ProductList;
