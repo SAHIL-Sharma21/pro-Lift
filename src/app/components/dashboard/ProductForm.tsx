@@ -6,7 +6,7 @@ import { Input } from '@/components/ui/input';
 import { Label } from '@/components/ui/label';
 import { AlertCircle } from 'lucide-react';
 import React, { useState } from 'react'
-
+import {useProduct} from '@/app/hooks/useProduct';
 
 interface ProductCreationProps {
   categoryId: string,
@@ -17,11 +17,11 @@ const ProductForm = ({categoryId, onComplete}: ProductCreationProps) => {
 
   const [productName, setProductName] = useState<string>('');
   const [description, setDescription] = useState<string>('');
-  const [price, setPrice] = useState('');
-  const [imageUrl, setImageUrl] = useState<string>('');
-  const [quantity, setQuantity] = useState<string>('');
-
-  const {create, error, loading} = useCreateProduct() // we have to create the cutrom hooks for this
+  const [price, setPrice] = useState(0);
+  const [imageUrl, setImageUrl] = useState<File | null>(null);
+  const [quantity, setQuantity] = useState(0);
+  const {addProducts, loading, error} = useProduct();
+ // we have to create the cutrom hooks for this
 
   const handleSubmit = (e: React.FormEvent) => {
     e.preventDefault();
@@ -31,10 +31,12 @@ const ProductForm = ({categoryId, onComplete}: ProductCreationProps) => {
       console.log("No category selected");
       return;
     }
+
     try {
       //crerate the product funtionality or hooks
-      const data = create({categoryId, productName, description, price, imageUrl, quantity});
-
+      const result = addProducts({categoryId, description, name: productName, price, image: imageUrl as File, quantity});
+      console.log(result);
+      onComplete();
     } catch (error:any) {
       // TODO: show notification
       console.log("Error creating product: ", error);
@@ -74,7 +76,7 @@ const ProductForm = ({categoryId, onComplete}: ProductCreationProps) => {
           id='price'
           placeholder='Enter product price'
           value={price}
-          onChange={(e) => setPrice(e.target.value)}
+          onChange={(e) => setPrice(e.target.valueAsNumber)}
           required
           step="0.01"
           />
@@ -85,8 +87,7 @@ const ProductForm = ({categoryId, onComplete}: ProductCreationProps) => {
           type='file'
           id='image'
           placeholder='product image'
-          value={imageUrl}
-          onChange={(e) => setImageUrl(e.target.value)}
+          onChange={(e) => setImageUrl(e.target.files? e.target.files[0] : null)}
           required
           />
         </div>
@@ -97,7 +98,7 @@ const ProductForm = ({categoryId, onComplete}: ProductCreationProps) => {
           id='quantity'
           placeholder='Enter quantity'
           value={quantity}
-          onChange={(e) => setQuantity(e.target.value)}
+          onChange={(e) => setQuantity(e.target.valueAsNumber)}
           required
           />
         </div>

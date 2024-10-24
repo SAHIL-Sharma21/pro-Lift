@@ -18,7 +18,7 @@ const CategorgyCreation = () => {
     const [showProductDialog, setShowProductDialog] = useState(false);
     const [createdCategoryId, setCreatedCategoryId] = useState<string>('');
 
-    const {create, error,loading} = useCreateCategory();
+    const {create, error, loading} = useCreateCategory();
 
     const handleSubmit = (e: React.FormEvent) => {
         e.preventDefault();
