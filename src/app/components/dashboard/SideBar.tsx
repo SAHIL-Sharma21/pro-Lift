@@ -22,7 +22,7 @@ const SideBar = () => {
     <>
         <div className='flex flex-col h-full bg-gray-900 text-white w-64'>
             <div className='p-4'>
-                <h1 className='ext-2xl font-bold"'>Admin Dashboard</h1>
+                <h1 className='text-3xl font-bold'>Pro Lifts</h1>
             </div>
             <nav className='flex-1'>
                 <ul className='space-y-2 p-4'>
