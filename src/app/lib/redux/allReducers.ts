@@ -6,11 +6,13 @@ import { productSlice } from "./slices/productSlice";
 import {cartSlice} from './slices/cartSlice';
 import {authSlice} from './slices/authSlice';
 import {categorySlice} from './slices/categorySlice';
+import {addressSlice} from './slices/addressSlice';
 
 export const allReducers = {
     counter: counterSice.reducer,
     product: productSlice.reducer,
     cart: cartSlice.reducer,
     auth: authSlice.reducer,
-    category: categorySlice.reducer
+    category: categorySlice.reducer,
+    address: addressSlice.reducer
 }
