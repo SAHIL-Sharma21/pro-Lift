@@ -12,7 +12,7 @@ export default function ProductPage() {
   );
 
 useEffect(() => {
-    dispatch(fetchProducts());
+    dispatch(fetchProducts({limit: 10, page: 1}));
 }, [dispatch])
 
 //adding custom loader or designed page or showing loader to user 
