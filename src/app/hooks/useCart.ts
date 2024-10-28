@@ -9,7 +9,7 @@ import {fetchCart, addToCart, clearCart, removeFromCart, updateToCart} from '@/a
 export const useCart = () => {
     const dispatch = useDispatch<AppDispatch>();
 
-    const {cart, loading, error} = useSelector((state: RootState) => state.cart);
+    const {cart, loading, error, totalItems, totalPrice} = useSelector((state: RootState) => state.cart);
 
     const getCart = useCallback(() => {
         return dispatch(fetchCart());
@@ -36,6 +36,8 @@ export const useCart = () => {
         cart,
         loading,
         error,
+        totalItems,
+        totalPrice,
         getCart,
         addItemToCart,
         updateItemToCart,

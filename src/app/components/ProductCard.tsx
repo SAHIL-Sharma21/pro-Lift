@@ -3,7 +3,9 @@
 import React from 'react'
 import Image from 'next/image'
 import {Product} from '@/app/types/products.types'
-import { useDispatch } from 'react-redux'
+import { useCart } from '../hooks/useCart'
+import { Card, CardContent, CardHeader, CardTitle } from '@/components/ui/card'
+import { Button } from '@/components/ui/button'
 
 
 interface ProductCardProps {
@@ -11,36 +13,39 @@ interface ProductCardProps {
 }
 
 const ProductCard = ({product}: ProductCardProps) => {
-
-    const dispatch = useDispatch();
+    const {addItemToCart} = useCart();
 
     const handleAddToCart = () => {
-        //logic here for add to cart with redux
+        addItemToCart({productId: product.id, quantity: 1});
     }
 
   return (
    <>
-    <div className='bg-gray-800 shadow-md rounded-lg overflow-hidden'>
-        <Image 
-        src={product.image}
-        alt={product.name}
-        width={300}
-        height={300}
-        className='w-full h-48 object-cover'
-        />
-        <div className='p-4'>
-            <h2 className='font-bold text-xl mb-2'>{product.name}</h2>
-            <p className='text-gray-700 text-base mb-4"'>{product.description}</p>
+    <Card className='overflow-hidden'>
+        <CardHeader className='p-0'>
+            <div className='relative h-48 w-full'>
+                <Image
+                src={product.image}
+                alt={product.name}
+                fill
+                className='object-cover'
+                />
+            </div>
+        </CardHeader>
+        <CardContent className='p-4'>
+            <CardTitle className='mb-2'>{product.name}</CardTitle>
+            <p className='text-sm text-muted-foreground mb-4'>{product.description}</p>
             <div className='flex justify-between items-center'>
                 <span className='text-lg font-bold'>Rs: {product.price}</span>
-                <button
+                <Button
                 onClick={handleAddToCart}
-                className='bg-blue-500 hover:bg-blue-700 text-white font-bold py-2 px-4 rounded'
                 disabled={product.quantity === 0}
-                >{product.quantity > 0 ? "Add To Cart" : "Out of stock"}</button>
+                >
+                    {product.quantity > 0 ? "Add to cart" : "Out of stock"}
+                </Button>
             </div>
-        </div>
-    </div>
+        </CardContent>
+    </Card>
    </>
   )
 }
