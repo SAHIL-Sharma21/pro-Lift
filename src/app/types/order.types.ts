@@ -17,3 +17,10 @@ export interface Order {
     createdAt: string;
     updatedAt: string;
 }
+
+export interface VerifyPaymentData {
+    razorpayOrderId: string;
+    razorpayPaymentId: string;
+    razorpaySignature: string;
+    addressId: string;
+}
