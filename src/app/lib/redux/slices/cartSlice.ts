@@ -6,12 +6,16 @@ interface CartState {
   cart: Cart | null;
   loading: boolean;
   error: string | null;
+  totalItems?: number;
+  totalPrice?: number;
 }
 
 const initialState: CartState = {
   cart: null,
   loading: false,
   error: null,
+  totalItems: 0,
+  totalPrice: 0
 };
 
 //defining async thunks
@@ -143,11 +147,44 @@ export const cartSlice = createSlice({
         state.loading = false;
         state.error = action.error.message || "Failed to fetch cart";
       })
+      .addCase(addToCart.pending, (state) => {
+        state.loading = true;
+        state.error = null;
+      })
       .addCase(addToCart.fulfilled, (state, action: PayloadAction<Cart>) => {
-        state.cart = action.payload;
+        state.loading = false;
+        if(state.cart){
+          const existingItemIndex = state.cart.items.findIndex((item) => item.id === action.payload.items[0].id);
+          if(existingItemIndex !== -1){
+            state.cart.items[existingItemIndex].quantity += action.payload.items[0].quantity;
+          } else {
+            state.cart.items.push(action.payload.items[0])
+          }
+          state.totalItems = state.cart.items.reduce((total, item) => total + item.quantity, 0);
+          state.totalPrice = state.cart.items.reduce((total, item) => total + (item.quantity * item.product.price), 0);
+        } else {
+          state.cart = action.payload
+        }
+      })
+      .addCase(addToCart.rejected, (state, action) => {
+        state.loading = false;
+        state.error = action.error.message || "Failed to add product to cart";
+      })
+      .addCase(updateToCart.pending, (state) => {
+        state.loading = true;
+        state.error = null;
       })
       .addCase(updateToCart.fulfilled, (state, action: PayloadAction<Cart>) => {
+        state.loading = false;
         state.cart = action.payload;
+      })
+      .addCase(updateToCart.rejected, (state, action) => {
+        state.loading = false;
+        state.error = action.error.message || "Failed to update cart";
+      })
+      .addCase(removeFromCart.pending, (state) => {
+        state.loading = true;
+        state.error = null;
       })
       .addCase(
         removeFromCart.fulfilled,
@@ -159,6 +196,10 @@ export const cartSlice = createSlice({
           }
         }
       )
+      .addCase(removeFromCart.rejected, (state, action) => {
+        state.loading = false;
+        state.error = action.error.message || "Failed to remove item from cart";
+      })
       .addCase(clearCart.fulfilled, (state) => {
         state.cart = null;
       });
