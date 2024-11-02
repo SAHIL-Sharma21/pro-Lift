@@ -26,7 +26,7 @@ export const addCategory = createAsyncThunk(
   async (payload: CreateCategory, { rejectWithValue }) => {
     try {
       const response = await fetch(
-        `${process.env.NEXT_BACKEND_URI}/categories/create-category`,
+        `${process.env.NEXT_PUBLIC_BACKEND_URI}/categories/create-category`,
         {
           method: "POST",
           headers: { "Content-Type": "application/json" },
@@ -37,6 +37,8 @@ export const addCategory = createAsyncThunk(
       if (!response.ok) {
         throw new Error("Failed to create category");
       }
+      const data = await response.json();
+      console.log(data);
       return await response.json();
     } catch (error: any) {
       console.log("Error creating category: ", error?.message);
@@ -53,7 +55,7 @@ export const updateCategory = createAsyncThunk(
   ) => {
     try {
       const response = await fetch(
-        `${process.env.NEXT_BACKEND_URI}/categories/update-category/${categoryId}`,
+        `${process.env.NEXT_PUBLIC_BACKEND_URI}/categories/update-category/${categoryId}`,
         {
           method: "PATCH",
           headers: { "Content-Type": "application/json" },
@@ -64,6 +66,8 @@ export const updateCategory = createAsyncThunk(
       if (!response.ok) {
         throw new Error("Failed to update category");
       }
+      const data = await response.json();
+      console.log(data);
       return await response.json();
     } catch (error: any) {
       console.log("Error upating category: ", error?.message);
@@ -77,7 +81,7 @@ export const deleteCategory = createAsyncThunk(
   async (categoryId: string, { rejectWithValue }) => {
     try {
       const response = await fetch(
-        `${process.env.NEXT_BACKEND_URI}/categories/delete-category/${categoryId}`,
+        `${process.env.NEXT_PUBLIC_BACKEND_URI}/categories/delete-category/${categoryId}`,
         {
           method: "DELETE",
           headers: { "Content-Type": "application/json" },
@@ -88,6 +92,8 @@ export const deleteCategory = createAsyncThunk(
       if (!response.ok) {
         throw new Error("Failed to delete category");
       }
+      const data = await response.json();
+      console.log(data);
       return await response.json();
     } catch (error: any) {
       console.log("Error deleting category: ", error?.message);
@@ -101,11 +107,13 @@ export const getAllCategories = createAsyncThunk(
   async (_, { rejectWithValue }) => {
     try {
       const response = await fetch(
-        `${process.env.NEXT_BACKEND_URI}/categories/get-allCategories`
+        `${process.env.NEXT_PUBLIC_BACKEND_URI}/categories/get-allCategories`
       );
       if (!response.ok) {
         throw new Error("Failed to get all categories");
       }
+      const data = await response.json();
+      console.log(data);
       return await response.json();
     } catch (error: any) {
       console.log("Error getting all categories: ", error?.message);
@@ -119,12 +127,14 @@ export const getCategoryById = createAsyncThunk(
   async (categoryId: string, { rejectWithValue }) => {
     try {
       const response = await fetch(
-        `${process.env.NEXT_BACKEND_URI}/categories/get-category/${categoryId}`
+        `${process.env.NEXT_PUBLIC_BACKEND_URI}/categories/get-category/${categoryId}`
       );
 
       if (!response.ok) {
         throw new Error("Failed to get category by id");
       }
+      const data = await response.json();
+      console.log(data);
       return await response.json();
     } catch (error: any) {
       console.log("Error getting category by id: ", error?.message);

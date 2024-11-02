@@ -44,7 +44,7 @@ const apiCall = async(credentials: ApiCallCredentials) => {
 //asyn thunk method for api calls
 export const registerUser = createAsyncThunk('auth/registerUser', async(userData: RegisterUserCredentials, {rejectWithValue}) => {
     try {
-       const response = await fetch(`${process.env.NEXT_BACKEND_URI}/users/register`, {
+       const response = await fetch(`${process.env.NEXT_PUBLIC_BACKEND_URI}/users/register`, {
         method: "POST",
         headers: {"Content-Type": "application/json"},
         body: JSON.stringify(userData)
@@ -65,7 +65,7 @@ export const registerUser = createAsyncThunk('auth/registerUser', async(userData
 
 export const loginUser = createAsyncThunk("auth/loginUser", async(credentials: LoginUserCredentials, {rejectWithValue}) => {
     try {
-        const response = await fetch(`${process.env.NEXT_BACKEND_URI}/users/login`, {
+        const response = await fetch(`${process.env.NEXT_PUBLIC_BACKEND_URI}/users/login`, {
             method: "POST",
             headers: {"Content-Type": "application/json"},
             body: JSON.stringify(credentials)
@@ -75,13 +75,13 @@ export const loginUser = createAsyncThunk("auth/loginUser", async(credentials: L
             throw new Error("Failed to login user");
         }
         const data = await response.json();
-
+        console.log(data)
         //if data is there then i can store token in localstorage
         //will havbe to see how the data is coming from the backend
-        if(data.accessToken){
-            localStorage.setItem("accessToken", data.accessToken);
-            localStorage.setItem("refreshToken", data.refreshToken);
-        }
+        // if(data.accessToken){
+        //     localStorage.setItem("accessToken", data.accessToken);
+        //     localStorage.setItem("refreshToken", data.refreshToken);
+        // }
 
         return data;
     } catch (error: any) {
@@ -96,7 +96,7 @@ export const getLoggedInUser = createAsyncThunk('auth/getLoggedInUser', async(_,
         const state = getState() as {auth: AuthState}
 
         if(state.auth.accessToken){
-            const data = await apiCall({url: `${process.env.NEXT_BACKEND_URI}/users/getUser`, method: "GET", token: state.auth.accessToken,body: undefined});
+            const data = await apiCall({url: `${process.env.NEXT_PUBLIC_BACKEND_URI}/users/getUser`, method: "GET", token: state.auth.accessToken, body: undefined});
             return data;
         }
         throw new Error("No access token available");
@@ -112,10 +112,10 @@ export const logoutUser = createAsyncThunk('auth/logoutUser', async(_,{getState,
         const state = getState() as {auth: AuthState};
 
         if(state.auth.accessToken){
-            const data = await apiCall({url: `${process.env.NEXT_BACKEND_URI}/users/logout`, method: "POST", token: state.auth.accessToken, body: undefined});
+            const data = await apiCall({url: `${process.env.NEXT_PUBLIC_BACKEND_URI}/users/logout`, method: "POST", token: state.auth.accessToken, body: undefined});
             return data;
         }
-        //another way to logout but have to look into it....
+        //another way to logout but have to look into it....s
         if(localStorage.getItem("accessToken")){
             localStorage.removeItem("accessToken");
             localStorage.removeItem("refreshToken");
@@ -131,7 +131,7 @@ export const logoutUser = createAsyncThunk('auth/logoutUser', async(_,{getState,
 //implementing google login
 export const googlLogin = createAsyncThunk('auth/googleLogin', async(token: string, {rejectWithValue}) => {
     try {
-        const response = await fetch(`${process.env.NEXT_BACKEND_URI}/users/google-login`, {
+        const response = await fetch(`${process.env.NEXT_PUBLIC_BACKEND_URI}/users/google-login`, {
             method: "POST",
             headers: {'Content-Type': 'application/json'},
             body: JSON.stringify({token})

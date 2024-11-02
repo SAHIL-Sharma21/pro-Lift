@@ -1,5 +1,5 @@
+'use client'
 //order slice
-
 import {createSlice, createAsyncThunk} from '@reduxjs/toolkit'
 import {Order, VerifyPaymentData} from '@/app/types/order.types';
 
@@ -20,11 +20,12 @@ const initialState: OrderState = {
 
 export const fetchOrders = createAsyncThunk('order/fetchOrders', async(_, {rejectWithValue}) => {
     try {
-        const response = await fetch(`${process.env.NEXT_BACKEND_URI}/orders/get-orders`); //this have to make in backend
+        const response = await fetch(`${process.env.NEXT_PUBLIC_BACKEND_URI}/orders/get-orders`); //this have to make in backend
         if(!response.ok){
             throw new Error("Error fetching orders");
         }
-
+        const data = await response.json();
+        console.log(data);
         return await response.json();
     } catch (error: any) {
         console.log("Error fetching orders: ", error);
@@ -35,7 +36,7 @@ export const fetchOrders = createAsyncThunk('order/fetchOrders', async(_, {rejec
 
 export const checkout = createAsyncThunk('order/checkout', async(guestId: {guestId?: string}, {rejectWithValue}) => {
     try {
-        const response = await fetch(`${process.env.NEXT_BACKEND_URI}/orders/checkout`, {
+        const response = await fetch(`${process.env.NEXT_PUBLIC_BACKEND_URI}/orders/checkout`, {
             method: "POST",
             headers: {"Content-Type": "application/json"},
             body: JSON.stringify(guestId)
@@ -43,6 +44,8 @@ export const checkout = createAsyncThunk('order/checkout', async(guestId: {guest
         if(!response.ok){
             throw new Error("Error fetching orders");
         }
+        const data = await response.json();
+        console.log(data);
         return await response.json();
     } catch (error: any) {
         console.log("Error fetching orders: ", error);
@@ -52,7 +55,7 @@ export const checkout = createAsyncThunk('order/checkout', async(guestId: {guest
 
 export const processPaymentAndOrderCreate = createAsyncThunk('order/processPayment', async(_, {rejectWithValue}) => {
     try {
-        const response = await fetch(`${process.env.NEXT_BACKEND_URI}/orders/process-payment`, {
+        const response = await fetch(`${process.env.NEXT_PUBLIC_BACKEND_URI}/orders/process-payment`, {
             method: "POST",
             headers: {"Content-Type": "application/json"},
             body: JSON.stringify({})
@@ -61,6 +64,8 @@ export const processPaymentAndOrderCreate = createAsyncThunk('order/processPayme
         if(!response.ok){
             throw new Error("Error fetching orders");
         }
+        const data = await response.json();
+        console.log(data);
         return await response.json();
     } catch (error: any) {
         console.log("Error fetching orders: ", error);
@@ -71,7 +76,7 @@ export const processPaymentAndOrderCreate = createAsyncThunk('order/processPayme
 
 export const verifyPayment = createAsyncThunk('order/verifyPayment', async(paymaneData: VerifyPaymentData, {rejectWithValue}) => {
     try {
-        const response = await fetch(`${process.env.NEXT_BACKEND_URI}/orders/verify-payment`, {
+        const response = await fetch(`${process.env.NEXT_PUBLIC_BACKEND_URI}/orders/verify-payment`, {
             method: "POST",
             headers: {"Content-Type": "application/json"},
             body: JSON.stringify(paymaneData)
@@ -80,7 +85,8 @@ export const verifyPayment = createAsyncThunk('order/verifyPayment', async(payma
         if(!response.ok){
             throw new Error("Error fetching orders");
         }
-
+        const data = await response.json();
+        console.log(data);
         return await response.json();
     } catch (error: any) {
         console.log("Error fetching orders: ", error);

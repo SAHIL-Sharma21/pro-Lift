@@ -17,7 +17,7 @@ const initialState: AddressState = {
 
 export const createAddress = createAsyncThunk('address/createAddress', async(payload: AddressCreate, {rejectWithValue}) => {
     try {
-        const response = await fetch(`${process.env.NEXT_BACKEND_URI}/address/create`, {
+        const response = await fetch(`${process.env.NEXT_PUBLIC_BACKEND_URI}/address/create`, {
             method: "POST",
             headers: {"Content-Type": "application/json"},
             body: JSON.stringify(payload)
@@ -37,7 +37,7 @@ export const createAddress = createAsyncThunk('address/createAddress', async(pay
 
 export const updateAddress = createAsyncThunk('address/updateAddress', async({payload, addressId}: {payload: AddressUpdate, addressId: string}, {rejectWithValue}) => {
     try {
-        const response = await fetch(`${process.env.NEXT_BACKEND_URI}/address/updateAddress/${addressId}`, {
+        const response = await fetch(`${process.env.NEXT_PUBLIC_BACKEND_URI}/address/updateAddress/${addressId}`, {
             method: "PATCH",
             headers: {"Content-Type": "application/json"},
             body: JSON.stringify(payload)
@@ -55,7 +55,7 @@ export const updateAddress = createAsyncThunk('address/updateAddress', async({pa
 
 export const deleteAddress = createAsyncThunk('address/deleteAddress', async(addressId: string, {rejectWithValue}) => {
     try {
-        const response = await fetch(`${process.env.NEXT_BACKEND_URI}/address/deleteAddress/${addressId}`, {
+        const response = await fetch(`${process.env.NEXT_PUBLIC_BACKEND_URI}/address/deleteAddress/${addressId}`, {
             method: "DELETE",
             headers: {"Content-Type": "application/json"},
             body: JSON.stringify({})
@@ -74,7 +74,7 @@ export const deleteAddress = createAsyncThunk('address/deleteAddress', async(add
 
 export const getAllAddresses = createAsyncThunk('address/getAllAddresses', async(_, {rejectWithValue}) => {
     try {
-        const response = await fetch(`${process.env.NEXT_BACKEND_URI}/address/allAddress`, {
+        const response = await fetch(`${process.env.NEXT_PUBLIC_BACKEND_URI}/address/allAddress`, {
             method: "GET",
             headers: {"Content-Type": "application/json"},
             body: JSON.stringify({})

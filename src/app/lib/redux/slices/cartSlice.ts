@@ -19,10 +19,10 @@ const initialState: CartState = {
 };
 
 //defining async thunks
-export const fetchCart = createAsyncThunk("cart/fetchCart", async () => {
+export const fetchCart = createAsyncThunk("cart/fetchCart", async (_, {rejectWithValue}) => {
   try {
     const response = await fetch(
-      `${process.env.NEXT_BACKEND_URI}/cart/get-cart`
+      `${process.env.NEXT_PUBLIC_BACKEND_URI}/cart/get-cart`
     );
     if (!response.ok) {
       throw new Error("Failed to get the user cart.");
@@ -31,16 +31,16 @@ export const fetchCart = createAsyncThunk("cart/fetchCart", async () => {
     return data;
   } catch (error: any) {
     console.log("Error fetching cart:", error?.message);
-    return;
+    return rejectWithValue(error?.message);
   }
 });
 
 //TODO: we need cartId as in our backend we have middleware for that
 export const addToCart = createAsyncThunk(
   "cart/addToCart",
-  async ({ productId, quantity }: { productId: string; quantity: number }) => {
+  async ({ productId, quantity }: { productId: string; quantity: number }, {rejectWithValue}) => {
     try {
-      const response = await fetch(`${process.env.NEXT_BACKEND_URI}/cart/add`, {
+      const response = await fetch(`${process.env.NEXT_PUBLIC_BACKEND_URI}/cart/add`, {
         method: "POST",
         headers: { "Content-Type": "application/json" },
         body: JSON.stringify({ productId, quantity }),
@@ -53,17 +53,17 @@ export const addToCart = createAsyncThunk(
       return data;
     } catch (error: any) {
       console.log("Error adding product to cart:", error?.message);
-      return;
+      return rejectWithValue(error?.message);
     }
   }
 );
 
 export const updateToCart = createAsyncThunk(
   "cart/updateToCart",
-  async ({ productId, quantity }: { productId: string; quantity: number }) => {
+  async ({ productId, quantity }: { productId: string; quantity: number }, {rejectWithValue}) => {
     try {
       const response = await fetch(
-        `${process.env.NEXT_BACKEND_URI}/cart/update-cart/${productId}`,
+        `${process.env.NEXT_PUBLIC_BACKEND_URI}/cart/update-cart/${productId}`,
         {
           method: "PATCH",
           headers: { "Content-Type": "application/json" },
@@ -79,7 +79,7 @@ export const updateToCart = createAsyncThunk(
       return data;
     } catch (error: any) {
       console.log("Error updating the cart: ", error?.message);
-      return;
+      return rejectWithValue(error?.message);
     }
   }
 );
@@ -87,10 +87,10 @@ export const updateToCart = createAsyncThunk(
 //remove from the cart
 export const removeFromCart = createAsyncThunk(
   "cart/removeFromCart",
-  async ({ cartItemId }: { cartItemId: string }) => {
+  async ({ cartItemId }: { cartItemId: string }, {rejectWithValue}) => {
     try {
       const response = await fetch(
-        `${process.env.NEXT_BACKEND_URI}/cart/delete-cart/${cartItemId}`,
+        `${process.env.NEXT_PUBLIC_BACKEND_URI}/cart/delete-cart/${cartItemId}`,
         {
           method: "DELETE",
           headers: { "Content-Type": "application/json" },
@@ -105,25 +105,31 @@ export const removeFromCart = createAsyncThunk(
       return data;
     } catch (error: any) {
       console.log("Error removing item from the cart: ", error?.message);
-      return;
+      return rejectWithValue(error?.message);
     }
   }
 );
 
 //TODO: the cart id is required in backend but will come from the middleware need to implement it
-export const clearCart = createAsyncThunk("cart/clearCart", async () => {
+export const clearCart = createAsyncThunk("cart/clearCart", async (_, {rejectWithValue}) => {
   try {
-    const responnse = await fetch(
-      `${process.env.NEXT_BACKEND_URI}/cart/empty-cart`,
+    const response = await fetch(
+      `${process.env.NEXT_PUBLIC_BACKEND_URI}/cart/empty-cart`,
       {
         method: "DELETE",
         headers: { "Content-Type": "application/json" },
         body: JSON.stringify({}),
       }
     );
+
+    if(!response.ok){
+      throw new Error("Failed to clear the cart");
+    }
+    const data = await response.json();
+    return data;
   } catch (error: any) {
     console.log("Error clearing the cart: ", error?.message);
-    return;
+    return rejectWithValue(error?.message);
   }
 });
 

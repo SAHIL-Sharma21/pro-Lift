@@ -25,13 +25,14 @@ export const fetchProducts = createAsyncThunk(
   async ({page = 1, limit = 10}:{page?: number, limit?: number}, {rejectWithValue}) => {
     try {
       const response = await fetch(
-        `${process.env.NEXT_BACKEND_URI}/products/get-allproducts?page=${page}&limit=${limit}`
+        `${process.env.NEXT_PUBLIC_BACKEND_URI}/products/get-allproducts?page=${page}&limit=${limit}`
       );
-
       if (!response.ok) {
         throw new Error("Failed to fetch products");
       }
-      return await response.json();
+      const data = await response.json();
+      console.log(data.data);
+      return data;
     } catch (error: any) {
       console.log("Error fetching products:", error?.message);
       rejectWithValue(error?.message);
@@ -41,7 +42,7 @@ export const fetchProducts = createAsyncThunk(
 
 export const createProduct = createAsyncThunk('product/createProduct', async(payload: ProductCreate, {rejectWithValue}) => {
   try {
-    const response = await fetch(`${process.env.NEXT_BACKEND_URI}/products/create-product`, {
+    const response = await fetch(`${process.env.NEXT_PUBLIC_BACKEND_URI}/products/create-product`, {
       method: "POST",
       headers: {"Content-Type": "application/json"},
       body: JSON.stringify(payload)
@@ -59,7 +60,7 @@ export const createProduct = createAsyncThunk('product/createProduct', async(pay
 
 export const updateProduct = createAsyncThunk('product/updateProduct', async({payload, productId}: {payload: ProductUpdate, productId: string}, {rejectWithValue}) => {
   try {
-    const response = await fetch(`${process.env.NEXT_BACKEND_URI}/products/update-product/${productId}`, {
+    const response = await fetch(`${process.env.NEXT_PUBLIC_BACKEND_URI}/products/update-product/${productId}`, {
       method: "PATCH",
       headers: {"Content-Type": "application/json"},
       body: JSON.stringify(payload)
@@ -77,7 +78,7 @@ export const updateProduct = createAsyncThunk('product/updateProduct', async({pa
 
 export const deleteProduct = createAsyncThunk('product/deleteProduct', async(productId: string, {rejectWithValue}) => {
   try {
-    const response = await fetch(`${process.env.NEXT_BACKEND_URI}/products/delete-product/${productId}`, {
+    const response = await fetch(`${process.env.NEXT_PUBLIC_BACKEND_URI}/products/delete-product/${productId}`, {
       method: "DELETE",
       headers: {"Content-Type": "application/json"},
       body: JSON.stringify({})
@@ -95,7 +96,7 @@ export const deleteProduct = createAsyncThunk('product/deleteProduct', async(pro
 
 export const getProductById = createAsyncThunk('product/getProductById', async(productId: string, {rejectWithValue}) => {
   try {
-    const response = await fetch(`${process.env.NEXT_BACKEND_URI}/products/get-product/${productId}`);
+    const response = await fetch(`${process.env.NEXT_PUBLIC_BACKEND_URI}/products/get-product/${productId}`);
 
     if(!response.ok){
       throw new Error("Failed to get product");
@@ -118,11 +119,11 @@ export const productSlice = createSlice({
         state.error = null;
       })
       .addCase(fetchProducts.fulfilled, (state, action: PayloadAction<any>) => {
-        state.products = action.payload.data.products;
+        state.products = action.payload.data?.products || [];
         state.loading = false;
         state.error = null;
-        state.currentPage = action.payload.data.currentPage;
-        state.totalPage = action.payload.data.totalPage;
+        state.currentPage = action.payload.data?.page || 1;
+        state.totalPage = action.payload.data?.totalPage || 1;
       })
       .addCase(fetchProducts.rejected, (state, action) => {
         state.loading = false;
