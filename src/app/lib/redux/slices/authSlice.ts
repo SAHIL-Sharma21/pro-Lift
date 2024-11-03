@@ -40,7 +40,6 @@ const apiCall = async(credentials: ApiCallCredentials) => {
     }
     return response.json();
 }
-
 //asyn thunk method for api calls
 export const registerUser = createAsyncThunk('auth/registerUser', async(userData: RegisterUserCredentials, {rejectWithValue}) => {
     try {
@@ -161,7 +160,7 @@ export const authSlice = createSlice({
             })
             .addCase(registerUser.fulfilled, (state, action) => {
                 state.loading = false;
-                state.user = action.payload; //data should be here --> plce to watch out in future
+                state.user = action.payload.data;
                 state.error = null;
             })
             .addCase(registerUser.rejected, (state, action) => {

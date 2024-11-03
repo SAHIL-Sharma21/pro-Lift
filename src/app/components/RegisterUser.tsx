@@ -34,9 +34,16 @@ const RegisterUser = () => {
     e.preventDefault();
     try {
       await register({ firstName, lastName, email, password, phoneNumber, role });
-      router.push(role === "ADMIN" ? "/admin/login": "/login");
+      router.push(role === "ADMIN" ? "/auth/admin/login": "/auth/login");
     } catch (error: any) {
       console.log("Registration failed: ", error); // can show notification or some ui components
+    } finally {
+      setFirstName("");
+      setLastName("");
+      setEmail("");
+      setPassword("");
+      setRole("CUSTOMER");
+      setPhoneNumber("");
     }
   };
 
@@ -116,6 +123,7 @@ const RegisterUser = () => {
             <Button
               className="w-full"
               disabled={loading}
+              type="submit"
               onClick={handleSubmit}
             >
               {loading ? "Registering..." : "Register"}
