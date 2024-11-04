@@ -6,6 +6,8 @@ import { AppDispatch, RootState } from "../lib/redux/store";
 import { useEffect, useState } from "react";
 import { Button } from "@/components/ui/button";
 import { Loader2 } from "lucide-react";
+import { useAuth } from "../hooks/useAuth";
+import LogoutBtn from '@/app/components/LogoutBtn';
 
 export default function ProductPage() {
   const dispatch = useDispatch<AppDispatch>();
@@ -14,6 +16,7 @@ export default function ProductPage() {
   );
 
   const [page, setPage] = useState(1);
+  const {user} = useAuth();
 
 useEffect(() => {
     dispatch(fetchProducts({limit: 10, page}));
@@ -40,6 +43,7 @@ const loadMore = () => {
     <>
       <div className="container mx-auto px-4 py-8">
         <h1 className="text-3xl text-center font-bold mb-6">Our Products</h1>
+        {user ? <LogoutBtn /> : "Login"}
         {products.length > 0 ? (
           <>
             <div className="grid grid-cols-1 sm:grid-cols-2 md:grid-cols-3 lg:grid-cols-4 gap-6">

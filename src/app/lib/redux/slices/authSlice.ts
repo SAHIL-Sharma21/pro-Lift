@@ -106,17 +106,15 @@ export const getLoggedInUser = createAsyncThunk('auth/getLoggedInUser', async(_,
 export const logoutUser = createAsyncThunk('auth/logoutUser', async(_,{getState, rejectWithValue}) => {
     try {
         const state = getState() as {auth: AuthState};
-
+        
         if(state.auth.accessToken){
             const data = await apiCall({url: `${process.env.NEXT_PUBLIC_BACKEND_URI}/users/logout`, method: "POST", token: state.auth.accessToken, body: undefined});
+            console.log(data);
+            if(localStorage.getItem("accessToken")){
+                localStorage.removeItem("accessToken");
+                localStorage.removeItem("refreshToken");
+            };
             return data;
-        }
-        //another way to logout but have to look into it....s
-        if(localStorage.getItem("accessToken")){
-            localStorage.removeItem("accessToken");
-            localStorage.removeItem("refreshToken");
-        } else {
-            throw new Error("No access token provided to logout user")
         }
     } catch (error: any) {
         console.log("Error logging out User: ", error?.message)
@@ -180,10 +178,20 @@ export const authSlice = createSlice({
                 state.loading = false;
                 state.error = action.error.message as string || "Failed to login user";
             })
+            .addCase(logoutUser.pending, (state) => {
+                state.loading = true;
+                state.error = null;
+            })
             .addCase(logoutUser.fulfilled, (state) => {
                 state.user = null;
                 state.accessToken = null;
                 state.refreshToken = null;
+                state.loading = false;
+                state.error = null;
+            })
+            .addCase(logoutUser.rejected, (state, action) => {
+                state.loading = false;
+                state.error = action.error.message as string || "Failed to logout user";
             })
             .addCase(getLoggedInUser.pending, (state) => {
                 state.loading = true;
@@ -196,10 +204,12 @@ export const authSlice = createSlice({
                 state.loading = false;
                 state.error = null;
             })
-            .addCase(getLoggedInUser.rejected, (state) => {
+            .addCase(getLoggedInUser.rejected, (state, action) => {
                 state.user = null;
                 state.accessToken = null;
                 state.refreshToken = null;
+                state.loading = false;
+                state.error = action.error.message as string || "Failed to get logged in user";
             })
             .addCase(googlLogin.pending, (state) => {
                 state.loading = true;
