@@ -74,15 +74,12 @@ export const loginUser = createAsyncThunk("auth/loginUser", async(credentials: L
             throw new Error("Failed to login user");
         }
         const data = await response.json();
-        console.log(data)
         //if data is there then i can store token in localstorage
-        //will havbe to see how the data is coming from the backend
-        // if(data.accessToken){
-        //     localStorage.setItem("accessToken", data.accessToken);
-        //     localStorage.setItem("refreshToken", data.refreshToken);
-        // }
-
-        return data;
+        if(data.data){
+            localStorage.setItem("accessToken", data.data.accessToken);
+            localStorage.setItem("refreshToken", data.data.refreshToken);
+        }
+        return data.data;
     } catch (error: any) {
         console.log("Error logging in user: ", error?.message)
         return rejectWithValue(error?.message);
@@ -118,8 +115,9 @@ export const logoutUser = createAsyncThunk('auth/logoutUser', async(_,{getState,
         if(localStorage.getItem("accessToken")){
             localStorage.removeItem("accessToken");
             localStorage.removeItem("refreshToken");
+        } else {
+            throw new Error("No access token provided to logout user")
         }
-        throw new Error("No access token provided to logout user")
     } catch (error: any) {
         console.log("Error logging out User: ", error?.message)
         return rejectWithValue(error?.message);
@@ -140,7 +138,8 @@ export const googlLogin = createAsyncThunk('auth/googleLogin', async(token: stri
             throw new Error("Failed to login with google");
         }
         const data = await response.json();
-        return data;
+        console.log(data.data);
+        return data.data;
     } catch (error: any) {
         console.log("Error logging in with google: ", error?.message)
         return rejectWithValue(error?.message);
@@ -173,9 +172,9 @@ export const authSlice = createSlice({
             })
             .addCase(loginUser.fulfilled, (state, action) => {
                 state.loading = false;
-                state.user = action.payload;
-                state.accessToken = action.payload.data.accessToken; // gotcha moment
-                state.refreshToken = action.payload.data.refreshToken; // gotcha moment
+                state.user = action.payload.user;
+                state.accessToken = action.payload.accessToken; 
+                state.refreshToken = action.payload.refreshToken; 
             })
             .addCase(loginUser.rejected, (state, action) => {
                 state.loading = false;
@@ -186,8 +185,16 @@ export const authSlice = createSlice({
                 state.accessToken = null;
                 state.refreshToken = null;
             })
+            .addCase(getLoggedInUser.pending, (state) => {
+                state.loading = true;
+                state.error = null;
+            })
             .addCase(getLoggedInUser.fulfilled, (state, action) => {
-                state.user = action.payload.data; //gotcha moment will have to look what response is comming from the backend
+                state.user = action.payload.user; 
+                state.accessToken = action.payload.accessToken;
+                state.refreshToken = action.payload.refreshToken;
+                state.loading = false;
+                state.error = null;
             })
             .addCase(getLoggedInUser.rejected, (state) => {
                 state.user = null;
@@ -200,7 +207,7 @@ export const authSlice = createSlice({
             })
             .addCase(googlLogin.fulfilled, (state, action) => {
                 state.loading = false;
-                state.user = action.payload.user, //gotcha moment will have to look what response is comming from the backend
+                state.user = action.payload.user,
                 state.accessToken = action.payload.accessToken,
                 state.refreshToken = action.payload.refreshToken
                 state.error = null;

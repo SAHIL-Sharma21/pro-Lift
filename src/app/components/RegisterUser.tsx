@@ -137,7 +137,7 @@ const RegisterUser = () => {
             )}
             <p className="mt-4 text-sm text-center">
               Already have an account?{" "}
-              <Link href="/login" className="text-blue-500 hover:underline">
+              <Link href="/auth/login" className="text-blue-500 hover:underline">
                 Login
               </Link>
             </p>

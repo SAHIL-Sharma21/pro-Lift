@@ -2,13 +2,17 @@
 
 import React from 'react'
 import {GoogleLogin} from '@react-oauth/google'
-import { useAuth } from '../hooks/useAuth'
+import { useAuth } from '../hooks/useAuth';
+import { useRouter } from 'next/navigation';
 
 const GoogleLoginButton = () => {
+    const router = useRouter();
 
     const {googleLogin} = useAuth();
     const handleGoogleLoginSuccess = (credentialResponse: any) => {
+        console.log(credentialResponse);
         googleLogin(credentialResponse.credential); //error may come here
+        router.push("/products");
     }
 
   return (
