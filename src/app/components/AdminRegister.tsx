@@ -125,6 +125,7 @@ const AdminRegister = () => {
             className='w-full'
             type='submit'
             variant="default"
+            onClick={handleRegisterAdmin}
             disabled={loading}
             >
               {loading ? "Creating Account...." : "Create Account"}

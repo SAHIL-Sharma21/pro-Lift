@@ -18,7 +18,6 @@ export interface RegisterUserCredentials {
 export interface LoginUserCredentials {
     email: string;
     password: string;
-    role?: string;
 }
 export interface ApiCallCredentials {
     url: string;

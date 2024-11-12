@@ -9,10 +9,8 @@ import { useAuth } from '../hooks/useAuth'
 import { Alert, AlertDescription, AlertTitle } from '@/components/ui/alert'
 import { AlertCircle } from 'lucide-react'
 import { useRouter } from 'next/navigation'
-import {User} from '@/app/types/user.types';
 
 const AdminLogin = () => {
-
     const [email, setEmail] = useState<string>('');
     const [password, setPassword] = useState<string>('');
     const {loading, error, login} = useAuth();
@@ -22,15 +20,18 @@ const AdminLogin = () => {
     const handleSubmit = async(e: React.FormEvent) => {
         e.preventDefault();
         try {
-            //gotcha moment
-            const user: any = await login({email, password, role: "ADMIN"});
-            if(user.role === "ADMIN"){
-                router.push("/admin/dashboard")
+            const user: any = await login({email, password});
+            if(user.payload.user.role === "ADMIN"){
+                router.push("/dashboard")
             } else {
+                //can show us toast notification
                 throw new Error("Unauthorized Admin");
             }
         } catch (error: any) {
             console.log("Login failed: ", error);
+        } finally {
+            setEmail("");
+            setPassword("");
         }
     }
 
