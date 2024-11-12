@@ -2,7 +2,7 @@
 
 import {useDispatch, useSelector} from 'react-redux';
 import { AppDispatch, RootState } from '../lib/redux/store';
-import {registerUser, loginUser, logoutUser, getLoggedInUser,googlLogin} from '@/app/lib/redux/slices/authSlice';
+import {registerUser, loginUser, logoutUser, getLoggedInUser,googlLogin, registerAdmin} from '@/app/lib/redux/slices/authSlice';
 import { RegisterUserCredentials, LoginUserCredentials } from '../types/user.types';
 
 
@@ -13,6 +13,10 @@ export const useAuth = () => {
 
     const register = async(userData: RegisterUserCredentials) => {
         return await dispatch(registerUser(userData));
+    }
+
+    const admin = async(userData: RegisterUserCredentials) => {
+        return await dispatch(registerAdmin(userData));
     }
 
     const login = async(userData: LoginUserCredentials) => {
@@ -40,6 +44,7 @@ export const useAuth = () => {
         login,
         logout,
         register,
+        admin,
         getCurrentUser,
         googleLogin
     };

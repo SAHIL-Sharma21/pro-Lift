@@ -61,6 +61,24 @@ export const registerUser = createAsyncThunk('auth/registerUser', async(userData
     }
 });
 
+export const registerAdmin = createAsyncThunk('auth/registerAdmin', async(userData: RegisterUserCredentials, {rejectWithValue}) => {
+    try {
+        const response = await fetch(`${process.env.NEXT_PUBLIC_BACKEND_URI}/users/admin-register`, {
+            method: "POST",
+            headers: {"Content-type": "application/json"},
+            body: JSON.stringify(userData)
+        });
+
+        if(!response.ok){
+            throw new Error("Failed to register admin");
+        }
+        const data = await response.json();
+        return data;
+    } catch (error: any) {
+        console.error("Error registering admin: ", error?.message);
+        return rejectWithValue(error?.message);
+    }
+});
 
 export const loginUser = createAsyncThunk("auth/loginUser", async(credentials: LoginUserCredentials, {rejectWithValue}) => {
     try {
@@ -163,6 +181,19 @@ export const authSlice = createSlice({
             .addCase(registerUser.rejected, (state, action) => {
                 state.loading = false;
                 state.error = action.error.message as string  || "Failed to register user";
+            })
+            .addCase(registerAdmin.pending, (state) => {
+                state.loading = true;
+                state.error = null;
+            })
+            .addCase(registerAdmin.fulfilled, (state, action) => {
+                state.loading = false;
+                state.user = action.payload.data;
+                state.error = null;
+            })
+            .addCase(registerAdmin.rejected, (state, action) => {
+                state.loading = false;
+                state.error = action.error.message as string || "Failed to register admin"
             })
             .addCase(loginUser.pending, (state) => {
                 state.loading = true;
