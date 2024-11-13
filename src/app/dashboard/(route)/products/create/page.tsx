@@ -7,7 +7,7 @@ import { Button } from '@/components/ui/button';
 import { Dialog, DialogContent, DialogHeader, DialogTitle } from '@/components/ui/dialog';
 import { Input } from '@/components/ui/input';
 import { Label } from '@/components/ui/label';
-import { Select, SelectContent, SelectTrigger, SelectValue } from '@/components/ui/select';
+import { Select, SelectContent, SelectItem, SelectTrigger, SelectValue } from '@/components/ui/select';
 import { AlertCircle } from 'lucide-react';
 import React, { useEffect, useState } from 'react'
 
@@ -18,7 +18,7 @@ function Create() {
     const [categoryName, setCategoryName] = useState("");
     const [categoryDescription, setCategoryDescription] = useState("");
     const {loading, error: categoryError,create} = useCreateCategory();
-    const {loading: categoriesLoading, error: categoriesError, fetchAll} = useGetAllCategories();
+    const {loading: categoryLoading, error: allCategoryError, fetchAll, categories} = useGetAllCategories();
 
     // useEffect(() => {
     //     fetchAll();
@@ -32,6 +32,65 @@ function Create() {
     const [quantity, setQuantity]= useState(0);
     const [selectCategoryId, setSelectCategoryId] = useState("");
     const {loading: productLoading, error: productError, addProducts} = useProduct();
+
+
+    const [showProductDialog, setShowProductDialog] = useState(false);
+
+
+    const handleCategorySubmit = async(e: React.FormEvent) => {
+        e.preventDefault();
+        try {
+            const result = await create({name: categoryName, description: categoryDescription});
+            console.log("Category created-->", result)
+            setShowProductDialog(true);
+            fetchAll(); // fetching all categories -> gotcha moment will have to look 
+        } catch (error) {
+            // TODO: show notification or toast messages
+            console.error("Error creating category: ", error);
+        }
+    }
+
+    //for product
+    const handleProductSubmit = async(e: React.FormEvent) => {
+        e.preventDefault();
+
+        //if id is not selected then this error.
+        if(!selectCategoryId){
+            console.error("No category selected");
+            return;
+        }
+
+        try {
+            const result = await addProducts({
+                categoryId: selectCategoryId,
+                name: productName,
+                description: productDescrioption,
+                price: price,
+                image: imageUrl as File,
+                quantity: quantity
+            });
+            console.log("Product created-->", result);
+            setShowProductDialog(false);
+
+            //TODO: show notification
+        } catch (error) {
+            // TODO: show notification or toast messages
+            console.error("Error creating product: ", error);
+        } finally {
+            //reset the form
+            resetProductForm();
+        }
+    }
+
+
+    const resetProductForm = () => {
+        setProductName("");
+        setProductDescription("");
+        setPrice(0);
+        setImageUrl(null);
+        setQuantity(0);
+        setSelectCategoryId("");
+    }
 
 
   return (
@@ -64,7 +123,7 @@ function Create() {
                 type='submit'
                 disabled={loading}
                 >
-                    {loading ? "Creating..." : "Create Category"}
+                    {categoryLoading ? "Creating..." : "Create Category"}
                 </Button>
                 {categoryError && (
                     <Alert variant="destructive">
@@ -77,7 +136,7 @@ function Create() {
             
             {/* dialog for  product  */}
             
-            <Dialog>
+            <Dialog open={showProductDialog} onOpenChange={setShowProductDialog}>
                 <DialogContent>
                     <DialogHeader>
                         <DialogTitle>Create Product</DialogTitle>
@@ -85,12 +144,16 @@ function Create() {
                     <form className='space-y-4'>
                         <div className='flex flex-col space-y-2'>
                             <Label htmlFor='category'>Category</Label>
-                            <Select>
+                            <Select value={selectCategoryId} onValueChange={setSelectCategoryId}>
                                 <SelectTrigger>
                                     <SelectValue placeholder='select a category' />
                                 </SelectTrigger>
                                 <SelectContent>
-                                    {/* map over categories after fetching from api  */}
+                                    {categories.map((category) => (
+                                        <SelectItem key={category.id} value={category.id}>
+                                            {category.name}
+                                        </SelectItem>
+                                    ))}
                                 </SelectContent>
                             </Select>
                         </div>
@@ -111,7 +174,7 @@ function Create() {
                             type='text'
                             id='productDescription'
                             value={productDescrioption}
-                            onChange={(e) => setCategoryDescription(e.target.value)}
+                            onChange={(e) => setProductDescription(e.target.value)}
                             placeholder='Enter product description'
                             required
                             />
