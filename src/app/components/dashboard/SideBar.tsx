@@ -1,5 +1,6 @@
 'use client'
 
+import { useAuth } from '@/app/hooks/useAuth';
 import { Button } from '@/components/ui/button';
 import { cn } from '@/lib/utils';
 import { FileText, LayoutDashboard, LogOut, Settings, ShoppingBag } from 'lucide-react';
@@ -10,6 +11,7 @@ import React from 'react'
 const SideBar = () => {
 
     const pathName =  usePathname();
+    const {logout, loading} = useAuth();
 
     const navItems = [
         {icon: LayoutDashboard, label: 'Dashboard', href: '/dashboard'},
@@ -45,9 +47,9 @@ const SideBar = () => {
                 </ul>
             </nav>
             <div className='p-4'>
-                <Button variant="ghost" className='w-full justify-start'>
-                    <LogOut className='mr-2 h-4 w-4'/>
-                    Logout
+                <Button variant="ghost" className='w-full justify-start hover:bg-red-500 hover:text-white font-medium' onClick={logout}>
+                    <LogOut className='mr-1 h-3 w-3'/>
+                    {loading ? "Logging out..." : "Logout"}
                 </Button>
             </div>
         </div>

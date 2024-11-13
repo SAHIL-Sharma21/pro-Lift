@@ -1,5 +1,6 @@
 "use client";
 
+import { useAuth } from "@/app/hooks/useAuth";
 import { Button } from "@/components/ui/button";
 import {
   DropdownMenu,
@@ -10,9 +11,17 @@ import {
   DropdownMenuTrigger,
 } from "@/components/ui/dropdown-menu";
 import { Bell, User } from "lucide-react";
+import { useRouter } from "next/navigation";
 import React from "react";
 
 const Header = () => {
+  const { user, logout, loading } = useAuth();
+  const router = useRouter();
+
+  if (!user) {
+    router.push("/auth/admin/login");
+  }
+
   return (
     <>
       <header className="bg-gray-800 text-white p-4">
@@ -34,18 +43,24 @@ const Header = () => {
               <DropdownMenuContent className="w-56" align="end" forceMount>
                 <DropdownMenuLabel className="font-normal">
                   <div className="flex flex-col space-y-1">
-                    <p className="text-sm font-medium leading-none">
-                      Admin User
+                    <p className="text-2xl font-semibold leading-none">
+                      {user?.firstName}
                     </p>
-                    <p className="text-xs leading-none text-gray">
-                      admin@example.com
+                    <p className="text-sm text-red-800 leading-none text-gray">
+                      {user?.email}
                     </p>
                   </div>
                 </DropdownMenuLabel>
                 <DropdownMenuSeparator />
                 <DropdownMenuItem>Profile</DropdownMenuItem>
                 <DropdownMenuItem>Settings</DropdownMenuItem>
-                <DropdownMenuItem>Logout</DropdownMenuItem>
+                <Button
+                  onClick={logout}
+                  className="w-full font-semibold hover:bg-white hover:border hover:text-red-600"
+                  variant="destructive"
+                >
+                  {loading ? "Logging Out..." : "Logout"}
+                </Button>
               </DropdownMenuContent>
             </DropdownMenu>
           </div>

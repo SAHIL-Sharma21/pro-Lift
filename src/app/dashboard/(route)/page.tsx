@@ -7,7 +7,7 @@ import React from 'react'
 const page = () => {
   return (
     <div className='space-y-4'>
-      <h1>Dahboard Overview</h1>
+      <h1 className='text-3xl font-bold text-white'>Dahboard Overview</h1>
       <div className='grid gap-4 md:grid-cols-2 lg:grid-cols-4'>
         <Card>
           <CardHeader className='flex flex-row items-center justify-between space-y-0 pb-2'>

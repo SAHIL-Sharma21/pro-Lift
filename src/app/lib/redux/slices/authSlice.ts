@@ -124,10 +124,8 @@ export const getLoggedInUser = createAsyncThunk('auth/getLoggedInUser', async(_,
 export const logoutUser = createAsyncThunk('auth/logoutUser', async(_,{getState, rejectWithValue}) => {
     try {
         const state = getState() as {auth: AuthState};
-        
         if(state.auth.accessToken){
             const data = await apiCall({url: `${process.env.NEXT_PUBLIC_BACKEND_URI}/users/logout`, method: "POST", token: state.auth.accessToken, body: undefined});
-            console.log(data);
             if(localStorage.getItem("accessToken")){
                 localStorage.removeItem("accessToken");
                 localStorage.removeItem("refreshToken");
