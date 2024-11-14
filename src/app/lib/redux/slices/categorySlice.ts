@@ -27,7 +27,7 @@ export const createCategory = createAsyncThunk<Category, CreateCategory, { state
         method: 'POST',
         body: payload,
       }, getState);
-      return response;
+      return response.data;
     } catch (error: any) {
       console.log("Error creating category: ", error?.message);
       return rejectWithValue(error?.message);
@@ -44,7 +44,7 @@ export const updateCategory = createAsyncThunk<Category, { payload: UpdateCatego
         method: 'PATCH',
         body: payload,
       }, getState);
-      return response;
+      return response.data;
     } catch (error: any) {
       console.log("Error updating category: ", error?.message);
       return rejectWithValue(error?.message);
@@ -60,7 +60,7 @@ export const deleteCategory = createAsyncThunk<Category, string, { state: RootSt
         url: `${process.env.NEXT_PUBLIC_BACKEND_URI}/categories/delete-category/${categoryId}`,
         method: 'DELETE',
       }, getState);
-      return response;
+      return response.data;
     } catch (error: any) {
       console.log("Error deleting category: ", error?.message);
       return rejectWithValue(error?.message);
@@ -76,7 +76,7 @@ export const getAllCategories = createAsyncThunk<Category[], void, { state: Root
         url: `${process.env.NEXT_PUBLIC_BACKEND_URI}/categories/get-allCategories`,
         method: 'GET',
       }, getState);
-      return response;
+      return response.data;
     } catch (error: any) {
       console.log("Error getting all categories: ", error?.message);
       return rejectWithValue(error?.message);
@@ -92,7 +92,7 @@ export const getCategoryById = createAsyncThunk<Category, string, { state: RootS
         url: `${process.env.NEXT_PUBLIC_BACKEND_URI}/categories/get-category/${categoryId}`,
         method: 'GET',
       }, getState);
-      return response;
+      return response.data;
     } catch (error: any) {
       console.log("Error getting category by id: ", error?.message);
       return rejectWithValue(error?.message);

@@ -1,107 +1,50 @@
-"use client";
+'use client';
 
-//category hooks
-import { useSelector, useDispatch } from "react-redux";
-import { AppDispatch } from "../lib/redux/store";
+import { useDispatch, useSelector } from 'react-redux'
+import { AppDispatch, RootState } from '@/app/lib/redux/store';
+import { useCallback } from 'react';
 import {
-  addCategory,
+  createCategory,
   updateCategory,
   deleteCategory,
   getAllCategories,
-  getCategoryById,
-  selectAllCategories,
-  selectCategoryError,
-  selectCategoryLoading,
-  selectSelectedCategory,
-} from "../lib/redux/slices/categorySlice";
-import { useCallback } from "react";
+  getCategoryById
+} from '@/app/lib/redux/slices/categorySlice';
+import { CreateCategory, UpdateCategory } from '../types/category.types';
 
-export const useCreateCategory = () => {
+export const useCategory = () => {
   const dispatch = useDispatch<AppDispatch>();
-  const loading = useSelector(selectCategoryLoading);
-  const error = useSelector(selectCategoryError);
+  const { categories, loading, error, selectedCategory } = useSelector((state: RootState) => state.category);
 
-  const create = useCallback(
-    (categoryData: { name: string; description?: string }) => {
-      return dispatch(addCategory(categoryData));
-    },
-    [dispatch]
-  );
-
-  return { create, loading, error };
-};
-
-export const useUpdateCategory = () => {
-  const dispatch = useDispatch<AppDispatch>();
-  const loading = useSelector(selectCategoryLoading);
-  const error = useSelector(selectCategoryError);
-
-  //gotcha moment
-  const update = useCallback(
-    (
-      categoryData: { name?: string; description?: string },
-      categoryId: string
-    ) => {
-      return dispatch(
-        updateCategory({ payload: categoryData, categoryId: categoryId })
-      );
-    },
-    [dispatch]
-  );
-
-  return { update, loading, error };
-};
-
-export const useDeleteCategory = () => {
-  const dispatch = useDispatch<AppDispatch>();
-  const loading = useSelector(selectCategoryLoading);
-  const error = useSelector(selectCategoryError);
-
-  const remove = useCallback(
-    (categoryId: string) => {
-      return dispatch(deleteCategory(categoryId));
-    },
-    [dispatch]
-  );
-
-  return { remove, loading, error };
-};
-
-export const useGetAllCategories = () => {
-  const dispatch = useDispatch<AppDispatch>();
-  const categories = useSelector(selectAllCategories);
-  const error = useSelector(selectCategoryError);
-  const loading = useSelector(selectCategoryLoading);
-
-  const fetchAll = useCallback(() => {
+  const fetchAllCategories = useCallback(() => {
     return dispatch(getAllCategories());
   }, [dispatch]);
 
-  return { fetchAll, categories, error, loading };
-};
+  const addCategory = useCallback((categoryData: CreateCategory) => {
+    return dispatch(createCategory(categoryData));
+  }, [dispatch]);
 
-export const useGetCategoryById = () => {
-  const dispatch = useDispatch<AppDispatch>();
-  const loading = useSelector(selectCategoryLoading);
-  const error = useSelector(selectCategoryError);
-  const selectedCategory = useSelector(selectSelectedCategory);
+  const editCategory = useCallback((categoryData: UpdateCategory, categoryId: string) => {
+    return dispatch(updateCategory({ payload: categoryData, categoryId }));
+  }, [dispatch]);
 
-  const fetchById = useCallback(
-    (categoryId: string) => {
-      return dispatch(getCategoryById(categoryId));
-    },
-    [dispatch]
-  );
+  const removeCategory = useCallback((categoryId: string) => {
+    return dispatch(deleteCategory(categoryId));
+  }, [dispatch]);
 
-  return { fetchById, loading, error, selectedCategory };
-};
+  const fetchCategoryById = useCallback((categoryId: string) => {
+    return dispatch(getCategoryById(categoryId));
+  }, [dispatch]);
 
-//hook for accessing category state
-export const useCategoryState = () => {
-  const categories = useSelector(selectAllCategories);
-  const loading = useSelector(selectCategoryLoading);
-  const error = useSelector(selectCategoryError);
-  const selectCategory = useSelector(selectSelectedCategory);
-
-  return { categories, loading, error, selectCategory };
-};
+  return {
+    categories,
+    loading,
+    error,
+    fetchAllCategories,
+    addCategory,
+    editCategory,
+    removeCategory,
+    fetchCategoryById,
+    selectedCategory
+  };
+}

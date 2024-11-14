@@ -7,8 +7,8 @@ import { Popover, PopoverContent, PopoverTrigger } from "@/components/ui/popover
 import { Label } from "@/components/ui/label";
 import { Input } from "@/components/ui/input";
 import { useState } from "react";
-import { useCreateCategory } from "@/app/hooks/useCategory";
 import Link from "next/link";
+import { useCategory } from "@/app/hooks/useCategory";
 
 
 export default function ProductsPage() {
@@ -16,17 +16,16 @@ export default function ProductsPage() {
     const [categoryName, setCategoryName] = useState("");
     const [categoryDescription, setCategoryDescription] = useState("");
 
-    const {loading, create} = useCreateCategory();
+    const {loading, addCategory } = useCategory();
 
 
     const handleCreateCategory = async(e: React.FormEvent) => {
         e.preventDefault();
         try {
-            const result = await create({
+            const result = await addCategory({
                 name: categoryName,
-                description: categoryDescription,
+                 description: categoryDescription
             });
-            console.log("Category created-->", result);
         } catch (error) {
             console.error("Error creating category: ", error);
         } finally {

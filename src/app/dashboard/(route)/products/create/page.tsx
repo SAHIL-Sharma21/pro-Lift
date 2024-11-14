@@ -1,6 +1,7 @@
 'use client'
 
-import { useGetAllCategories } from '@/app/hooks/useCategory'
+
+import { useCategory } from '@/app/hooks/useCategory'
 import { useProduct } from '@/app/hooks/useProduct'
 import { Button } from '@/components/ui/button'
 import { Input } from '@/components/ui/input'
@@ -19,15 +20,14 @@ function ProductCreate() {
     const [quantity, setQuantity] = useState(0);
     const [selectedCategoryId, setSelectedCategoryId] = useState("");
 
-
-    const {categories, fetchAll} = useGetAllCategories();
-    const {loading, error, addProducts} = useProduct();
-
+    const {loading, addProducts} = useProduct();
+    const {categories, fetchAllCategories} = useCategory();
     const router = useRouter();
 
     useEffect(() => {
-        fetchAll();
-    }, [fetchAll]);
+        fetchAllCategories();
+    }, [fetchAllCategories]);
+
 
     const handleCreateProduct = async (e: React.FormEvent) => {
         e.preventDefault();
