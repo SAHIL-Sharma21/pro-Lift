@@ -26,6 +26,10 @@ export default function ProductsPage() {
                 name: categoryName,
                  description: categoryDescription
             });
+
+            if(result.meta.requestStatus === "rejected"){
+                throw new Error("Failed to create category");
+            }
         } catch (error) {
             console.error("Error creating category: ", error);
         } finally {
