@@ -12,15 +12,21 @@ import {
 } from "@/components/ui/dropdown-menu";
 import { Bell, User } from "lucide-react";
 import { useRouter } from "next/navigation";
-import React from "react";
+import React, { useEffect } from "react";
 
 const Header = () => {
   const { user, logout, loading } = useAuth();
   const router = useRouter();
 
-  if (!user) {
-    router.push("/auth/admin/login");
-  }
+  useEffect(() => {
+      if(!loading && !user || localStorage.getItem("accessToken") === null){
+        router.push("/auth/admin/login");
+      }
+  }, [user, loading, router]);
+
+if(loading){
+    return <div>Loading...</div>
+}
 
   return (
     <>
@@ -44,10 +50,10 @@ const Header = () => {
                 <DropdownMenuLabel className="font-normal">
                   <div className="flex flex-col space-y-1">
                     <p className="text-2xl font-semibold leading-none">
-                      {user?.firstName}
+                      {user?.firstName || "Not Found"}
                     </p>
                     <p className="text-sm text-red-800 leading-none text-gray">
-                      {user?.email}
+                      {user?.email || "Not Found"}
                     </p>
                   </div>
                 </DropdownMenuLabel>
