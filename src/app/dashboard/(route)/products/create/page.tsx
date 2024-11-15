@@ -72,14 +72,16 @@ function ProductCreate() {
 
     try {
       const formData = new FormData();
+
+      formData.append("image", image);
       if (name && description && price >= 0 && quantity >= 0 && categoryId && image) {
         formData.append("name", name);
         formData.append("description", description);
         formData.append("price", price.toString());
         formData.append("quantity", quantity.toString());
         formData.append("categoryId", categoryId);
-        formData.append("image", image);
 
+        
         const result = await addProducts(formData);
         console.log("Product created-->", result);
         router.push("/dashboard/products");

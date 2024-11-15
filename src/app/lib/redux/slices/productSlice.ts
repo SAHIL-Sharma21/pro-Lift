@@ -46,11 +46,13 @@ export const fetchProducts = createAsyncThunk(
 export const createProduct = createAsyncThunk('product/createProduct', async(formData: FormData, {rejectWithValue, getState}) => {
   try {
 
-    const response = await apiCall({
-      url: `${process.env.NEXT_PUBLIC_BACKEND_URI}/products/create-product`,
+    const response = await fetch(`${process.env.NEXT_PUBLIC_BACKEND_URI}/products/create-product`, {
       method: "POST",
-      body: formData,
-    }, getState as () => RootState);
+      headers: {
+        'Authorization': `Bearer ${localStorage.getItem("accessToken")}`
+      },
+      body: formData
+    });
 
     if(!response.ok){
       throw new Error("Failed to create product");
