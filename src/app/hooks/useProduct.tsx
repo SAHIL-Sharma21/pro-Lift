@@ -4,7 +4,7 @@ import {useDispatch, useSelector} from 'react-redux'
 import {AppDispatch, RootState} from '@/app/lib/redux/store';
 import { useCallback } from 'react';
 import {fetchProducts, createProduct, deleteProduct, getProductById, updateProduct} from '@/app/lib/redux/slices/productSlice';
-import { ProductCreate, ProductUpdate } from '../types/products.types';
+import { ProductUpdate, ProductCreate} from '../types/products.types';
 
 
 export const useProduct = () => {
@@ -15,8 +15,8 @@ export const useProduct = () => {
         return dispatch(fetchProducts({page, limit}));
     }, [dispatch]);
 
-    const addProducts = useCallback((productData: ProductCreate) => {
-        return dispatch(createProduct(productData))
+    const addProducts = useCallback((formData: FormData) => {
+        return dispatch(createProduct(formData))
     }, [dispatch]);
 
     //may error can come

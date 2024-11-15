@@ -1,7 +1,10 @@
 //product slice here
 
 import { createSlice, createAsyncThunk, PayloadAction } from "@reduxjs/toolkit";
-import { Product, ProductCreate, ProductUpdate } from "@/app/types/products.types";
+import { Product, ProductUpdate } from "@/app/types/products.types";
+import { apiCall } from "@/utils/apiCall";
+import { RootState } from "../store";
+
 
 interface ProductState {
   products: Product[];
@@ -40,17 +43,20 @@ export const fetchProducts = createAsyncThunk(
   }
 );
 
-export const createProduct = createAsyncThunk('product/createProduct', async(payload: ProductCreate, {rejectWithValue}) => {
+export const createProduct = createAsyncThunk('product/createProduct', async(formData: FormData, {rejectWithValue, getState}) => {
   try {
-    const response = await fetch(`${process.env.NEXT_PUBLIC_BACKEND_URI}/products/create-product`, {
+
+    const response = await apiCall({
+      url: `${process.env.NEXT_PUBLIC_BACKEND_URI}/products/create-product`,
       method: "POST",
-      headers: {"Content-Type": "application/json"},
-      body: JSON.stringify(payload)
-    });
+      body: formData,
+    }, getState as () => RootState);
 
     if(!response.ok){
       throw new Error("Failed to create product");
     }
+    const data = await response.json();
+    console.log("created data--->", data);
     return await response.json();
   } catch (error:any) {
     console.log("Error creating product: ", error);
@@ -58,17 +64,19 @@ export const createProduct = createAsyncThunk('product/createProduct', async(pay
   }
 });
 
-export const updateProduct = createAsyncThunk('product/updateProduct', async({payload, productId}: {payload: ProductUpdate, productId: string}, {rejectWithValue}) => {
+export const updateProduct = createAsyncThunk('product/updateProduct', async({payload, productId}: {payload: ProductUpdate, productId: string}, {rejectWithValue, getState}) => {
   try {
-    const response = await fetch(`${process.env.NEXT_PUBLIC_BACKEND_URI}/products/update-product/${productId}`, {
+    const response = await apiCall({
+      url: `${process.env.NEXT_PUBLIC_BACKEND_URI}/products/update-product/${productId}`,
       method: "PATCH",
-      headers: {"Content-Type": "application/json"},
-      body: JSON.stringify(payload)
-    });
-
+      body: payload,
+    }, getState as () => RootState);
     if(!response.ok){
       throw new Error("Failed to update product");
     }
+
+    const data = await response.json();
+    console.log("updated data--->", data);
     return await response.json();
   } catch (error: any) {
     console.log("Error updating product: ", error);
@@ -76,17 +84,18 @@ export const updateProduct = createAsyncThunk('product/updateProduct', async({pa
   }
 });
 
-export const deleteProduct = createAsyncThunk('product/deleteProduct', async(productId: string, {rejectWithValue}) => {
+export const deleteProduct = createAsyncThunk('product/deleteProduct', async(productId: string, {rejectWithValue, getState}) => {
   try {
-    const response = await fetch(`${process.env.NEXT_PUBLIC_BACKEND_URI}/products/delete-product/${productId}`, {
+    const response = await apiCall({
+      url: `${process.env.NEXT_PUBLIC_BACKEND_URI}/products/delete-product/${productId}`,
       method: "DELETE",
-      headers: {"Content-Type": "application/json"},
-      body: JSON.stringify({})
-    });
+    }, getState as () => RootState);
 
     if(!response.ok){
       throw new Error("Failed to delete product");
     }
+    const data = await response.json();
+    console.log("Deleted data --->", data);
     return await response.json();
   } catch (error: any) {
     console.log("Error deleting product: ", error);

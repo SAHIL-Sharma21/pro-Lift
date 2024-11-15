@@ -25,12 +25,13 @@ import { useRouter } from "next/navigation";
 import React, { useEffect, useState } from "react";
 
 function ProductCreate() {
-  const [productName, setProductName] = useState("");
-  const [productDescription, setProductDescription] = useState("");
+  const [name, setName] = useState("");
+  const [description, setDescription] = useState("");
   const [price, setPrice] = useState(0);
-  const [imageUrl, setImageUrl] = useState<File | null>(null);
+  const [image, setImage] = useState<File | null>(null);
   const [quantity, setQuantity] = useState(0);
-  const [selectedCategoryId, setSelectedCategoryId] = useState("");
+  const [categoryId, setCategoryId] = useState("");
+  const [imagePreview, setImagePreview] = useState<string | null>(null);
 
   const { loading, addProducts } = useProduct();
   const { categories, fetchAllCategories } = useCategory();
@@ -40,25 +41,49 @@ function ProductCreate() {
     fetchAllCategories();
   }, [fetchAllCategories]);
 
+  const handleImageChange = (e: React.ChangeEvent<HTMLInputElement>) => {
+    const file = e.target.files?.[0];
+    if (file && file.type.startsWith("image/")) {
+      setImage(file);
+      const reader = new FileReader();
+      reader.onloadend = () => {
+        setImagePreview(reader.result as string);
+      };
+      reader.readAsDataURL(file);
+    } else {
+      console.error("File is not an image");
+      setImage(null);
+      setImagePreview(null);
+    }
+  };
+
   const handleCreateProduct = async (e: React.FormEvent) => {
     e.preventDefault();
 
-    if (!selectedCategoryId) {
+    if (!categoryId) {
       console.error("No category selected");
       return;
     }
 
+    if (!image) {
+      console.error("No image selected");
+      return;
+    }
+
     try {
-      const result = await addProducts({
-        name: productName,
-        description: productDescription,
-        price,
-        image: imageUrl as File,
-        quantity,
-        categoryId: selectedCategoryId,
-      });
-      console.log("Product created-->", result);
-      router.push("/dashboard/products");
+      const formData = new FormData();
+      if (name && description && price >= 0 && quantity >= 0 && categoryId && image) {
+        formData.append("name", name);
+        formData.append("description", description);
+        formData.append("price", price.toString());
+        formData.append("quantity", quantity.toString());
+        formData.append("categoryId", categoryId);
+        formData.append("image", image);
+
+        const result = await addProducts(formData);
+        console.log("Product created-->", result);
+        router.push("/dashboard/products");
+    }
     } catch (error) {
       console.error("Error creating product: ", error);
     } finally {
@@ -67,109 +92,110 @@ function ProductCreate() {
   };
 
   const resetForm = () => {
-    setProductName("");
-    setProductDescription("");
+    setName("");
+    setDescription("");
     setPrice(0);
-    setImageUrl(null);
+    setImage(null);
     setQuantity(0);
-    setSelectedCategoryId("");
+    setCategoryId("");
+    setImagePreview(null);
   };
 
   return (
-    <>
-      <Card className="w-full max-w-2xl mx-auto">
-        <CardHeader>
-          <CardTitle>Create New Product</CardTitle>
-          <CardDescription>
-            Fill the details to create new product
-          </CardDescription>
-        </CardHeader>
-        <form onSubmit={handleCreateProduct}>
-          <CardContent className="space-y-4">
+    <Card className="w-full max-w-2xl mx-auto">
+      <CardHeader>
+        <CardTitle>Create New Product</CardTitle>
+        <CardDescription>
+          Fill the details to create new product
+        </CardDescription>
+      </CardHeader>
+      <form onSubmit={handleCreateProduct}>
+        <CardContent className="space-y-4">
+          <div className="space-y-2">
+            <Label htmlFor="productName">Product Name</Label>
+            <Input
+              id="productName"
+              type="text"
+              placeholder="Enter the product name"
+              value={name}
+              onChange={(e) => setName(e.target.value)}
+              required
+            />
+          </div>
+          <div className="space-y-2">
+            <Label htmlFor="productDescription">Product Description</Label>
+            <Textarea
+              id="productDescription"
+              placeholder="Enter the product description"
+              value={description}
+              onChange={(e) => setDescription(e.target.value)}
+              required
+            />
+          </div>
+          <div className="grid grid-cols-2 gap-4">
             <div className="space-y-2">
-              <Label htmlFor="productName">Product Name</Label>
+              <Label htmlFor="price">Price</Label>
               <Input
-                id="productName"
-                type="text"
-                placeholder="Enter the product name"
-                value={productName}
-                onChange={(e) => setProductName(e.target.value)}
+                id="price"
+                type="number"
+                placeholder="Enter the product price"
+                value={price}
+                onChange={(e) => setPrice(Number(e.target.value))}
                 required
               />
             </div>
             <div className="space-y-2">
-              <Label htmlFor="productDescription">Product Description</Label>
-              <Textarea
-                id="productName"
-                placeholder="Enter the product description"
-                value={productDescription}
-                onChange={(e) => setProductDescription(e.target.value)}
-                required
-              />
-            </div>
-            <div className="grid grid-cols-2 gap-4">
-              <div className="space-y-2">
-                <Label htmlFor="price">Price</Label>
-                <Input
-                  id="price"
-                  type="number"
-                  placeholder="Enter the product price"
-                  value={price}
-                  onChange={(e) => setPrice(Number(e.target.value))}
-                  required
-                />
-              </div>
-              <div className="space-y-2">
-                <Label htmlFor="quantity">Quantity</Label>
-                <Input
-                  id="quantity"
-                  type="number"
-                  placeholder="Enter the product quantity"
-                  value={quantity}
-                  onChange={(e) => setQuantity(Number(e.target.value))}
-                  required
-                />
-              </div>
-            </div>
-            <div className="space-y-2">
-              <Label htmlFor="category">Category</Label>
-              <Select
-                value={selectedCategoryId}
-                onValueChange={setSelectedCategoryId}
-              >
-                <SelectTrigger>
-                  <SelectValue placeholder="Select a category" />
-                </SelectTrigger>
-                <SelectContent>
-                  {categories.map((category) => (
-                    <SelectItem key={category.id} value={category.id}>
-                      {category.name}
-                    </SelectItem>
-                  ))}
-                </SelectContent>
-              </Select>
-            </div>
-            <div className="space-y-2">
-              <Label htmlFor="productImage">Product Image</Label>
+              <Label htmlFor="quantity">Quantity</Label>
               <Input
-                id="productImage"
-                type="file"
-                accept="image/*"
-                onChange={(e) =>
-                  setImageUrl(e.target.files ? e.target.files[0] : null)
-                }
+                id="quantity"
+                type="number"
+                placeholder="Enter the product quantity"
+                value={quantity}
+                onChange={(e) => setQuantity(Number(e.target.value))}
                 required
               />
             </div>
-          </CardContent>
-          <CardFooter>
-            <Button type="submit" className="w-full" disabled={loading}>
-              {loading ? "Creating..." : "Create Product"}
-            </Button>
-          </CardFooter>
-        </form>
-      </Card>
-    </>
+          </div>
+          <div className="space-y-2">
+            <Label htmlFor="category">Category</Label>
+            <Select
+              value={categoryId}
+              onValueChange={setCategoryId}
+            >
+              <SelectTrigger>
+                <SelectValue placeholder="Select a category" />
+              </SelectTrigger>
+              <SelectContent>
+                {categories.map((category) => (
+                  <SelectItem key={category.id} value={category.id}>
+                    {category.name}
+                  </SelectItem>
+                ))}
+              </SelectContent>
+            </Select>
+          </div>
+          <div className="space-y-2">
+            <Label htmlFor="image">Product Image</Label>
+            <Input
+              id="image"
+              name="image"
+              type="file"
+              accept="image/*"
+              onChange={handleImageChange}
+              required
+            />
+            {imagePreview && (
+              <img src={imagePreview} alt="Preview" className="mt-2 max-w-full h-auto" />
+            )}
+          </div>
+        </CardContent>
+        <CardFooter>
+          <Button type="submit" className="w-full" disabled={loading}>
+            {loading ? "Creating..." : "Create Product"}
+          </Button>
+        </CardFooter>
+      </form>
+    </Card>
   );
 }
 

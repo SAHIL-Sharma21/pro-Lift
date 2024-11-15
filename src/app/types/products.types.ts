@@ -17,7 +17,7 @@ export interface ProductCreate {
     description: string;
     price: number;
     categoryId: string;
-    image: File | null;
+    image: string | null;
     quantity: number;
 }
 
@@ -26,6 +26,6 @@ export interface ProductUpdate {
     description?: string;
     price?: number;
     categoryId?: string;
-    image?: File | null;
+    image?: string | null;
     quantity?: number;
 }
