@@ -1,17 +1,30 @@
 'use client'
 
-import React, { useEffect } from 'react'
+import React, { useEffect, useState } from 'react'
 import { useProduct } from '@/app/hooks/useProduct'
 import { Table, TableBody, TableCell, TableHead, TableHeader, TableRow } from '@/components/ui/table'
 import { Button } from '@/components/ui/button'
 import { Pencil, Trash2 } from 'lucide-react'
 
 export default function ProductList() {
-  const { loading, error, getAllProducts, products } = useProduct();
+  const { loading, error, getAllProducts, products, removeProduct } = useProduct();
+  const [deleteError, setDeleteError] = useState<string | null>(null);
 
   useEffect(() => {
     getAllProducts();
   }, [getAllProducts]);
+
+  const handleDelete = async (productId: string) => {
+    try {
+      await removeProduct(productId);
+      // Optionally refresh the product list
+      getAllProducts();
+      setDeleteError(null);
+    } catch (error) {
+      console.error('Error deleting product:', error);
+      setDeleteError('Failed to delete product. Please try again.');
+    }
+  };
 
   if (loading) return <div className="text-center p-4 text-white">Loading Products...</div>;
   if (error) return <div className="text-center p-4 text-red-400">Error: {error}</div>;
@@ -20,6 +33,7 @@ export default function ProductList() {
     <div className="container mx-auto p-4 text-white">
       <div className='space-y-4'>
         <h2 className='text-2xl font-bold mb-4'>Products</h2>
+        {deleteError && <div className="text-red-400 mb-4">{deleteError}</div>}
         <div className="border border-gray-700 rounded-lg overflow-hidden">
           <Table>
             <TableHeader>
@@ -43,7 +57,11 @@ export default function ProductList() {
                       <Button variant="outline" size="icon" className="text-black hover:bg-gray-400 border-none hover:text-white">
                         <Pencil className='h-4 w-4' />
                       </Button>
-                      <Button variant="outline" size="icon" className="bg-red-700 border-none   hover:bg-red-400 hover:text-white">
+                      <Button 
+                        onClick={() => handleDelete(product.id)}
+                        variant="outline" 
+                        size="icon" 
+                        className="bg-red-700 border-none hover:bg-red-400 hover:text-white">
                         <Trash2 className='h-4 w-4' />
                       </Button>
                     </div>

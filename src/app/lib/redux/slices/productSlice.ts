@@ -34,6 +34,10 @@ export const fetchProducts = createAsyncThunk(
         throw new Error("Failed to fetch products");
       }
       const data = await response.json();
+
+      if(!data || !data.data){
+        throw new Error("Invalid data format recieved.");
+      }
       console.log(data.data);
       return data;
     } catch (error: any) {
@@ -43,9 +47,8 @@ export const fetchProducts = createAsyncThunk(
   }
 );
 
-export const createProduct = createAsyncThunk('product/createProduct', async(formData: FormData, {rejectWithValue, getState}) => {
+export const createProduct = createAsyncThunk('product/createProduct', async(formData: FormData, {rejectWithValue}) => {
   try {
-
     const response = await fetch(`${process.env.NEXT_PUBLIC_BACKEND_URI}/products/create-product`, {
       method: "POST",
       headers: {
@@ -58,6 +61,9 @@ export const createProduct = createAsyncThunk('product/createProduct', async(for
       throw new Error("Failed to create product");
     }
     const data = await response.json();
+    if(!data || !data.data){
+      throw new Error("Invalid data format recieved.");
+    }
     return data.data;
   } catch (error:any) {
     console.log("Error creating product: ", error);
@@ -85,22 +91,34 @@ export const updateProduct = createAsyncThunk('product/updateProduct', async({pa
   }
 });
 
-export const deleteProduct = createAsyncThunk('product/deleteProduct', async(productId: string, {rejectWithValue, getState}) => {
+export const deleteProduct = createAsyncThunk<
+  { id: string },
+  string,
+  { rejectValue: string; state: RootState }
+>('product/deleteProduct', async (productId, { rejectWithValue, getState }) => {
   try {
     const response = await apiCall({
       url: `${process.env.NEXT_PUBLIC_BACKEND_URI}/products/delete-product/${productId}`,
       method: "DELETE",
-    }, getState as () => RootState);
+    }, getState);
 
-    if(!response.ok){
-      throw new Error("Failed to delete product");
+    // Check if response is a standard Response object
+    if (response instanceof Response) {
+      if (!response.ok) {
+        const errorData = await response.json();
+        throw new Error(errorData.message || "Failed to delete product");
+      }
+      const data = await response.json();
+      return data;
+    } else {
+      // If response is not a standard Response object, assume it's already parsed
+      console.log("Deleted data --->", response);
     }
-    const data = await response.json();
-    console.log("Deleted data --->", data);
-    return data.data;
+    
+    return { id: productId };
   } catch (error: any) {
     console.log("Error deleting product: ", error);
-    rejectWithValue(error?.message);
+    return rejectWithValue(error.message || "Failed to delete product");
   }
 });
 
@@ -133,10 +151,15 @@ export const productSlice = createSlice({
       .addCase(fetchProducts.fulfilled, (state, action: PayloadAction<any>) => {
         state.loading = false;
         state.error = null;
-        state.products = action.payload.data?.products || [];
-        console.log(action.payload.data)
-        state.currentPage = action.payload.data?.currentPage || 1;
-        state.totalPage = action.payload.data?.totalPage || 1;
+        const products = action.payload.data?.products;
+        if(Array.isArray(products)){
+          state.products = products;
+          state.currentPage = action.payload.data?.currentPage || 1;
+          state.totalPage = action.payload.data?.totalPage || 1;
+        } else {
+          state.products = [];
+          console.error("Recieved invalid products data:" , action.payload);         
+        }
       })
       .addCase(fetchProducts.rejected, (state, action) => {
         state.loading = false;
@@ -148,7 +171,9 @@ export const productSlice = createSlice({
       })
       .addCase(createProduct.fulfilled, (state, action) => {
         state.loading = false;
-        state.products.push(action.payload.data);
+        if(action.payload?.data){
+          state.products.push(action.payload.data);
+        }
         state.error = null;
       })
       .addCase(createProduct.rejected, (state, action) => {
@@ -175,9 +200,13 @@ export const productSlice = createSlice({
         state.loading = true;
         state.error = null;
       })
-      .addCase(deleteProduct.fulfilled, (state, action) => {
+      .addCase(deleteProduct.fulfilled, (state, action: PayloadAction<{id: string}>) => {
         state.loading = false;
-        state.products = state.products.filter((product) => product.id !== action.payload.data.id);
+        if(action.payload && action.payload.id){
+          state.products = state.products.filter((product) => product.id !== action.payload.id);
+        } else {
+          console.error("Invalid payload received in deleteProduct.fulfilled:", action.payload);
+        }
         state.error = null;
       })
       .addCase(deleteProduct.rejected, (state, action) => {

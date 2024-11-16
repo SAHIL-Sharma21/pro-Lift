@@ -24,8 +24,18 @@ export const useProduct = () => {
         return dispatch(updateProduct({productId, payload: productData}));
     }, [dispatch]);
 
-    const removeProduct = useCallback((productId: string) => {
-        return dispatch(deleteProduct(productId));
+    const removeProduct = useCallback(async (productId: string) => {
+        try {
+            const result = await dispatch(deleteProduct(productId)).unwrap();
+            if (result && result.id) {
+                return result;
+            } else {
+                throw new Error('Delete operation did not return expected result');
+            }
+        } catch (error: any) {
+            console.error('Failed to delete product:', error);
+            throw error;
+        }
     }, [dispatch]);
 
 
