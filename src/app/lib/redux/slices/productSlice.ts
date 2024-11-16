@@ -58,8 +58,7 @@ export const createProduct = createAsyncThunk('product/createProduct', async(for
       throw new Error("Failed to create product");
     }
     const data = await response.json();
-    console.log("created data--->", data);
-    return await response.json();
+    return data.data;
   } catch (error:any) {
     console.log("Error creating product: ", error);
     rejectWithValue(error?.message);
@@ -79,7 +78,7 @@ export const updateProduct = createAsyncThunk('product/updateProduct', async({pa
 
     const data = await response.json();
     console.log("updated data--->", data);
-    return await response.json();
+    return data.data;
   } catch (error: any) {
     console.log("Error updating product: ", error);
     rejectWithValue(error?.message);
@@ -98,7 +97,7 @@ export const deleteProduct = createAsyncThunk('product/deleteProduct', async(pro
     }
     const data = await response.json();
     console.log("Deleted data --->", data);
-    return await response.json();
+    return data.data;
   } catch (error: any) {
     console.log("Error deleting product: ", error);
     rejectWithValue(error?.message);
@@ -112,7 +111,9 @@ export const getProductById = createAsyncThunk('product/getProductById', async(p
     if(!response.ok){
       throw new Error("Failed to get product");
     }
-    return await response.json();
+    const data = await response.json();
+    console.log("Product data by ID--->", data);
+    return data.data;
   } catch (error: any) {
     console.log("Error fetching product: ", error);
     rejectWithValue(error?.message);
@@ -130,10 +131,11 @@ export const productSlice = createSlice({
         state.error = null;
       })
       .addCase(fetchProducts.fulfilled, (state, action: PayloadAction<any>) => {
-        state.products = action.payload.data?.products || [];
         state.loading = false;
         state.error = null;
-        state.currentPage = action.payload.data?.page || 1;
+        state.products = action.payload.data?.products || [];
+        console.log(action.payload.data)
+        state.currentPage = action.payload.data?.currentPage || 1;
         state.totalPage = action.payload.data?.totalPage || 1;
       })
       .addCase(fetchProducts.rejected, (state, action) => {
