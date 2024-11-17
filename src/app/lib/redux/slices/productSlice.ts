@@ -130,7 +130,6 @@ export const getProductById = createAsyncThunk('product/getProductById', async(p
       throw new Error("Failed to get product");
     }
     const data = await response.json();
-    console.log("Product data by ID--->", data);
     return data.data;
   } catch (error: any) {
     console.log("Error fetching product: ", error);
@@ -219,7 +218,7 @@ export const productSlice = createSlice({
       })
       .addCase(getProductById.fulfilled, (state, action) => {
         state.loading = false;
-        state.selectedProduct = action.payload.data;
+        state.selectedProduct = action.payload;
         state.error = null;
       })
       .addCase(getProductById.rejected, (state, action) => {

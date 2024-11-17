@@ -1,5 +1,6 @@
 "use client";
 
+import { useCart } from "@/app/hooks/useCart";
 import { useProduct } from "@/app/hooks/useProduct";
 import { Button } from "@/components/ui/button";
 import { Card, CardContent } from "@/components/ui/card";
@@ -8,18 +9,30 @@ import { ArrowLeft, Package, ShoppingCart } from "lucide-react";
 import Image from "next/image";
 import Link from "next/link";
 import { useParams } from "next/navigation";
-import React, { useEffect } from "react";
+import React, { useEffect, useState } from "react";
 
 function ProductPage() {
   const params = useParams();
   const { loading, error, selectedProduct, fetchProductById } = useProduct();
+  const {addItemToCart} = useCart();
+  const [imageLoaded, setImageLoaded] = useState(false);
 
-    //TODO: check for correct params id in debugging
-    // useEffect(() => {
-    //     if(params.id){
-    //         fetchProductById(params.id as string);
-    //     }
-    // }, [fetchProductById, params.id]);
+    useEffect(() => {
+        if(params.id){
+            fetchProductById(params.id as string);
+        }
+    }, [params.id]);
+
+    const handleAddToCart = () => {
+      if(selectedProduct){
+        const result = addItemToCart({productId: selectedProduct.id, quantity: 1});
+        if(!result){
+          throw new Error("Failed to add product to cart");
+          //TODO: notfication
+        }
+        //handle notification here
+      }
+    }
 
 
   if (loading) {
@@ -92,13 +105,18 @@ function ProductPage() {
             <div className="flex flex-col md:flex-row gap-8">
               <div className="w-full md:w-1/2 relative">
                 <div className="aspect-square relative rounded-lg overflow-hidden">
+                  {!imageLoaded && (
+                    <div className="absolute inset-0 bg-gray-200 animate-pulse justify-center items-center">
+                      <Skeleton className="h-full w-full" />
+                    </div>
+                  )}
                   <Image
                     src={selectedProduct.image}
                     alt={selectedProduct.name}
                     fill
-                    className="object-cover"
+                    className={`object-cover transition-opacity duration-300 ${imageLoaded ? 'opacity-100': 'opacity-0'}`}
                     sizes="(max-width: 768px) 100vw, 50vw"
-                    priority
+                    onLoad={() => setImageLoaded(true)}
                   />
                 </div>
               </div>
@@ -118,10 +136,10 @@ function ProductPage() {
                 <div className="flex items-center gap-4 mb-6">
                   <Package className="h-6 w-6 text-gray-500" />
                   <span className="text-gray-600 text-sm">
-                    In Stocke: {selectedProduct.quantity}
+                    In Stock: {selectedProduct.quantity}
                   </span>
                 </div>
-                <Button className="w-full sm:w-auto">
+                <Button className="w-full sm:w-auto" onClick={handleAddToCart}>
                   {" "}
                   {/* here i have to call the function to add to cart the product */}
                   <ShoppingCart className="mr-2 h-4 w-4" />
