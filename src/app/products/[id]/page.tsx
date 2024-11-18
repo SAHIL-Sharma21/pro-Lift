@@ -5,7 +5,7 @@ import { useProduct } from "@/app/hooks/useProduct";
 import { Button } from "@/components/ui/button";
 import { Card, CardContent } from "@/components/ui/card";
 import { Skeleton } from "@/components/ui/skeleton";
-import { ArrowLeft, MinusCircle, Package, PlusCircle, ShoppingCart } from "lucide-react";
+import { ArrowLeft, MinusCircle, Package, PlusCircle, ShoppingCart, Trash2 } from "lucide-react";
 import Image from "next/image";
 import Link from "next/link";
 import { useParams } from "next/navigation";
@@ -14,7 +14,7 @@ import React, { useEffect, useState } from "react";
 function ProductPage() {
   const params = useParams();
   const { loading, error, selectedProduct, fetchProductById } = useProduct();
-  const {addItemToCart, loading: cartLoading} = useCart();
+  const {addItemToCart, loading: cartLoading, removeItemFromCart, cart} = useCart();
   const [imageLoaded, setImageLoaded] = useState(false);
   const [quantity, setQuantity] = useState(1);
 
@@ -35,6 +35,21 @@ function ProductPage() {
         //handle notification here
         alert("Product added to cart");
         setQuantity(1);
+      }
+    }
+
+    const isInCart = selectedProduct && cart?.items.some((item) => item.productId=== selectedProduct.id);
+
+    const handleRemoveFromCart = () => {
+      if (selectedProduct && cart) {
+        const cartItem = cart.items.find((item) => item.productId === selectedProduct.id);
+        if (cartItem) {
+          const result = removeItemFromCart(cartItem.id);
+          if (!result) {
+            throw new Error("Failed to remove product from cart");
+          }
+          alert("Product removed from cart");
+        }
       }
     }
 
@@ -178,12 +193,30 @@ function ProductPage() {
                     </Button>
                   </div>
 
-                <Button className="w-full sm:w-auto" onClick={handleAddToCart} disabled={cartLoading}>
-                  {" "}
-                  {/* here i have to call the function to add to cart the product */}
-                  <ShoppingCart className="mr-2 h-4 w-4" />
-                  {cartLoading ? "Adding to cart..." : "Add to cart"}
-                </Button>
+                  <div className="flex flex-col sm:flex-row gap-4">
+                      <Button 
+                        className="w-full sm:w-auto" 
+                        onClick={handleAddToCart} 
+                        disabled={cartLoading || isInCart as boolean}>
+                          {" "}
+                          {/* here i have to call the function to add to cart the product */}
+                          <ShoppingCart className="mr-2 h-4 w-4" />
+                        {cartLoading ? "Adding to cart..." : isInCart ? "InCart" : "Add to cart"}
+                      </Button>
+
+                      {isInCart && (
+                        <Button
+                        variant="destructive"
+                        className="w-full sm:w-auto"
+                        onClick={handleRemoveFromCart}
+                        disabled={cartLoading}
+                        >
+                          <Trash2 className="mr-2 h-4 w-4" />
+                          {cartLoading ? "Removing from cart..." : "Remove from cart"}
+                        </Button>
+                      )}
+                  </div>
+
               </div>
             </div>
           </CardContent>

@@ -69,14 +69,27 @@ export const updateCartItem = createAsyncThunk(
 
 export const removeFromCart = createAsyncThunk(
   "cart/removeFromCart",
-  async (cartItemId: string, { rejectWithValue }) => {
+  async (cartItemId: string, { rejectWithValue, getState }) => {
     try {
-      const response = await fetch(`${process.env.NEXT_PUBLIC_BACKEND_URI}/cart/delete-cart/${cartItemId}`, {
-        method: "DELETE",
-      });
-      if (!response.ok) throw new Error("Failed to remove item from the cart.");
-      const data = await response.json();
-      return data.data;
+      const state = getState() as { cart: CartState };
+      if (!state.cart.cart || state.cart.cart.items.length === 0) {
+        throw new Error("Cart is empty");
+      }
+
+      const response = await fetch(
+        `${process.env.NEXT_PUBLIC_BACKEND_URI}/cart/delete-cart/${cartItemId}`,
+        {
+          method: "DELETE",
+          headers: { "Content-Type": "application/json" },
+        }
+      );
+
+      if (!response.ok) {
+        const errorData = await response.json();
+        throw new Error(errorData.message || "Failed to remove item from the cart.");
+      }
+
+      return cartItemId;
     } catch (error: any) {
       console.error("Error removing item from the cart:", error.message);
       return rejectWithValue(error.message);
@@ -154,12 +167,21 @@ export const cartSlice = createSlice({
           }
         }
       })
+      .addCase(removeFromCart.pending, (state )=> {
+        state.loading = true;
+        state.error = null;
+      })
       .addCase(removeFromCart.fulfilled, (state, action: PayloadAction<string>) => {
+        state.loading = false;
         if (state.cart) {
           state.cart.items = state.cart.items.filter(item => item.id !== action.payload);
           state.totalItems = state.cart.items.reduce((total, item) => total + item.quantity, 0);
           state.totalPrice = state.cart.items.reduce((total, item) => total + (item.quantity * item.product.price), 0);
         }
+      })
+      .addCase(removeFromCart.rejected, (state, action) => {
+        state.loading = false;
+        state.error = action.error.message || "Failed to remove product from cart";
       })
       .addCase(clearCart.fulfilled, (state) => {
         state.cart = null;
