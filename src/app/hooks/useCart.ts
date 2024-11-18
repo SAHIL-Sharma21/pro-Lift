@@ -4,7 +4,7 @@
 import {useDispatch, useSelector} from 'react-redux';
 import { AppDispatch, RootState } from '../lib/redux/store';
 import { useCallback } from 'react';
-import {fetchCart, addToCart, clearCart, removeFromCart, updateToCart} from '@/app/lib/redux/slices/cartSlice';
+import {fetchCart, addToCart, clearCart, removeFromCart, updateCartItem} from '@/app/lib/redux/slices/cartSlice';
 
 export const useCart = () => {
     const dispatch = useDispatch<AppDispatch>();
@@ -20,12 +20,12 @@ export const useCart = () => {
     }, [dispatch]);
 
     const updateItemToCart = useCallback(({productId, quantity}:{productId: string, quantity: number}) => {
-        return dispatch(updateToCart({productId, quantity}));
+        return dispatch(updateCartItem({cartItemId: productId, quantity}));
     }, [dispatch]);
 
     const removeItemFromCart = useCallback((productId: string) => {
-        return dispatch(removeFromCart({cartItemId: productId}));
-    }, []);
+        return dispatch(removeFromCart(productId));
+    }, [dispatch]);
 
     const clearCartItems = useCallback(() => {
         return dispatch(clearCart());

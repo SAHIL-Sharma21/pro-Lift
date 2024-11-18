@@ -5,7 +5,7 @@ import { useProduct } from "@/app/hooks/useProduct";
 import { Button } from "@/components/ui/button";
 import { Card, CardContent } from "@/components/ui/card";
 import { Skeleton } from "@/components/ui/skeleton";
-import { ArrowLeft, Package, ShoppingCart } from "lucide-react";
+import { ArrowLeft, MinusCircle, Package, PlusCircle, ShoppingCart } from "lucide-react";
 import Image from "next/image";
 import Link from "next/link";
 import { useParams } from "next/navigation";
@@ -14,8 +14,10 @@ import React, { useEffect, useState } from "react";
 function ProductPage() {
   const params = useParams();
   const { loading, error, selectedProduct, fetchProductById } = useProduct();
-  const {addItemToCart} = useCart();
+  const {addItemToCart, loading: cartLoading} = useCart();
   const [imageLoaded, setImageLoaded] = useState(false);
+  const [quantity, setQuantity] = useState(1);
+
 
     useEffect(() => {
         if(params.id){
@@ -25,12 +27,26 @@ function ProductPage() {
 
     const handleAddToCart = () => {
       if(selectedProduct){
-        const result = addItemToCart({productId: selectedProduct.id, quantity: 1});
+        const result = addItemToCart({productId: selectedProduct.id, quantity});
         if(!result){
           throw new Error("Failed to add product to cart");
           //TODO: notfication
         }
         //handle notification here
+        alert("Product added to cart");
+        setQuantity(1);
+      }
+    }
+
+    const handleQuantityIncrement = () => {
+      if(selectedProduct && quantity < selectedProduct.quantity){
+        setQuantity(prevQuantity => prevQuantity + 1);
+      }
+    }
+
+    const handleQuantityDecrement = () => {
+      if(quantity > 1){
+        setQuantity(prevQuantity => prevQuantity - 1);
       }
     }
 
@@ -139,11 +155,34 @@ function ProductPage() {
                     In Stock: {selectedProduct.quantity}
                   </span>
                 </div>
-                <Button className="w-full sm:w-auto" onClick={handleAddToCart}>
+
+                  <div className="flex items-center gap-4 mb-6">
+                    <Button
+                    variant="outline"
+                    size="icon"
+                    onClick={handleQuantityDecrement}
+                    disabled={quantity===1}
+                    aria-label="Decrement quantity"
+                    >
+                      <MinusCircle className="h-4 w-4" />
+                    </Button>
+                    <span className="text-xl font-semibold">{quantity}</span>
+                    <Button
+                    variant="outline"
+                    size="icon"
+                    onClick={handleQuantityIncrement}
+                    disabled={quantity===selectedProduct.quantity}
+                    aria-label="Increment quantity"
+                    >
+                      <PlusCircle className="h-4 w-4" />
+                    </Button>
+                  </div>
+
+                <Button className="w-full sm:w-auto" onClick={handleAddToCart} disabled={cartLoading}>
                   {" "}
                   {/* here i have to call the function to add to cart the product */}
                   <ShoppingCart className="mr-2 h-4 w-4" />
-                  Add to Cart
+                  {cartLoading ? "Adding to cart..." : "Add to cart"}
                 </Button>
               </div>
             </div>
