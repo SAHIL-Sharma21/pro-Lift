@@ -12,6 +12,7 @@ import {
   updateCartItem,
 } from "@/app/lib/redux/slices/cartSlice";
 
+
 export const useCart = () => {
   const dispatch = useDispatch<AppDispatch>();
 
@@ -19,8 +20,8 @@ export const useCart = () => {
     (state: RootState) => state.cart
   );
 
-  const getCart = useCallback(() => {
-    return dispatch(fetchCart());
+  const getCart = useCallback( async() => {
+      return dispatch(fetchCart());
   }, [dispatch]);
 
   //cart is did not found.
