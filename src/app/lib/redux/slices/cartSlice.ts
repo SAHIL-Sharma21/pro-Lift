@@ -22,9 +22,16 @@ export const fetchCart = createAsyncThunk(
   async (_, { rejectWithValue }) => {
     try {
       const response = await fetch(
-        `${process.env.NEXT_PUBLIC_BACKEND_URI}/cart/get-cart`,
+        `${process.env.NEXT_PUBLIC_BACKEND_URI}/cart/get-cart`, {
+          credentials: "include",
+        }
       );
-      if (!response.ok) throw new Error("Failed to get the user cart.");
+      if (!response.ok) {
+        if(response.status === 400){
+          return {items: [], id: null}
+        }
+        throw new Error("Failed to get the user cart");
+      }
       const data = await response.json();
       return data.data;
     } catch (error: any) {
@@ -78,7 +85,6 @@ export const updateCartItem = createAsyncThunk(
       );
       if (!response.ok) throw new Error("Failed to update the cart item.");
       const data = await response.json();
-      console.log(data)
       return data.data;
     } catch (error: any) {
       console.error("Error updating the cart item:", error.message);
@@ -89,12 +95,8 @@ export const updateCartItem = createAsyncThunk(
 
 export const removeFromCart = createAsyncThunk(
   "cart/removeFromCart",
-  async (cartItemId: string, { rejectWithValue, getState }) => {
+  async (cartItemId: string, { rejectWithValue }) => {
     try {
-      // const state = getState() as { cart: CartState };
-      // if (!state.cart.cart || state.cart.cart.items.length === 0) {
-      //   throw new Error("Cart is empty");
-      // }
 
       const response = await fetch(
         `${process.env.NEXT_PUBLIC_BACKEND_URI}/cart/delete-cart/${cartItemId}`,
@@ -113,9 +115,7 @@ export const removeFromCart = createAsyncThunk(
           errorData.message || "Failed to remove item from the cart."
         );
       }
-
-      console.log(data);
-      return data.data;
+      return data.data.updatedCart.id;
     } catch (error: any) {
       console.error("Error removing item from the cart:", error.message);
       return rejectWithValue(error.message);
@@ -252,6 +252,9 @@ export const cartSlice = createSlice({
               (total, item) => total + item.quantity * item.product.price,
               0
             );
+            if(state.cart.items.length === 0){
+              state.cart = null;
+            }
           }
         }
       )

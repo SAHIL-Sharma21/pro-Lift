@@ -5,18 +5,12 @@ import { useProduct } from "@/app/hooks/useProduct";
 import { Button } from "@/components/ui/button";
 import { Card, CardContent } from "@/components/ui/card";
 import { Skeleton } from "@/components/ui/skeleton";
-import {
-  ArrowLeft,
-  MinusCircle,
-  Package,
-  PlusCircle,
-  ShoppingCart,
-  Trash2,
-} from "lucide-react";
+import { ArrowLeft, MinusCircle, Package, PlusCircle, ShoppingCart, Trash2 } from 'lucide-react';
 import Image from "next/image";
 import Link from "next/link";
 import { useParams } from "next/navigation";
-import React, { useEffect, useState } from "react";
+import React, { useEffect, useState, useCallback } from "react";
+import debounce from 'lodash/debounce';
 
 function ProductPage() {
   const params = useParams();
@@ -28,9 +22,11 @@ function ProductPage() {
     updateItemToCart,
     totalPrice,
     cart,
+    getCart,
   } = useCart();
   const [imageLoaded, setImageLoaded] = useState(false);
   const [quantity, setQuantity] = useState(1);
+  const [localCartLoading, setLocalCartLoading] = useState(false);
 
   useEffect(() => {
     if (params.id) {
@@ -38,85 +34,85 @@ function ProductPage() {
     }
   }, [params.id, fetchProductById]);
 
-  const handleAddToCart = () => {
-    if (selectedProduct) {
-      const result = addItemToCart({ productId: selectedProduct.id, quantity });
-      if (!result) {
-        alert("Failed to add product to cart");
-        throw new Error("Failed to add product to cart");
-        //TODO: notfication
+  useEffect(() => {
+    if (!cart) {
+      getCart();
+    }
+  }, [cart, getCart]);
+
+  const debouncedUpdateCart = useCallback(
+    debounce(async (cartItemId: string, newQuantity: number) => {
+      setLocalCartLoading(true);
+      try {
+        await updateItemToCart({ cartItemId, quantity: newQuantity });
+        await getCart();
+      } catch (error) {
+        console.error("Failed to update cart:", error);
+      } finally {
+        setLocalCartLoading(false);
       }
-      //handle notification here
-      alert("Product added to cart");
-      setQuantity(1);
+    }, 500),
+    [updateItemToCart, getCart]
+  );
+
+  const handleAddToCart = async () => {
+    if (selectedProduct) {
+      setLocalCartLoading(true);
+      try {
+        await addItemToCart({ productId: selectedProduct.id, quantity });
+        await getCart();
+        alert("Product added to cart");
+        setQuantity(1);
+      } catch (error) {
+        console.error("Failed to add product to cart:", error);
+        alert("Failed to add product to cart");
+      } finally {
+        setLocalCartLoading(false);
+      }
     }
   };
 
-  const isInCart = selectedProduct && cart?.items.some((item) => item.productId === selectedProduct.id)
+  const isInCart = selectedProduct && cart?.items.some((item) => item.productId === selectedProduct.id);
 
-  const handleRemoveFromCart = () => {
+  const handleRemoveFromCart = async () => {
     if (selectedProduct && cart) {
       const cartItem = cart.items.find(
         (item) => item.productId === selectedProduct.id
       );
       if (cartItem) {
-        const result = removeItemFromCart(cartItem.id);
-        if (!result) {
+        setLocalCartLoading(true);
+        try {
+          await removeItemFromCart(cartItem.id);
+          await getCart();
+          alert("Product removed from cart");
+          setQuantity(1);
+        } catch (error) {
+          console.error("Failed to remove product from cart:", error);
           alert("Failed to remove product from cart");
-          throw new Error("Failed to remove product from cart");
+        } finally {
+          setLocalCartLoading(false);
         }
-        alert("Product removed from cart");
       }
     }
   };
 
-  const handleQuantityIncrement = async() => {
-    if (selectedProduct && quantity < selectedProduct.quantity) {
-      setQuantity((prevQuantity) => prevQuantity + 1);
-
-      await updateItemToCart({
-        cartItemId: selectedProduct.id,
-        quantity: quantity + 1
-      })
-
-      if(isInCart && cart){
+  const handleQuantityChange = (newQuantity: number) => {
+    if (selectedProduct && newQuantity >= 1 && newQuantity <= selectedProduct.quantity) {
+      setQuantity(newQuantity);
+      if (isInCart && cart) {
         const cartItem = cart.items.find((item) => item.productId === selectedProduct.id);
-        if(cartItem){
-          await updateItemToCart({cartItemId: cartItem.id, quantity: quantity + 1});
+        if (cartItem) {
+          debouncedUpdateCart(cartItem.id, newQuantity);
         }
       }
     }
   };
-
-  const handleQuantityDecrement = async() => {
-    if (quantity > 1) {
-      setQuantity((prevQuantity) => prevQuantity - 1);
-
-      await updateItemToCart({
-        cartItemId: selectedProduct?.id as string,
-        quantity: quantity - 1,
-      });
-
-      if(isInCart && cart){
-        const cartItem = cart.items.find((item) => item.productId === selectedProduct.id);
-        if(cartItem){
-          await updateItemToCart({
-            cartItemId: cartItem.id,
-            quantity: quantity - 1,
-          });
-        }
-      }
-
-    }
-  };
-
-  //TODO: handling updating cart here only when user click on increment or decrement quantity...
 
   if (loading) {
     return (
       <div className="container mx-auto py-8 px-4">
         <Card className="max-w-4xl mx-auto">
-          <CardContent className="p-6">z
+          <CardContent className="p-6">
             <div className="flex flex-col md:flex-row gap-8">
               <Skeleton className="w-full md:w-1/2 h-[400px] rounded-lg" />
               <div className="w-full md:w-1/2 space-y-4">
@@ -223,8 +219,8 @@ function ProductPage() {
                   <Button
                     variant="outline"
                     size="icon"
-                    onClick={handleQuantityDecrement}
-                    disabled={quantity === 1}
+                    onClick={() => handleQuantityChange(quantity - 1)}
+                    disabled={quantity === 1 || localCartLoading}
                     aria-label="Decrement quantity"
                   >
                     <MinusCircle className="h-4 w-4" />
@@ -233,8 +229,8 @@ function ProductPage() {
                   <Button
                     variant="outline"
                     size="icon"
-                    onClick={handleQuantityIncrement}
-                    disabled={quantity === selectedProduct.quantity}
+                    onClick={() => handleQuantityChange(quantity + 1)}
+                    disabled={quantity === selectedProduct.quantity || localCartLoading}
                     aria-label="Increment quantity"
                   >
                     <PlusCircle className="h-4 w-4" />
@@ -245,15 +241,13 @@ function ProductPage() {
                   <Button
                     className="w-full sm:w-auto"
                     onClick={handleAddToCart}
-                    disabled={cartLoading || (isInCart as boolean)}
+                    disabled={localCartLoading || cartLoading || isInCart as boolean}
                   >
-                    {" "}
-                    {/* here i have to call the function to add to cart the product */}
                     <ShoppingCart className="mr-2 h-4 w-4" />
-                    {cartLoading
-                      ? "Adding to cart..."
+                    {localCartLoading || cartLoading
+                      ? "Processing..."
                       : isInCart
-                      ? "InCart"
+                      ? "In Cart"
                       : "Add to cart"}
                   </Button>
 
@@ -262,11 +256,11 @@ function ProductPage() {
                       variant="destructive"
                       className="w-full sm:w-auto"
                       onClick={handleRemoveFromCart}
-                      disabled={cartLoading}
+                      disabled={localCartLoading || cartLoading}
                     >
                       <Trash2 className="mr-2 h-4 w-4" />
-                      {cartLoading
-                        ? "Removing from cart..."
+                      {localCartLoading || cartLoading
+                        ? "Processing..."
                         : "Remove from cart"}
                     </Button>
                   )}
