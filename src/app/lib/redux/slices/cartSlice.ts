@@ -114,7 +114,8 @@ export const removeFromCart = createAsyncThunk(
         );
       }
 
-      return cartItemId;
+      console.log(data);
+      return data.data;
     } catch (error: any) {
       console.error("Error removing item from the cart:", error.message);
       return rejectWithValue(error.message);
@@ -239,7 +240,6 @@ export const cartSlice = createSlice({
         removeFromCart.fulfilled,
         (state, action: PayloadAction<string>) => {
           state.loading = false;
-          console.log("state cart-->", state.cart);
           if (state.cart) {
             state.cart.items = state.cart.items.filter(
               (item) => item.id !== action.payload

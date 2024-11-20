@@ -24,7 +24,7 @@ export const useCart = () => {
       return dispatch(fetchCart());
   }, [dispatch]);
 
-  //cart is did not found.
+  // cart is did not found.
   useEffect(() => {
     getCart();
   }, [getCart]);

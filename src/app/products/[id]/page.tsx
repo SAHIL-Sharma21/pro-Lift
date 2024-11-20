@@ -26,6 +26,7 @@ function ProductPage() {
     loading: cartLoading,
     removeItemFromCart,
     updateItemToCart,
+    totalPrice,
     cart,
   } = useCart();
   const [imageLoaded, setImageLoaded] = useState(false);
@@ -269,6 +270,12 @@ function ProductPage() {
                         : "Remove from cart"}
                     </Button>
                   )}
+                </div>
+                <div className="mt-6 p-4 bg-gray-100 rounded-lg">
+                  <h2 className="text-xl font-semibold mb-2">Cart Summary</h2>
+                  <p className="text-lg">
+                    Total Price: Rs:{totalPrice}
+                  </p>
                 </div>
               </div>
             </div>
