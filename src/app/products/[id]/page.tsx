@@ -25,6 +25,7 @@ function ProductPage() {
     addItemToCart,
     loading: cartLoading,
     removeItemFromCart,
+    updateItemToCart,
     cart,
   } = useCart();
   const [imageLoaded, setImageLoaded] = useState(false);
@@ -34,12 +35,13 @@ function ProductPage() {
     if (params.id) {
       fetchProductById(params.id as string);
     }
-  }, [params.id]);
+  }, [params.id, fetchProductById]);
 
   const handleAddToCart = () => {
     if (selectedProduct) {
       const result = addItemToCart({ productId: selectedProduct.id, quantity });
       if (!result) {
+        alert("Failed to add product to cart");
         throw new Error("Failed to add product to cart");
         //TODO: notfication
       }
@@ -49,9 +51,7 @@ function ProductPage() {
     }
   };
 
-  const isInCart =
-    selectedProduct &&
-    cart?.items.some((item) => item.productId === selectedProduct.id);
+  const isInCart = selectedProduct && cart?.items.some((item) => item.productId === selectedProduct.id)
 
   const handleRemoveFromCart = () => {
     if (selectedProduct && cart) {
@@ -61,6 +61,7 @@ function ProductPage() {
       if (cartItem) {
         const result = removeItemFromCart(cartItem.id);
         if (!result) {
+          alert("Failed to remove product from cart");
           throw new Error("Failed to remove product from cart");
         }
         alert("Product removed from cart");
@@ -68,15 +69,43 @@ function ProductPage() {
     }
   };
 
-  const handleQuantityIncrement = () => {
+  const handleQuantityIncrement = async() => {
     if (selectedProduct && quantity < selectedProduct.quantity) {
       setQuantity((prevQuantity) => prevQuantity + 1);
+
+      await updateItemToCart({
+        cartItemId: selectedProduct.id,
+        quantity: quantity + 1
+      })
+
+      if(isInCart && cart){
+        const cartItem = cart.items.find((item) => item.productId === selectedProduct.id);
+        if(cartItem){
+          await updateItemToCart({cartItemId: cartItem.id, quantity: quantity + 1});
+        }
+      }
     }
   };
 
-  const handleQuantityDecrement = () => {
+  const handleQuantityDecrement = async() => {
     if (quantity > 1) {
       setQuantity((prevQuantity) => prevQuantity - 1);
+
+      await updateItemToCart({
+        cartItemId: selectedProduct?.id as string,
+        quantity: quantity - 1,
+      });
+
+      if(isInCart && cart){
+        const cartItem = cart.items.find((item) => item.productId === selectedProduct.id);
+        if(cartItem){
+          await updateItemToCart({
+            cartItemId: cartItem.id,
+            quantity: quantity - 1,
+          });
+        }
+      }
+
     }
   };
 

@@ -78,6 +78,7 @@ export const updateCartItem = createAsyncThunk(
       );
       if (!response.ok) throw new Error("Failed to update the cart item.");
       const data = await response.json();
+      console.log(data)
       return data.data;
     } catch (error: any) {
       console.error("Error updating the cart item:", error.message);
@@ -90,10 +91,10 @@ export const removeFromCart = createAsyncThunk(
   "cart/removeFromCart",
   async (cartItemId: string, { rejectWithValue, getState }) => {
     try {
-      const state = getState() as { cart: CartState };
-      if (!state.cart.cart || state.cart.cart.items.length === 0) {
-        throw new Error("Cart is empty");
-      }
+      // const state = getState() as { cart: CartState };
+      // if (!state.cart.cart || state.cart.cart.items.length === 0) {
+      //   throw new Error("Cart is empty");
+      // }
 
       const response = await fetch(
         `${process.env.NEXT_PUBLIC_BACKEND_URI}/cart/delete-cart/${cartItemId}`,
@@ -104,8 +105,10 @@ export const removeFromCart = createAsyncThunk(
         }
       );
 
+      const data = await response.json();
+
       if (!response.ok) {
-        const errorData = await response.json();
+        const errorData = data;
         throw new Error(
           errorData.message || "Failed to remove item from the cart."
         );
@@ -236,6 +239,7 @@ export const cartSlice = createSlice({
         removeFromCart.fulfilled,
         (state, action: PayloadAction<string>) => {
           state.loading = false;
+          console.log("state cart-->", state.cart);
           if (state.cart) {
             state.cart.items = state.cart.items.filter(
               (item) => item.id !== action.payload
