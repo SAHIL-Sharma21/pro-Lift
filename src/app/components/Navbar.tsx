@@ -2,9 +2,9 @@
 
 import { Button } from "@/components/ui/button";
 import { Sheet, SheetContent, SheetTrigger } from "@/components/ui/sheet";
-import { MenuSquare, ShoppingCart, User } from "lucide-react";
+import { LogOut, MenuSquare, ShoppingBag, ShoppingCart, User, UserCircle2 } from "lucide-react";
 import Link from "next/link";
-import React, { useState } from "react";
+import React, { useEffect, useState } from "react";
 import { useAuth } from "../hooks/useAuth";
 import { DropdownMenu, DropdownMenuContent, DropdownMenuItem, DropdownMenuLabel, DropdownMenuSeparator, DropdownMenuTrigger } from "@/components/ui/dropdown-menu";
 
@@ -95,15 +95,28 @@ export default function Navbar(){
                     ) : user ? (
                         <>
                             <DropdownMenu>
-                                <DropdownMenuTrigger className="cursor-pointer">{user.firstName}</DropdownMenuTrigger>
-                                <DropdownMenuContent>
-                                    <DropdownMenuLabel>My Account</DropdownMenuLabel>
-                                    <DropdownMenuSeparator />
-                                    <DropdownMenuItem>User Profile</DropdownMenuItem>
-                                    <DropdownMenuItem>Orders</DropdownMenuItem>
-                                    <DropdownMenuItem>
-                                        <Button variant="destructive" size="sm" asChild onClick={logout}>Logout</Button>
-                                    </DropdownMenuItem>
+                                <DropdownMenuTrigger asChild>
+                                <Button variant="ghost" size="sm" className="text-zinc-100">
+                                    <UserCircle2 className="mr-1 h-5 w-5" />
+                                    <span className="text-base font-semibold">{user.firstName}</span>
+                                </Button>
+                                </DropdownMenuTrigger>
+                                <DropdownMenuContent className="w-56" align="end">
+                                <DropdownMenuLabel>My Account</DropdownMenuLabel>
+                                <DropdownMenuSeparator />
+                                <DropdownMenuItem>
+                                    <UserCircle2 className="mr-2 h-4 w-4" />
+                                    <span>Profile</span>
+                                </DropdownMenuItem>
+                                <DropdownMenuItem>
+                                    <ShoppingBag className="mr-2 h-4 w-4" />
+                                    <span>Orders</span>
+                                </DropdownMenuItem>
+                                <DropdownMenuSeparator />
+                                <DropdownMenuItem onClick={logout} className="text-red-600 focus:text-red-600">
+                                    <LogOut className="mr-2 h-4 w-4" />
+                                    <span>Log out</span>
+                                </DropdownMenuItem>
                                 </DropdownMenuContent>
                             </DropdownMenu>
                         </>

@@ -152,7 +152,8 @@ export const googlLogin = createAsyncThunk('auth/googleLogin', async(token: stri
             throw new Error("Failed to login with google");
         }
         const data = await response.json();
-        console.log(data.data);
+        localStorage.setItem("accessToken", data.data.accessToken);
+        localStorage.setItem("refreshToken", data.data.refreshToken);
         return data.data;
     } catch (error: any) {
         console.log("Error logging in with google: ", error?.message)
@@ -245,7 +246,7 @@ export const authSlice = createSlice({
                 state.error = null;
             })
             .addCase(googlLogin.fulfilled, (state, action) => {
-                state.loading = false;
+                state.loading = false;;
                 state.user = action.payload.user,
                 state.accessToken = action.payload.accessToken,
                 state.refreshToken = action.payload.refreshToken

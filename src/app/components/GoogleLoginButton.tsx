@@ -10,7 +10,6 @@ const GoogleLoginButton = () => {
 
     const {googleLogin} = useAuth();
     const handleGoogleLoginSuccess = (credentialResponse: any) => {
-        console.log(credentialResponse);
         googleLogin(credentialResponse.credential); //error may come here
         router.push("/products");
     }
