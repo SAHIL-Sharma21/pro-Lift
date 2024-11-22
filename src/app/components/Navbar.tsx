@@ -7,6 +7,7 @@ import Link from "next/link";
 import React, { useEffect, useState } from "react";
 import { useAuth } from "../hooks/useAuth";
 import { DropdownMenu, DropdownMenuContent, DropdownMenuItem, DropdownMenuLabel, DropdownMenuSeparator, DropdownMenuTrigger } from "@/components/ui/dropdown-menu";
+import { useRouter } from "next/navigation";
 
 
 
@@ -33,6 +34,7 @@ export default function Navbar(){
 
     const [isOpen, setIsOpen] = useState(false);
     const {user, loading, logout} = useAuth();
+    const router = useRouter();
 
     const navItems = [
         {title: "Home", path: "/"},
@@ -86,7 +88,12 @@ export default function Navbar(){
                     </SheetContent>
                 </Sheet>
                 <div className="flex items-center space-x-4">
-                    <Button variant="outline" size="icon" className="text-zinc-900 border-none hover:bg-zinc-900 hover:text-white">
+                    <Button 
+                    variant="outline" 
+                    size="icon" 
+                    className="text-zinc-900 border-none hover:bg-zinc-900 hover:text-white"
+                    onClick={() => router.push("/cart")}
+                    >
                         <ShoppingCart className="h-7 w-7" />
                         <span className="sr-only">Shopping Cart</span>
                     </Button>

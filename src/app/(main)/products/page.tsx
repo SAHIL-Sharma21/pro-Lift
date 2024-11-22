@@ -2,11 +2,11 @@
 import { useSelector, useDispatch } from "react-redux";
 import { fetchProducts } from "@/app/lib/redux/slices/productSlice";
 import ProductCard from "@/app/components/ProductCard";
-import { AppDispatch, RootState } from "../lib/redux/store";
+import { AppDispatch, RootState } from "@/app/lib/redux/store";
 import { useEffect, useState } from "react";
 import { Button } from "@/components/ui/button";
 import { Loader2 } from "lucide-react";
-import { useAuth } from "../hooks/useAuth";
+import { useAuth } from "@/app/hooks/useAuth";
 import LogoutBtn from '@/app/components/LogoutBtn';
 
 export default function ProductPage() {

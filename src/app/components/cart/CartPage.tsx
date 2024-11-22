@@ -1,0 +1,168 @@
+'use client';
+
+import { useCart } from '@/app/hooks/useCart';
+import { useOrder } from '@/app/hooks/useOrder';
+import { Button } from '@/components/ui/button';
+import { Card, CardContent, CardFooter, CardHeader, CardTitle } from '@/components/ui/card';
+import { ScrollArea } from '@/components/ui/scroll-area';
+import { Separator } from '@/components/ui/separator';
+import { Skeleton } from '@/components/ui/skeleton';
+import { ArrowLeftCircle, MinusCircle, PlusCircle, Trash2 } from 'lucide-react';
+import Image from 'next/image';
+import Link from 'next/link';
+import React from 'react'
+
+const CartPage = () => {
+
+    const {loading, error, cart, totalItems, totalPrice} = useCart();
+    const {loading: checkOutLoading, error: checkOutError} = useOrder();
+
+
+    const handleRemoveFromCart = (cartItemId: string) => {
+        if(cart){
+            const cartItem = cart.items.find((item) => item.id === cartItemId);
+            if(cartItemId){
+                //TODO: writing logic for this
+            }
+        }
+    }
+
+    if(loading){
+        return (
+            <div className='container mx-auto py-8 px-4'>
+                <Card className='max-w-4xl mx-auto'>
+                    <CardContent className='p-6'>
+                        <div className='flex flex-col md:flex-row gap-8'>
+                            <Skeleton className='w-full md:w-1/2 h-[400px] rounded-lg' />
+                            <div className='w-full md:w-1/2 space-y-4'>
+                                <Skeleton className='h-8 w-3/4'/>
+                                <Skeleton className='h-6 w-1/4'/>
+                                <Skeleton className='h-24 w-full'/>
+                                <Skeleton className='h-10 w-32'/>
+                            </div>
+                        </div>
+                    </CardContent>
+                </Card>
+            </div>
+        );
+    }
+
+
+    if(error){
+        return (
+            <div className='flex items-center justify-center min-h-screen'>
+                <div className='text-center'>
+                    <h2 className='text-2xl font-bold text-red-600 mb-4'>Error</h2>
+                    <p className='text-gray-600'>{error}</p>
+                    <Link href="/products">
+                        <Button className='mt-4' variant="outline">
+                            <ArrowLeftCircle className='mr-2 h-4 w-4' />
+                            Back to products
+                        </Button>
+                    </Link>
+                </div>
+            </div>
+        );
+    }
+
+
+  return (
+    <>
+        <div className='container mx-auto py-10'>
+            <Card className='bg-card text-card-foreground'>
+                <CardHeader>
+                    <CardTitle className='text-3xl font-bold'>
+                        Your Cart
+                    </CardTitle>
+                </CardHeader>
+                <CardContent>
+                    {cart?.items.length === 0 ? (
+                        <>
+                            <p className='text-center text-muted-foreground'>Your Cart is empty</p>
+                            <Button 
+                            variant={"outline"}
+                            >
+                                <Link href="/products">
+                                    Back to Products
+                                </Link>
+                            </Button>
+                        </>
+                        
+                    ) : (
+                        <ScrollArea className='h-[calc(100vh-300px)]'>
+                            {cart?.items.map((item) => (
+                                <div key={item.id} className='flex items-center space-x-4 py-4'>
+                                    <Image 
+                                    src={item.product.image}
+                                    alt={item.product.name}
+                                    height={150}
+                                    width={150}
+                                    className='h-24 w-24 rounded-md object-cover'
+                                    />
+                                    <div className='flex-1'>
+                                        <h3 className='font-semibold text-lg'>{item.product.name}</h3>
+                                        <p className='text-sm text-muted-foreground'>Rs:{item.product.price}</p>
+                                        <div className='flex items-center space-x-2 mt-2'>
+                                            <Button
+                                            variant="outline"
+                                            size="icon"
+                                            onClick={() => {}}
+                                            >
+                                                <MinusCircle className='h-4 w-4' />
+                                            </Button>
+                                            <span className='w-8 text-center'>{item.quantity}</span>
+                                            <Button
+                                            variant="outline"
+                                            size="icon"
+                                            onClick={() => {}} // TODO: handdle add funtion
+                                            >
+                                                <PlusCircle className='h-4 w-4' />
+                                            </Button>
+                                        </div>
+                                    </div>
+                                    <div className='text-right'>
+                                        <p className='font-semibold'>Rs:{item.product.price * item.quantity}</p>
+                                        <Button
+                                        variant="ghost"
+                                        size="icon"
+                                        onClick={() => handleRemoveFromCart(item.id)} 
+                                        >
+                                            <Trash2 className='h-4 w-4'/>
+                                        </Button>
+                                    </div>
+                                </div>
+                            ))}
+                        </ScrollArea>
+                    )}
+                </CardContent>
+                <Separator />
+                <CardFooter className='flex flex-col space-y-4 mt-4'>
+                    <div className='flex justify-between w-full text-lg font-semibold'>
+                        <span>Total:</span>
+                        <span>Rs:{totalPrice}</span>
+                    </div>
+                    <div className='flex space-x-2 w-full'>
+                        <Button
+                        variant="outline"
+                        className='flex-1'
+                        disabled={cart?.items.length === 0}
+                        onClick={() => {}}
+                        >
+                            Clear Cart
+                        </Button>
+                        <Button
+                        className='flex-1'
+                        disabled={cart?.items.length === 0 || checkOutLoading}
+                        onClick={() => {}}
+                        >
+                            {checkOutLoading? "Processing..." : "Proceed to Checkout"}
+                        </Button>
+                    </div>
+                </CardFooter>
+            </Card>
+        </div>
+    </>
+  )
+}
+
+export default CartPage;
