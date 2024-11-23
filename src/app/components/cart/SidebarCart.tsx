@@ -3,27 +3,54 @@
 import { useCart } from '@/app/hooks/useCart'
 import { Button } from '@/components/ui/button';
 import { Sheet, SheetContent, SheetHeader, SheetTitle, SheetTrigger } from '@/components/ui/sheet';
+import { debounce } from 'lodash';
 import { MinusCircle, PlusCircle, ShoppingCart, Trash2 } from 'lucide-react';
 import Image from 'next/image';
-import React, { useEffect, useState } from 'react'
+import React, { useCallback, useEffect, useState } from 'react'
 
-const SidebarCart = () => {
-    const {cart, loading, error, totalItems, totalPrice, removeItemFromCart, updateItemToCart} = useCart();
-    const [isOpen, setIsOpen] = useState(false);
-
+const SidebarCart = ({isOpen, setIsOpen}:{isOpen: boolean, setIsOpen: React.Dispatch<React.SetStateAction<boolean>>}) => {
+    const {cart, loading, error, totalItems, totalPrice, removeItemFromCart, updateItemToCart, getCart} = useCart();
+    
     useEffect(() => {
         if(cart && cart.items.length > 0) {
             setIsOpen(true);
         }
     }, [cart]);
 
+    const debounceCartUpdate = useCallback(
+        debounce(async(cartItemId: string, quantity: number) => {
+            try {
+                await updateItemToCart({cartItemId, quantity});
+                await getCart();
+            } catch (error) {
+                console.error("Failed to update the cart item:", error);
+                alert("Failed to update the cart item");
+            }
+        }, 500), 
+        [updateItemToCart, getCart]
+    );
 
     const handleUpdateQuantity = async(cartItemId: string, newQuantity: number) => {
-        //TODO: writing logic for this
+       try {
+            if(newQuantity > 0){
+                debounceCartUpdate(cartItemId, newQuantity);
+            }
+       } catch (error) {
+            console.error("Failed to update the cart item:", error);
+            alert("Failed to update the cart item");
+       }
     }
 
     const handleRemoveItem = async(cartItemId: string) => {
-        //TODO: writing logic for this
+        if(cart){
+            try {
+                await removeItemFromCart(cartItemId);
+                await getCart();
+            } catch (error) {
+                console.error("Failed to remove product from cart:", error);
+                alert("Failed to remove product from cart");
+            }
+        }
     }
 
 
@@ -65,6 +92,7 @@ const SidebarCart = () => {
                                         <Button
                                         variant="outline"
                                         size="icon"
+                                        disabled={item.quantity === 1}
                                         onClick={() => handleUpdateQuantity(item.id, item.quantity - 1)}
                                         >
                                             <MinusCircle className='h-4 w-4' />
@@ -73,6 +101,7 @@ const SidebarCart = () => {
                                         <Button
                                         variant="outline"
                                         size="icon"
+                                        disabled={item.quantity === item.product.quantity}
                                         onClick={() => handleUpdateQuantity(item.id, item.quantity + 1)}
                                         >
                                             <PlusCircle className='h-4 w-4' />

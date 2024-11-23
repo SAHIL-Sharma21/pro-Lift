@@ -136,7 +136,7 @@ export const clearCart = createAsyncThunk(
       );
       if (!response.ok) throw new Error("Failed to clear the cart");
       const data = await response.json();
-      return data.data;
+      return data;
     } catch (error: any) {
       console.error("Error clearing the cart:", error.message);
       return rejectWithValue(error.message);

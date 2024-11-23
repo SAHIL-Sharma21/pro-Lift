@@ -43,7 +43,6 @@ const loadMore = () => {
     <>
       <div className="container mx-auto px-4 py-8">
         <h1 className="text-3xl text-center font-bold mb-6">Our Products</h1>
-        {user ? <LogoutBtn /> : "Login"}
         {products.length > 0 ? (
           <>
             <div className="grid grid-cols-1 sm:grid-cols-2 md:grid-cols-3 lg:grid-cols-4 gap-6">

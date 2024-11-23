@@ -10,22 +10,62 @@ import { Skeleton } from '@/components/ui/skeleton';
 import { ArrowLeftCircle, MinusCircle, PlusCircle, Trash2 } from 'lucide-react';
 import Image from 'next/image';
 import Link from 'next/link';
-import React from 'react'
+import React, { useCallback } from 'react'
+import debounce from 'lodash/debounce';
+
 
 const CartPage = () => {
 
-    const {loading, error, cart, totalItems, totalPrice} = useCart();
+    const {loading, error, cart, totalItems, totalPrice, removeItemFromCart, getCart, updateItemToCart, clearCartItems} = useCart();
     const {loading: checkOutLoading, error: checkOutError} = useOrder();
 
 
-    const handleRemoveFromCart = (cartItemId: string) => {
+    const handleRemoveFromCart = async(cartItemId: string) => {
         if(cart){
             const cartItem = cart.items.find((item) => item.id === cartItemId);
             if(cartItemId){
-                //TODO: writing logic for this
+                try {
+                    await removeItemFromCart(cartItem?.id!)
+                    await getCart();
+                    alert("Product removed from cart");
+                } catch (error) {
+                    console.error("Failed to remove product from cart:", error);
+                    alert("Failed to remove product from cart");
+                }
             }
         }
     }
+
+    const debounceCartUpdate = useCallback(
+        debounce(async(cartItemId: string, quantity: number) => {
+            try {
+                await updateItemToCart({cartItemId, quantity});
+                await getCart();
+            } catch (error) {
+                console.error("Failed to update the cart item:", error);
+                alert("Failed to update the cart item");
+            }
+        }, 500), 
+        [updateItemToCart, getCart]
+    );
+
+    const handleUpdateQuantity = async(cartItemId: string, newQuantity: number) => {
+        if(newQuantity > 0){
+            debounceCartUpdate(cartItemId, newQuantity);
+        }
+    }
+
+
+    const handleClearCart = async() => {
+        try {
+            await clearCartItems();
+            await getCart();
+        } catch (error) {
+            console.error("Failed to clear the cart:", error);
+            alert("Failed to clear the cart");//TODO: remove this alert in future.
+        }
+    }
+
 
     if(loading){
         return (
@@ -106,7 +146,8 @@ const CartPage = () => {
                                             <Button
                                             variant="outline"
                                             size="icon"
-                                            onClick={() => {}}
+                                            disabled={item.quantity === 1}
+                                            onClick={() => handleUpdateQuantity(item.id, item.quantity - 1)}
                                             >
                                                 <MinusCircle className='h-4 w-4' />
                                             </Button>
@@ -114,7 +155,8 @@ const CartPage = () => {
                                             <Button
                                             variant="outline"
                                             size="icon"
-                                            onClick={() => {}} // TODO: handdle add funtion
+                                            disabled={item.quantity === item.product.quantity}
+                                            onClick={() => handleUpdateQuantity(item.id, item.quantity + 1)} 
                                             >
                                                 <PlusCircle className='h-4 w-4' />
                                             </Button>
@@ -127,7 +169,7 @@ const CartPage = () => {
                                         size="icon"
                                         onClick={() => handleRemoveFromCart(item.id)} 
                                         >
-                                            <Trash2 className='h-4 w-4'/>
+                                            <Trash2 className='h-4 w-4 text-red-500'/>
                                         </Button>
                                     </div>
                                 </div>
@@ -146,7 +188,7 @@ const CartPage = () => {
                         variant="outline"
                         className='flex-1'
                         disabled={cart?.items.length === 0}
-                        onClick={() => {}}
+                        onClick={handleClearCart}
                         >
                             Clear Cart
                         </Button>
