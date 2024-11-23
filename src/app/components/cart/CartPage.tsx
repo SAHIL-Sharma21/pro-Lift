@@ -185,7 +185,7 @@ const CartPage = () => {
                     </div>
                     <div className='flex space-x-2 w-full'>
                         <Button
-                        variant="outline"
+                        variant="destructive"
                         className='flex-1'
                         disabled={cart?.items.length === 0}
                         onClick={handleClearCart}

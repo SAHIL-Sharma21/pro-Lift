@@ -6,8 +6,7 @@ import { AppDispatch, RootState } from "@/app/lib/redux/store";
 import { useEffect, useState } from "react";
 import { Button } from "@/components/ui/button";
 import { Loader2 } from "lucide-react";
-import { useAuth } from "@/app/hooks/useAuth";
-import LogoutBtn from '@/app/components/LogoutBtn';
+import { useCart } from "@/app/hooks/useCart";
 
 export default function ProductPage() {
   const dispatch = useDispatch<AppDispatch>();
@@ -16,11 +15,18 @@ export default function ProductPage() {
   );
 
   const [page, setPage] = useState(1);
-  const {user} = useAuth();
+  const [isCartOpen, setIsCartOpen] = useState(false);
+  const { cart } = useCart();
 
 useEffect(() => {
     dispatch(fetchProducts({limit: 10, page}));
-}, [dispatch])
+}, [dispatch, page])
+
+useEffect(() => {
+    if(cart && cart.items.length > 0){
+        setIsCartOpen(true);
+    }
+}, [cart]);
 
 const loadMore = () => {
   setPage(prevPage => prevPage + 1);
@@ -42,12 +48,14 @@ const loadMore = () => {
   return (
     <>
       <div className="container mx-auto px-4 py-8">
-        <h1 className="text-3xl text-center font-bold mb-6">Our Products</h1>
+        <div className="flex justify-between items-center mb-6">
+          <h1 className="text-3xl text-center font-bold mb-6">Our Products</h1>
+        </div>
         {products.length > 0 ? (
           <>
             <div className="grid grid-cols-1 sm:grid-cols-2 md:grid-cols-3 lg:grid-cols-4 gap-6">
               {products.map((product) => (
-                <ProductCard key={product.id} product={product} />
+                <ProductCard key={product.id} product={product} setIsCartOpen={setIsCartOpen} />
               ))}
             </div>
             <div className="mt-8 flex justify-center">

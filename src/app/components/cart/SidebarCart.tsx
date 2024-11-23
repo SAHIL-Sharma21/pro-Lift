@@ -2,20 +2,22 @@
 
 import { useCart } from '@/app/hooks/useCart'
 import { Button } from '@/components/ui/button';
-import { Sheet, SheetContent, SheetHeader, SheetTitle, SheetTrigger } from '@/components/ui/sheet';
+import { Sheet, SheetContent, SheetDescription, SheetHeader, SheetTitle, SheetTrigger } from '@/components/ui/sheet';
 import { debounce } from 'lodash';
-import { MinusCircle, PlusCircle, ShoppingCart, Trash2 } from 'lucide-react';
+import {  MinusCircle, PlusCircle, ShoppingCart, Trash2 } from 'lucide-react';
 import Image from 'next/image';
-import React, { useCallback, useEffect, useState } from 'react'
+import {  useRouter } from 'next/navigation';
+import React, { useCallback, useEffect } from 'react'
 
 const SidebarCart = ({isOpen, setIsOpen}:{isOpen: boolean, setIsOpen: React.Dispatch<React.SetStateAction<boolean>>}) => {
-    const {cart, loading, error, totalItems, totalPrice, removeItemFromCart, updateItemToCart, getCart} = useCart();
-    
+    const {cart, loading, error, totalItems, totalPrice, removeItemFromCart, updateItemToCart, getCart, clearCartItems} = useCart();
+    const router = useRouter();
+
     useEffect(() => {
         if(cart && cart.items.length > 0) {
             setIsOpen(true);
         }
-    }, [cart]);
+    }, [cart, setIsOpen]);
 
     const debounceCartUpdate = useCallback(
         debounce(async(cartItemId: string, quantity: number) => {
@@ -53,23 +55,40 @@ const SidebarCart = ({isOpen, setIsOpen}:{isOpen: boolean, setIsOpen: React.Disp
         }
     }
 
+    const handleViewCart = () => {
+        router.push("/cart");
+        setIsOpen(false);
+    }
+
+    const handleClearCart = async() => {
+        try {
+            await clearCartItems();
+            await getCart();
+        } catch (error) {
+            console.error("Failed to clear the cart:", error);
+            alert("Failed to clear the cart");//TODO: remove this alert in future.
+        }
+    }
 
   return (
     <>
         <Sheet open={isOpen} onOpenChange={setIsOpen}>
             <SheetTrigger asChild>
-                <Button variant="outline" size="icon" className='relative'>
-                    <ShoppingCart className='h-4 w-4' />
-                    {totalItems > 0 && (
-                        <span className='absolute -top-2 -right-2 h-5 w-5 rounded-full bg-primary text-primary-foreground text-xs flex items-center justify-center'>
-                            {totalItems}
-                        </span>
-                    )}
-                </Button>
+                    <div className='relative cursor-pointer p-2 rounded-full hover:bg-zinc-600 transition-colors'>
+                        <ShoppingCart className='h-4 w-4 text-zinc-100' />
+                        {totalItems > 0 && (
+                            <span className='absolute -top-2 -right-2 h-5 w-5 bg-red-600 rounded-full bg-primary text-primary-foreground text-xs flex items-center justify-center'>
+                                {totalItems}
+                            </span>
+                        )}
+                    </div>
             </SheetTrigger>
             <SheetContent className='w-full sm:max-w-lg'>
                 <SheetHeader>
                     <SheetTitle>Your Cart</SheetTitle>
+                    <SheetDescription>
+                        View and manage items in your shopping cart
+                    </SheetDescription>
                 </SheetHeader>
                 {loading && <p>Loading...</p>}
                 {error && <p className='text-red-500'>{error}</p>}
@@ -111,6 +130,7 @@ const SidebarCart = ({isOpen, setIsOpen}:{isOpen: boolean, setIsOpen: React.Disp
                                 <Button 
                                 variant="ghost"
                                 size="icon"
+                                className='text-red-500 hover:text-red-600'
                                 onClick={() => handleRemoveItem(item.id)}
                                 >
                                     <Trash2 className='h-4 w-4' />
@@ -122,7 +142,19 @@ const SidebarCart = ({isOpen, setIsOpen}:{isOpen: boolean, setIsOpen: React.Disp
                                 <span className='font-medium'>Total:</span>
                                 <span className='font-medium'>Rs.{totalPrice}</span>
                             </div>
-                            <Button className='w-full mt-4'>Proceed to checkout</Button>
+                            <div className='flex justify-between gap-2'>
+                                <Button className='w-full mt-4' onClick={handleViewCart}>
+                                        View Cart
+                                </Button>
+                                <Button 
+                                className='w-full mt-4'
+                                variant="destructive"
+                                onClick={handleClearCart}
+                                >
+                                    Clear Cart
+                                </Button>
+                            </div>
+
                         </div>
                     </div>
                 )}

@@ -8,6 +8,7 @@ import React, { useEffect, useState } from "react";
 import { useAuth } from "../hooks/useAuth";
 import { DropdownMenu, DropdownMenuContent, DropdownMenuItem, DropdownMenuLabel, DropdownMenuSeparator, DropdownMenuTrigger } from "@/components/ui/dropdown-menu";
 import { useRouter } from "next/navigation";
+import SideBar from '@/app/components/cart/SidebarCart';
 
 
 
@@ -35,6 +36,7 @@ export default function Navbar(){
     const [isOpen, setIsOpen] = useState(false);
     const {user, loading, logout} = useAuth();
     const router = useRouter();
+    const [isCartOpen, setIsCartOpen] = useState<boolean>(false);
 
     const navItems = [
         {title: "Home", path: "/"},
@@ -88,15 +90,9 @@ export default function Navbar(){
                     </SheetContent>
                 </Sheet>
                 <div className="flex items-center space-x-4">
-                    <Button 
-                    variant="outline" 
-                    size="icon" 
-                    className="text-zinc-900 border-none hover:bg-zinc-900 hover:text-white"
-                    onClick={() => router.push("/cart")}
-                    >
-                        <ShoppingCart className="h-7 w-7" />
-                        <span className="sr-only">Shopping Cart</span>
-                    </Button>
+                        <div className="relative text-black bg-none">
+                            <SideBar isOpen={isCartOpen} setIsOpen={setIsCartOpen} />
+                        </div>
                     {loading ? (
                         <div className="w-24 h-6 bg-zinc-800 animate-pulse rounded"></div>
                     ) : user ? (
