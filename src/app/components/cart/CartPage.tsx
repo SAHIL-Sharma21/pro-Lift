@@ -108,99 +108,98 @@ const CartPage = () => {
 
   return (
     <>
-        <div className='container mx-auto py-10'>
+        <div className='mx-auto py-10'>
             <Card className='bg-card text-card-foreground'>
                 <CardHeader>
                     <CardTitle className='text-3xl font-bold'>
                         Your Cart
                     </CardTitle>
                 </CardHeader>
-                <CardContent>
-                    {cart?.items.length === 0 ? (
-                        <>
-                            <p className='text-center text-muted-foreground'>Your Cart is empty</p>
-                            <Button 
-                            variant={"outline"}
-                            >
-                                <Link href="/products">
-                                    Back to Products
-                                </Link>
-                            </Button>
-                        </>
-                        
-                    ) : (
-                        <ScrollArea className='h-[calc(100vh-300px)]'>
-                            {cart?.items.map((item) => (
-                                <div key={item.id} className='flex items-center space-x-4 py-4'>
-                                    <Image 
-                                    src={item.product.image}
-                                    alt={item.product.name}
-                                    height={150}
-                                    width={150}
-                                    className='h-24 w-24 rounded-md object-cover'
-                                    />
-                                    <div className='flex-1'>
-                                        <h3 className='font-semibold text-lg'>{item.product.name}</h3>
-                                        <p className='text-sm text-muted-foreground'>Rs:{item.product.price}</p>
-                                        <div className='flex items-center space-x-2 mt-2'>
+                <div className='flex flex-col h-[calc(100vh-200px)]'>
+                    <CardContent className='flex-grow overflow-hidden'>
+                        {cart?.items.length === 0 ? (
+                            <div className='flex flex-col items-center justify-center h-full'>
+                                <p className='text-center text-muted-foreground mb-4'>Your Cart is empty</p>
+                                <Button variant="outline">
+                                    <Link href="/products">
+                                        Back to Products
+                                    </Link>
+                                </Button>
+                            </div>
+                        ) : (
+                            <ScrollArea className='h-full pr-4'>
+                                {cart?.items.map((item) => (
+                                    <div key={item.id} className='flex items-center space-x-4 py-4'>
+                                        <Image 
+                                        src={item.product.image}
+                                        alt={item.product.name}
+                                        height={150}
+                                        width={150}
+                                        className='h-24 w-24 rounded-md object-cover'
+                                        />
+                                        <div className='flex-1'>
+                                            <h3 className='font-semibold text-lg'>{item.product.name}</h3>
+                                            <p className='text-sm text-muted-foreground'>Rs:{item.product.price}</p>
+                                            <div className='flex items-center space-x-2 mt-2'>
+                                                <Button
+                                                variant="outline"
+                                                size="icon"
+                                                disabled={item.quantity === 1}
+                                                onClick={() => handleUpdateQuantity(item.id, item.quantity - 1)}
+                                                >
+                                                    <MinusCircle className='h-4 w-4' />
+                                                </Button>
+                                                <span className='w-8 text-center'>{item.quantity}</span>
+                                                <Button
+                                                variant="outline"
+                                                size="icon"
+                                                disabled={item.quantity === item.product.quantity}
+                                                onClick={() => handleUpdateQuantity(item.id, item.quantity + 1)} 
+                                                >
+                                                    <PlusCircle className='h-4 w-4' />
+                                                </Button>
+                                            </div>
+                                        </div>
+                                        <div className='text-right'>
+                                            <p className='font-semibold'>Rs:{item.product.price * item.quantity}</p>
                                             <Button
-                                            variant="outline"
+                                            variant="ghost"
                                             size="icon"
-                                            disabled={item.quantity === 1}
-                                            onClick={() => handleUpdateQuantity(item.id, item.quantity - 1)}
+                                            onClick={() => handleRemoveFromCart(item.id)} 
                                             >
-                                                <MinusCircle className='h-4 w-4' />
-                                            </Button>
-                                            <span className='w-8 text-center'>{item.quantity}</span>
-                                            <Button
-                                            variant="outline"
-                                            size="icon"
-                                            disabled={item.quantity === item.product.quantity}
-                                            onClick={() => handleUpdateQuantity(item.id, item.quantity + 1)} 
-                                            >
-                                                <PlusCircle className='h-4 w-4' />
+                                                <Trash2 className='h-4 w-4 text-red-500'/>
                                             </Button>
                                         </div>
                                     </div>
-                                    <div className='text-right'>
-                                        <p className='font-semibold'>Rs:{item.product.price * item.quantity}</p>
-                                        <Button
-                                        variant="ghost"
-                                        size="icon"
-                                        onClick={() => handleRemoveFromCart(item.id)} 
-                                        >
-                                            <Trash2 className='h-4 w-4 text-red-500'/>
-                                        </Button>
-                                    </div>
-                                </div>
-                            ))}
-                        </ScrollArea>
-                    )}
-                </CardContent>
-                <Separator />
-                <CardFooter className='flex flex-col space-y-4 mt-4'>
-                    <div className='flex justify-between w-full text-lg font-semibold'>
-                        <span>Total:</span>
-                        <span>Rs:{totalPrice}</span>
+                                ))}
+                            </ScrollArea>
+                        )}
+                    </CardContent>
+                    <Separator />
+                    <div className='p-6 bg-background'>
+                        <div className='flex justify-between w-full text-lg font-semibold mb-4'>
+                            <span>Total:</span>
+                            <span>Rs:{totalPrice}</span>
+                        </div>
+                        <div className='flex space-x-2 w-full'>
+                            <Button
+                            variant="destructive"
+                            className='flex-1'
+                            disabled={cart?.items.length === 0}
+                            onClick={handleClearCart}
+                            >
+                                Clear Cart
+                            </Button>
+                            <Button
+                            className='flex-1'
+                            disabled={cart?.items.length === 0 || checkOutLoading}
+                            onClick={() => {}}
+                            >
+                                {checkOutLoading? "Processing..." : "Proceed to Checkout"}
+                            </Button>
+                        </div>
                     </div>
-                    <div className='flex space-x-2 w-full'>
-                        <Button
-                        variant="destructive"
-                        className='flex-1'
-                        disabled={cart?.items.length === 0}
-                        onClick={handleClearCart}
-                        >
-                            Clear Cart
-                        </Button>
-                        <Button
-                        className='flex-1'
-                        disabled={cart?.items.length === 0 || checkOutLoading}
-                        onClick={() => {}}
-                        >
-                            {checkOutLoading? "Processing..." : "Proceed to Checkout"}
-                        </Button>
-                    </div>
-                </CardFooter>
+                </div>
             </Card>
         </div>
     </>
