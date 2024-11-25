@@ -4,21 +4,21 @@ import {useDispatch, useSelector} from 'react-redux';
 import {AppDispatch, RootState} from '@/app/lib/redux/store';
 import { useCallback } from 'react';
 import {VerifyPaymentData} from '@/app/types/order.types';
-import {fetchOrders, checkout, clearCurrentOrder, processPaymentAndOrderCreate, verifyPayment} from '@/app/lib/redux/slices/orderSlice';
+import {fetchOrders, checkout, clearCurrentOrder, processPaymentAndOrderCreate, verifyPayment, setSelectedAddress} from '@/app/lib/redux/slices/orderSlice';
 
 
 export const useOrder = () => {
     const dispatch = useDispatch<AppDispatch>();
 
-    const {loading, error, currentOrder, orders} = useSelector((state: RootState) => state.order);
+    const {loading, error, currentOrder, orders,addresses,razorpayOrderId, selectedAddressId} = useSelector((state: RootState) => state.order);
 
 
     const getOrders = useCallback(() => {
         return dispatch(fetchOrders());
     }, [dispatch]);
 
-    const initiateCheckout = useCallback((guestId: {guestId?: string}) => {
-        return dispatch(checkout(guestId));
+    const initiateCheckout = useCallback(() => {
+        return dispatch(checkout());
     }, [dispatch]);
 
     const processPaymentAction = useCallback(() => {
@@ -34,16 +34,23 @@ export const useOrder = () => {
         return dispatch(clearCurrentOrder())
     }, [dispatch]); 
 
+    const setSelectedAddressAction = useCallback((addressId: string) => {
+        return dispatch(setSelectedAddress(addressId));
+    }, [dispatch]);
 
     return {
         loading,
         error,
         currentOrder,
         orders,
+        addresses, 
+        razorpayOrderId,
+        selectedAddressId,
         getOrders,
         initiateCheckout,
         processPaymentAction,
         verifyPaymentAction,
-        clearCurrentOrderAction
+        clearCurrentOrderAction,
+        setSelectedAddressAction
     };
 }

@@ -20,7 +20,8 @@ export const createAddress = createAsyncThunk('address/createAddress', async(pay
         const response = await fetch(`${process.env.NEXT_PUBLIC_BACKEND_URI}/address/create`, {
             method: "POST",
             headers: {"Content-Type": "application/json"},
-            body: JSON.stringify(payload)
+            body: JSON.stringify(payload),
+            credentials: "include"
         });
 
         if(!response.ok){
@@ -40,13 +41,16 @@ export const updateAddress = createAsyncThunk('address/updateAddress', async({pa
         const response = await fetch(`${process.env.NEXT_PUBLIC_BACKEND_URI}/address/updateAddress/${addressId}`, {
             method: "PATCH",
             headers: {"Content-Type": "application/json"},
-            body: JSON.stringify(payload)
+            body: JSON.stringify(payload),
+            credentials: "include"
         });
 
         if(!response.ok){
             throw new Error("Failed to update address");
         }
-        return await response.json();
+        const data = await response.json();
+        console.log("updated address-->", data);
+        return data;
     } catch (error: any) {
         console.log("Error updating address: ", error);
         rejectWithValue(error?.message);
@@ -58,13 +62,16 @@ export const deleteAddress = createAsyncThunk('address/deleteAddress', async(add
         const response = await fetch(`${process.env.NEXT_PUBLIC_BACKEND_URI}/address/deleteAddress/${addressId}`, {
             method: "DELETE",
             headers: {"Content-Type": "application/json"},
-            body: JSON.stringify({})
+            body: JSON.stringify({}),
+            credentials: "include"
         });
 
         if(!response.ok){
             throw new Error("Failed to delete address");
         }
-        return await response.json();
+        const data = await response.json();
+        console.log("deleted address->", data);
+        return data;
     } catch (error: any) {
         console.log("Error deleting address: ", error);
         rejectWithValue(error?.message);
@@ -77,13 +84,16 @@ export const getAllAddresses = createAsyncThunk('address/getAllAddresses', async
         const response = await fetch(`${process.env.NEXT_PUBLIC_BACKEND_URI}/address/allAddress`, {
             method: "GET",
             headers: {"Content-Type": "application/json"},
-            body: JSON.stringify({})
+            body: JSON.stringify({}),
+            credentials: "include"
         });
 
         if(!response.ok){
             throw new Error("Failed to get all addresses");
         }
-        return await response.json();
+        const data = await response.json();
+        console.log("getAll address-->", data);
+        return data;
     } catch (error: any) {
         console.log("Error getting all addresses: ", error);
         rejectWithValue(error?.message);
@@ -103,6 +113,7 @@ export const addressSlice = createSlice({
             })
             .addCase(createAddress.fulfilled, (state, action) => {
                 state.loading = false;
+                console.log("created address-->", action.payload);
                 state.addresses.push(action.payload);
                 state.error = null;
             })
@@ -116,6 +127,7 @@ export const addressSlice = createSlice({
             })
             .addCase(updateAddress.fulfilled, (state, action) => {
                 state.loading = false;
+                console.log("updated address-->", action.payload);
                 const index = state.addresses.findIndex((address) => address.id === action.payload.id);
                 if(index !== -1){
                     state.addresses[index] = action.payload;
@@ -131,6 +143,7 @@ export const addressSlice = createSlice({
             })
             .addCase(deleteAddress.fulfilled, (state, action) => {
                 state.loading = false;
+                console.log("deleted address-->", action.payload);
                 state.addresses = state.addresses.filter((address) => address.id !== action.payload.id)
             })
             .addCase(deleteAddress.rejected, (state, action) => {
@@ -143,6 +156,7 @@ export const addressSlice = createSlice({
             })
             .addCase(getAllAddresses.fulfilled, (state, action) => {
                 state.loading = false;
+                console.log("getAll address-->", action.payload);
                 state.addresses = action.payload;
             })
             .addCase(getAllAddresses.rejected, (state, action) => {
@@ -151,3 +165,5 @@ export const addressSlice = createSlice({
             })
     }
 });
+
+export default addressSlice.reducer;
