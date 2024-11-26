@@ -2,6 +2,7 @@ export interface Address {
     id: string;
     address1: string;
     city: string;
+    state: string;
     country: string
     postalCode: string;
     userId: string
@@ -10,14 +11,16 @@ export interface Address {
 export interface AddressCreate {
     address1: string;
     city: string;
+    state: string;
     country: string
     postalCode: string;
-    userId: string
+    userId?: string
 }
 
 export interface AddressUpdate {
     address1?: string;
     city?: string;
-    country?: string
+    state?: string;
+    country?: string;
     postalCode?: string;
 }
