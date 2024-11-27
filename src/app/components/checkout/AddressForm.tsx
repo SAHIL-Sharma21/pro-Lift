@@ -39,13 +39,15 @@ const AddressForm = ({ onNext }: AddressFormProps) => {
   const handleAddNewAddress = async (e: React.FormEvent) => {
     e.preventDefault();
     try {
-      await addAddress({
+      const newAddress = await addAddress({
         address1: addressLine1,
         city,
         state,
         country,
         postalCode,
       }); // debug here
+      console.log("New address added-->: ", newAddress, newAddress.payload);
+      setSelectedAddressAction(newAddress.payload.id);// debug here
       onNext();
     } catch (err) {
       console.error("Error adding new address: ", err);
@@ -57,6 +59,8 @@ const AddressForm = ({ onNext }: AddressFormProps) => {
     e.preventDefault();
     if (selectedAddressId) {
       onNext();
+    } else {
+      alert("Please select an address");
     }
   };
 

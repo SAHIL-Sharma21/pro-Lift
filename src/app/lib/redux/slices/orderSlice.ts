@@ -104,6 +104,10 @@ export const verifyPayment = createAsyncThunk('order/verifyPayment', async(payma
     }
 });
 
+export const setSelectedAddress = createAsyncThunk('order/setSelectedAddress', async(addressId: string, {dispatch}) => {
+    dispatch(orderSlice.actions.updateSelectedAddress(addressId));
+    return addressId;
+});
 
 
 export const orderSlice = createSlice({
@@ -113,7 +117,7 @@ export const orderSlice = createSlice({
         clearCurrentOrder: (state) => {
             state.currentOrder = null;
         }, 
-        setSelectedAddress: (state, action) => {
+        updateSelectedAddress: (state, action) => {
             state.selectedAddressId = action.payload
         }
     },
@@ -179,5 +183,5 @@ export const orderSlice = createSlice({
     }
 });
 
-export const {clearCurrentOrder, setSelectedAddress} = orderSlice.actions;
+export const {clearCurrentOrder, updateSelectedAddress} = orderSlice.actions;
 export default orderSlice.reducer;

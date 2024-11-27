@@ -15,7 +15,7 @@ import PaymentProcessor from '@/app/components/checkout/PaymentProcessor';
 const CheckoutFlow = () => {
 
   const [setp, setSetp] = useState(1);
-  const {loading, error, currentOrder, initiateCheckout, processPaymentAction, verifyPaymentAction }= useOrder();
+  const {loading, error, initiateCheckout, processPaymentAction, verifyPaymentAction,selectedAddressId }= useOrder();
   const {getAllAdress} = useAddress();
   const {isAuthenticated} = useAuth();
 
@@ -32,18 +32,37 @@ const CheckoutFlow = () => {
   const prevStep = () => setSetp(prev => prev - 1);
 
   const handleCheckout = async() => {
-    await initiateCheckout();
-    nextStep();
+    if(selectedAddressId){
+      try {
+        await initiateCheckout();
+        nextStep();
+      } catch (error) {
+        console.log("checkout Failed: ", error);
+        alert("Checkout failed, please try again");
+      }
+    } else {
+      alert("Please select an address before checkout");
+    }
   }
 
-  const paymentFailure = () => {
-
+  const handlePaymentSuccess = async() => {
+    console.log("Payment successful");
+    try {
+      await processPaymentAction();
+      router.push("/order-confirmation");
+    } catch (error) {
+      console.log("Error processing payment: ", error);
+      alert("There was an error processing your payment, please try again");
+    }
   }
 
-  const handlePayment = async() => {
-    await processPaymentAction();
-    nextStep();
+  const handlePaymentFailure = () => {
+    console.log("Payment failed");
+    //TODO: show callback or new page 
+    alert("Payment failed, please try again");
+    setSetp(2); // go back to order summary
   }
+
 
   if(!isAuthenticated){
     return(
@@ -65,9 +84,9 @@ const CheckoutFlow = () => {
       case 1:
         return <AddressForm onNext={nextStep} />;
       case 2:
-        return <OrderSummary onNext={nextStep} onPrev={prevStep}/>;
+        return <OrderSummary onNext={handleCheckout} onPrev={prevStep}/>;
       case 3:
-        return <PaymentProcessor onPaymentSuccess={handlePayment} onPaymentFailure={paymentFailure} />;
+        return <PaymentProcessor onPaymentSuccess={handlePaymentSuccess} onPaymentFailure={handlePaymentFailure} />;
       default:
         return <div>Invalid step</div>;
     }

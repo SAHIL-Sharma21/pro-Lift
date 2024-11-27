@@ -16,10 +16,11 @@ declare global {
 
 const PaymentProcessor = ({onPaymentSuccess, onPaymentFailure}: PaymentProcessorProps) => {
 
-  const {currentOrder, razorpayOrderId, verifyPaymentAction, addresses} = useOrder();
+  const {currentOrder, razorpayOrderId, verifyPaymentAction, selectedAddressId} = useOrder();
+
 
   useEffect(() => {
-    if(razorpayOrderId){
+    if(razorpayOrderId && selectedAddressId){
       const script = document.createElement('script');
       script.src = `https://checkout.razorpay.com/v1/checkout.js`;
       script.async = true;
@@ -38,9 +39,13 @@ const PaymentProcessor = ({onPaymentSuccess, onPaymentFailure}: PaymentProcessor
               razorpayOrderId: response.razorpay_order_id,
               razorpayPaymentId: response.razorpay_payment_id,
               razorpaySignature: response.razorpay_signature,
-              addressId: currentOrder?.id! // TODO:here to debug
-            });
-            onPaymentSuccess();
+              addressId: selectedAddressId!,
+            }).then(() => {
+              onPaymentSuccess();
+            }).catch((err) => {
+              console.log("Error verifying payment: ", err);
+              onPaymentFailure();
+            })
           },
           prefill:{
             name: "customer name",
@@ -60,7 +65,7 @@ const PaymentProcessor = ({onPaymentSuccess, onPaymentFailure}: PaymentProcessor
         document.body.removeChild(script);
       }
     }
-  }, [razorpayOrderId, currentOrder, verifyPaymentAction, onPaymentSuccess]);
+  }, [razorpayOrderId, currentOrder, verifyPaymentAction, onPaymentSuccess, onPaymentFailure, selectedAddressId]);
 
   return (
    <>
