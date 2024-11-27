@@ -23,9 +23,11 @@ const CheckoutFlow = () => {
 
   useEffect(() => {
     if(isAuthenticated){
-      getAllAdress();
+      getAllAdress().catch((err) => {
+        console.log("Error getting addresses: ", err);        
+      })
     }
-  }, [isAuthenticated, getAllAdress]);
+  }, [isAuthenticated]);
 
 
   const nextStep = () => setSetp(prev => prev + 1);

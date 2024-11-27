@@ -51,7 +51,7 @@ const AddressForm = ({ onNext }: AddressFormProps) => {
       onNext();
     } catch (err) {
       console.error("Error adding new address: ", err);
-      alert("Error deleting address. Please try again.");
+      alert("Error adding address. Please try again.");
     }
   };
 

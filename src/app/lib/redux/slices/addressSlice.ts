@@ -84,7 +84,6 @@ export const getAllAddresses = createAsyncThunk('address/getAllAddresses', async
         const response = await fetch(`${process.env.NEXT_PUBLIC_BACKEND_URI}/address/allAddress`, {
             method: "GET",
             headers: {"Content-Type": "application/json"},
-            body: JSON.stringify({}),
             credentials: "include"
         });
 
