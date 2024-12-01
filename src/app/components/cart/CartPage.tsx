@@ -12,13 +12,17 @@ import Image from 'next/image';
 import Link from 'next/link';
 import React, { useCallback } from 'react'
 import debounce from 'lodash/debounce';
+import { useAuth } from '@/app/hooks/useAuth';
+import { useRouter } from 'next/navigation';
 
 
 const CartPage = () => {
 
     const {loading, error, cart, totalItems, totalPrice, removeItemFromCart, getCart, updateItemToCart, clearCartItems} = useCart();
     const {loading: checkOutLoading, error: checkOutError} = useOrder();
+    const {isAuthenticated} = useAuth();
 
+    const router = useRouter();
 
     const handleRemoveFromCart = async(cartItemId: string) => {
         if(cart){
@@ -66,6 +70,14 @@ const CartPage = () => {
         }
     }
 
+
+    const handleCheckout = () => {
+        if(isAuthenticated){
+            router.push("/checkout");
+        } else {
+            router.push("/auth/login");
+        }
+    }
 
     if(loading){
         return (
@@ -193,9 +205,9 @@ const CartPage = () => {
                             <Button
                             className='flex-1'
                             disabled={cart?.items.length === 0 || checkOutLoading}
-                            onClick={() => {}}
+                            onClick={handleCheckout}
                             >
-                                {checkOutLoading? "Processing..." : "Proceed to Checkout"}
+                                {isAuthenticated ? checkOutLoading ? "checking out..." : "Proceed to Checkout" : "Sign in to checkout"}
                             </Button>
                         </div>
                     </div>
