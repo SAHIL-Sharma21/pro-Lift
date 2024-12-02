@@ -31,5 +31,5 @@ export const apiCall  = async(options: ApiCallOptions, getState: () => RootState
         throw new Error(errorData.message || "An error occurred");
     }
     
-    return await response.json();
+    return response;
 }

@@ -1,5 +1,7 @@
 import {createSlice, createAsyncThunk} from '@reduxjs/toolkit';
 import {Address, AddressCreate, AddressUpdate} from '@/app/types/address.types';
+import { apiCall } from '@/utils/apiCall';
+import { RootState } from '../store';
 
 
 interface AddressState {
@@ -15,19 +17,18 @@ const initialState: AddressState = {
 };
 
 
-export const createAddress = createAsyncThunk('address/createAddress', async(payload: AddressCreate, {rejectWithValue}) => {
+export const createAddress = createAsyncThunk('address/createAddress', async(payload: AddressCreate, {rejectWithValue, getState}) => {
     try {
-        const response = await fetch(`${process.env.NEXT_PUBLIC_BACKEND_URI}/address/create`, {
+        const response = await apiCall({
+            url: `${process.env.NEXT_PUBLIC_BACKEND_URI}/address/create`,
             method: "POST",
-            headers: {"Content-Type": "application/json"},
-            body: JSON.stringify(payload)
-        });
-
+            body: payload,
+        }, getState as () => RootState);
         if(!response.ok){
             throw new Error("Failed to create address");
         }
-        return await response.json();
-
+        const data = await response.json();
+        return data.data;
     } catch (error: any) {
         console.log("Error creating address: ", error);
         rejectWithValue(error?.message);
@@ -35,36 +36,39 @@ export const createAddress = createAsyncThunk('address/createAddress', async(pay
 });
 
 
-export const updateAddress = createAsyncThunk('address/updateAddress', async({payload, addressId}: {payload: AddressUpdate, addressId: string}, {rejectWithValue}) => {
+export const updateAddress = createAsyncThunk('address/updateAddress', async({payload, addressId}: {payload: AddressUpdate, addressId: string}, {rejectWithValue, getState}) => {
     try {
-        const response = await fetch(`${process.env.NEXT_PUBLIC_BACKEND_URI}/address/updateAddress/${addressId}`, {
+        const response = await apiCall({
+            url: `${process.env.NEXT_PUBLIC_BACKEND_URI}/address/updateAddress/${addressId}`,
             method: "PATCH",
-            headers: {"Content-Type": "application/json"},
-            body: JSON.stringify(payload)
-        });
+            body: payload,
+        }, getState as () => RootState);
 
         if(!response.ok){
             throw new Error("Failed to update address");
         }
-        return await response.json();
+        const data = await response.json();
+        console.log("updated data--->", data);
+        return data.data;
     } catch (error: any) {
         console.log("Error updating address: ", error);
         rejectWithValue(error?.message);
     }
 });
 
-export const deleteAddress = createAsyncThunk('address/deleteAddress', async(addressId: string, {rejectWithValue}) => {
+export const deleteAddress = createAsyncThunk('address/deleteAddress', async(addressId: string, {rejectWithValue, getState}) => {
     try {
-        const response = await fetch(`${process.env.NEXT_PUBLIC_BACKEND_URI}/address/deleteAddress/${addressId}`, {
+        const response = await apiCall({
+            url: `${process.env.NEXT_PUBLIC_BACKEND_URI}/address/deleteAddress/${addressId}`,
             method: "DELETE",
-            headers: {"Content-Type": "application/json"},
-            body: JSON.stringify({})
-        });
+        }, getState as () => RootState);
 
         if(!response.ok){
             throw new Error("Failed to delete address");
         }
-        return await response.json();
+        const data = await response.json();
+        console.log("deleted data--->", data);
+        return data.data;
     } catch (error: any) {
         console.log("Error deleting address: ", error);
         rejectWithValue(error?.message);
@@ -72,18 +76,18 @@ export const deleteAddress = createAsyncThunk('address/deleteAddress', async(add
 });
 
 
-export const getAllAddresses = createAsyncThunk('address/getAllAddresses', async(_, {rejectWithValue}) => {
+export const getAllAddresses = createAsyncThunk('address/getAllAddresses', async(_, {rejectWithValue, getState}) => {
     try {
-        const response = await fetch(`${process.env.NEXT_PUBLIC_BACKEND_URI}/address/allAddress`, {
+        const response = await apiCall({
+            url: `${process.env.NEXT_PUBLIC_BACKEND_URI}/address/allAddress`,
             method: "GET",
-            headers: {"Content-Type": "application/json"},
-            body: JSON.stringify({})
-        });
+        }, getState as () => RootState);
 
         if(!response.ok){
             throw new Error("Failed to get all addresses");
         }
-        return await response.json();
+        const data = await response.json();
+        return data.data || [];
     } catch (error: any) {
         console.log("Error getting all addresses: ", error);
         rejectWithValue(error?.message);
