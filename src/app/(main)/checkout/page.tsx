@@ -4,18 +4,20 @@ import React, { useState } from 'react'
 import AddressSection from '@/app/components/checkout/AddressSection';
 import AddresForm from '@/app/components/checkout/AddressForm';
 import { useAddress } from '@/app/hooks/useAddress';
+import OrderSummary from '@/app/components/checkout/OrderSummary';
+import { useCart } from '@/app/hooks/useCart';
 
-
-function page() {
+function CheckoutPage() {
 
   const [isNewAddress, setIsNewAddress] = useState(false);
   const [selectedAddress, setSelectedAddress] = useState<string | null>(null);
+  const {cart, totalPrice} = useCart();
 
   const {getAllAdress} = useAddress();
 
 
   const handleAddressAdd = () => {
-    setIsNewAddress(true);
+    setIsNewAddress(false);
     getAllAdress();
   }
 
@@ -29,15 +31,18 @@ function page() {
       <AddressSection 
       selectedAddress={selectedAddress}
       onSelectedAddress={setSelectedAddress}
-      onNewAddress={handleAddressAdd}
+      onNewAddress={() => setIsNewAddress(true)}
       />
 
       {isNewAddress && (
         <AddresForm onAddressAdded={handleAddressAdd} />
       )}
 
+      {/* OrderSummary  */}
+      <OrderSummary cart={cart} totalPrice={totalPrice} />
+
     </div>
   )
 }
 
-export default page
+export default CheckoutPage;
