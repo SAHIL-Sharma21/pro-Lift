@@ -158,6 +158,7 @@ export const orderSlice = createSlice({
       })
       .addCase(createOrder.fulfilled, (state, action) => {
         state.loading = false;
+        console.log("Created order--->", action.payload);
         state.orders.push(action.payload.order);
         state.currentOrder = action.payload.order;
         state.error = null;
@@ -172,6 +173,7 @@ export const orderSlice = createSlice({
       })
       .addCase(createPaymentOrder.fulfilled, (state, action) => {
         state.loading = false;
+        console.log("Created payment order--->", action.payload);
         state.currentOrder = {
           ...state.currentOrder!,
           paymentDetails: action.payload,
@@ -186,8 +188,9 @@ export const orderSlice = createSlice({
         state.loading = true;
         state.error = null;
       })
-      .addCase(verifyPayment.fulfilled, (state, _) => {
+      .addCase(verifyPayment.fulfilled, (state, action) => {
         state.loading = false;
+        console.log("Verified payment--->", action.payload);
         state.currentOrder = {
           ...state.currentOrder!,
           status: "PROCESSING",
