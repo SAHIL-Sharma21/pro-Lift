@@ -1,166 +1,209 @@
-'use client'
-//order slice
-import {createSlice, createAsyncThunk} from '@reduxjs/toolkit'
-import {Order, VerifyPaymentData} from '@/app/types/order.types';
+"use client";
 
+import {
+  CreateOrderData,
+  Order,
+  VerifyPaymentData,
+} from "@/app/types/order.types";
+import { apiCall } from "@/utils/apiCall";
+import { createSlice, createAsyncThunk } from "@reduxjs/toolkit";
+import { RootState } from "../store";
 
 interface OrderState {
-    orders: Order[];
-    loading: boolean;
-    error: string | null; 
-    currentOrder: Order | null;
+  orders: Order[];
+  loading: boolean;
+  error: string | null;
+  currentOrder: Order | null;
 }
 
 const initialState: OrderState = {
-    orders: [],
-    loading: false,
-    error: null,
-    currentOrder: null
-}
+  loading: false,
+  error: null,
+  orders: [],
+  currentOrder: null,
+};
 
-export const fetchOrders = createAsyncThunk('order/fetchOrders', async(_, {rejectWithValue}) => {
+export const getOrders = createAsyncThunk(
+  "order/getOrders",
+  async (_, { rejectWithValue, getState }) => {
     try {
-        const response = await fetch(`${process.env.NEXT_PUBLIC_BACKEND_URI}/orders/get-orders`); //this have to make in backend
-        if(!response.ok){
-            throw new Error("Error fetching orders");
-        }
-        const data = await response.json();
-        console.log(data);
-        return await response.json();
+      const response = await apiCall(
+        {
+          url: `${process.env.NEXT_PUBLIC_BACKEND_URI}/orders/getAllOrders`,
+          method: "GET",
+        },
+        getState as () => RootState
+      );
+
+      if (!response.ok) {
+        throw new Error("Failed to get orders");
+      }
+
+      const data = await response.json();
+      console.log("all orders--->", data);
+      return data.data;
     } catch (error: any) {
-        console.log("Error fetching orders: ", error);
-        rejectWithValue(error?.message);
+      return rejectWithValue(error?.message);
     }
-});
+  }
+);
 
-
-export const checkout = createAsyncThunk('order/checkout', async(guestId: {guestId?: string}, {rejectWithValue}) => {
+export const createOrder = createAsyncThunk(
+  "order/createOrder",
+  async (orderData: CreateOrderData, { rejectWithValue, getState }) => {
     try {
-        const response = await fetch(`${process.env.NEXT_PUBLIC_BACKEND_URI}/orders/checkout`, {
-            method: "POST",
-            headers: {"Content-Type": "application/json"},
-            body: JSON.stringify(guestId)
-        });
-        if(!response.ok){
-            throw new Error("Error fetching orders");
-        }
-        const data = await response.json();
-        console.log(data);
-        return await response.json();
-    } catch (error: any) {
-        console.log("Error fetching orders: ", error);
-        rejectWithValue(error?.message);
-    }
-});
+      const response = await apiCall(
+        {
+          url: `${process.env.NEXT_PUBLIC_BACKEND_URI}/orders/create`,
+          method: "POST",
+          body: orderData,
+        },
+        getState as () => RootState
+      );
 
-export const processPaymentAndOrderCreate = createAsyncThunk('order/processPayment', async(_, {rejectWithValue}) => {
+      if (!response.ok) {
+        throw new Error("Failed to create order");
+      }
+
+      const data = await response.json();
+      console.log("Created order--->", data);
+      return data.data;
+    } catch (error: any) {
+      console.error("Error creating order: ", error);
+      return rejectWithValue(error?.message);
+    }
+  }
+);
+
+export const createPaymentOrder = createAsyncThunk(
+  "order/createPaymentOrder",
+  async (orderId: string, { rejectWithValue, getState }) => {
     try {
-        const response = await fetch(`${process.env.NEXT_PUBLIC_BACKEND_URI}/orders/process-payment`, {
-            method: "POST",
-            headers: {"Content-Type": "application/json"},
-            body: JSON.stringify({})
-        });
+      const response = await apiCall(
+        {
+          url: `${process.env.NEXT_PUBLIC_BACKEND_URI}/payments/create-order`,
+          method: "POST",
+          body: orderId,
+        },
+        getState as () => RootState
+      );
 
-        if(!response.ok){
-            throw new Error("Error fetching orders");
-        }
-        const data = await response.json();
-        console.log(data);
-        return await response.json();
+      if (!response.ok) {
+        throw new Error("Failed to create payment order");
+      }
+      const data = await response.json();
+      console.log("Created payment order--->", data);
+      return data.data;
     } catch (error: any) {
-        console.log("Error fetching orders: ", error);
-        rejectWithValue(error?.message);
+      console.error("Error creating payment order: ", error);
+      return rejectWithValue(error?.message);
     }
-});
+  }
+);
 
-
-export const verifyPayment = createAsyncThunk('order/verifyPayment', async(paymaneData: VerifyPaymentData, {rejectWithValue}) => {
+export const verifyPayment = createAsyncThunk(
+  "order/verifyPayment",
+  async (paymentData: VerifyPaymentData, { rejectWithValue, getState }) => {
     try {
-        const response = await fetch(`${process.env.NEXT_PUBLIC_BACKEND_URI}/orders/verify-payment`, {
-            method: "POST",
-            headers: {"Content-Type": "application/json"},
-            body: JSON.stringify(paymaneData)
-        });
+      const response = await apiCall(
+        {
+          url: `${process.env.NEXT_PUBLIC_BACKEND_URI}/payments/verify`,
+          method: "POST",
+          body: paymentData,
+        },
+        getState as () => RootState
+      );
 
-        if(!response.ok){
-            throw new Error("Error fetching orders");
-        }
-        const data = await response.json();
-        console.log(data);
-        return await response.json();
+      if (!response.ok) {
+        throw new Error("Failed to verify payment");
+      }
+
+      const data = await response.json();
+
+      console.log("Verified payment--->", data);
+      return data.data;
     } catch (error: any) {
-        console.log("Error fetching orders: ", error);
-        rejectWithValue(error?.message);
+      console.error("Error verifying payment: ", error);
+      return rejectWithValue(error?.message);
     }
-});
-
-
+  }
+);
 
 export const orderSlice = createSlice({
-    name: "order",
-    initialState,
-    reducers: {
-        clearCurrentOrder: (state) => {
-            state.currentOrder = null;
-        }, 
+  name: "order",
+  initialState,
+  reducers: {
+    clearCurrentOrder: (state) => {
+      state.currentOrder = null;
     },
-    extraReducers: (builder) => {
-        builder
-            .addCase(fetchOrders.pending, (state) => {
-                state.error = null;
-                state.loading = true;
-            })
-            .addCase(fetchOrders.fulfilled, (state, action) => {
-                state.loading = false;
-                state.orders = action.payload;
-                state.error = null;
-            })
-            .addCase(fetchOrders.rejected, (state, action) => {
-                state.loading = false;
-                state.error = action.error.message || "Failed to fetch orders";
-            })
-            .addCase(checkout.pending, (state) => {
-                state.loading = true;
-                state.error = null;
-            })
-            .addCase(checkout.fulfilled, (state, action) => {
-                state.loading = false;
-                state.currentOrder = action.payload;
-                state.error = null;
-            })
-            .addCase(checkout.rejected, (state, action) => {
-                state.loading = false;
-                state.error = action.error.message || "Failed to checkout";
-            })
-            .addCase(processPaymentAndOrderCreate.pending, (state) => {
-                state.loading = true;
-                state.error = null;
-            })
-            .addCase(processPaymentAndOrderCreate.fulfilled, (state, action) => {
-                state.loading = false;
-                state.currentOrder = action.payload;
-                state.error = null;
-            })
-            .addCase(processPaymentAndOrderCreate.rejected, (state, action) => {
-                state.loading = false;
-                state.error = action.error.message || "Failed to checkout";
-            })
-            .addCase(verifyPayment.pending, (state) => {
-                state.loading = true;
-                state.error = null;
-            })
-            .addCase(verifyPayment.fulfilled, (state, action) => {
-                state.loading = false;
-                state.currentOrder = action.payload;
-                state.orders.push(action.payload);
-                state.error = null;
-            })
-            .addCase(verifyPayment.rejected, (state, action) => {
-                state.loading = false;
-                state.error = action.error.message || "Failed to checkout";
-            })
-    }
+  },
+  extraReducers: (builder) => {
+    builder
+      .addCase(getOrders.pending, (state) => {
+        state.loading = true;
+        state.error = null;
+      })
+      .addCase(getOrders.fulfilled, (state, action) => {
+        state.loading = false;
+        state.orders = action.payload;
+        state.error = null;
+      })
+      .addCase(getOrders.rejected, (state, action) => {
+        state.loading = false;
+        state.error = action.error.message || "Failed to get orders";
+      })
+      .addCase(createOrder.pending, (state) => {
+        state.loading = true;
+        state.error = null;
+      })
+      .addCase(createOrder.fulfilled, (state, action) => {
+        state.loading = false;
+        state.orders.push(action.payload.order);
+        state.currentOrder = action.payload.order;
+        state.error = null;
+      })
+      .addCase(createOrder.rejected, (state, action) => {
+        state.loading = false;
+        state.error = action.error.message || "Failed to create order";
+      })
+      .addCase(createPaymentOrder.pending, (state) => {
+        state.loading = true;
+        state.error = null;
+      })
+      .addCase(createPaymentOrder.fulfilled, (state, action) => {
+        state.loading = false;
+        state.currentOrder = {
+          ...state.currentOrder!,
+          paymentDetails: action.payload,
+        };
+        state.error = null;
+      })
+      .addCase(createPaymentOrder.rejected, (state, action) => {
+        state.loading = false;
+        state.error = action.error.message || "Failed to create payment order";
+      })
+      .addCase(verifyPayment.pending, (state) => {
+        state.loading = true;
+        state.error = null;
+      })
+      .addCase(verifyPayment.fulfilled, (state, _) => {
+        state.loading = false;
+        state.currentOrder = {
+          ...state.currentOrder!,
+          status: "PROCESSING",
+          paymentDetails: {
+            ...state.currentOrder!.paymentDetails,
+            status: "COMPLETED",
+          },
+        };
+        state.error = null;
+      })
+      .addCase(verifyPayment.rejected, (state, action) => {
+        state.loading = false;
+        state.error = action.error.message || "Failed to verify payment";
+      });
+  },
 });
 
-export const {clearCurrentOrder} = orderSlice.actions;
+export const { clearCurrentOrder } = orderSlice.actions;
 export default orderSlice.reducer;
