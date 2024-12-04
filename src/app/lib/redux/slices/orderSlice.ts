@@ -66,7 +66,6 @@ export const createOrder = createAsyncThunk(
       }
 
       const data = await response.json();
-      console.log("Created order--->", data);
       return data.data;
     } catch (error: any) {
       console.error("Error creating order: ", error);
@@ -83,16 +82,14 @@ export const createPaymentOrder = createAsyncThunk(
         {
           url: `${process.env.NEXT_PUBLIC_BACKEND_URI}/payments/create-order`,
           method: "POST",
-          body: orderId,
+          body: {orderId},
         },
         getState as () => RootState
       );
-
       if (!response.ok) {
         throw new Error("Failed to create payment order");
       }
       const data = await response.json();
-      console.log("Created payment order--->", data);
       return data.data;
     } catch (error: any) {
       console.error("Error creating payment order: ", error);
@@ -113,14 +110,10 @@ export const verifyPayment = createAsyncThunk(
         },
         getState as () => RootState
       );
-
       if (!response.ok) {
         throw new Error("Failed to verify payment");
       }
-
       const data = await response.json();
-
-      console.log("Verified payment--->", data);
       return data.data;
     } catch (error: any) {
       console.error("Error verifying payment: ", error);
@@ -158,7 +151,6 @@ export const orderSlice = createSlice({
       })
       .addCase(createOrder.fulfilled, (state, action) => {
         state.loading = false;
-        console.log("Created order--->", action.payload);
         state.orders.push(action.payload.order);
         state.currentOrder = action.payload.order;
         state.error = null;
@@ -173,7 +165,6 @@ export const orderSlice = createSlice({
       })
       .addCase(createPaymentOrder.fulfilled, (state, action) => {
         state.loading = false;
-        console.log("Created payment order--->", action.payload);
         state.currentOrder = {
           ...state.currentOrder!,
           paymentDetails: action.payload,
@@ -188,9 +179,8 @@ export const orderSlice = createSlice({
         state.loading = true;
         state.error = null;
       })
-      .addCase(verifyPayment.fulfilled, (state, action) => {
+      .addCase(verifyPayment.fulfilled, (state, _) => {
         state.loading = false;
-        console.log("Verified payment--->", action.payload);
         state.currentOrder = {
           ...state.currentOrder!,
           status: "PROCESSING",
