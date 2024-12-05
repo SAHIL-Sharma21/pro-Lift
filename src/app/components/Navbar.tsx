@@ -23,6 +23,7 @@ import {
   DropdownMenuTrigger,
 } from "@/components/ui/dropdown-menu";
 import SideBar from "@/app/components/cart/SidebarCart";
+import { useRouter } from "next/navigation";
 
 interface MobileLinkProps extends React.PropsWithChildren {
   href: string;
@@ -134,13 +135,17 @@ export default function Navbar() {
                   <DropdownMenuContent className="w-56" align="end">
                     <DropdownMenuLabel>My Account</DropdownMenuLabel>
                     <DropdownMenuSeparator />
-                    <DropdownMenuItem>
-                      <UserCircle2 className="mr-2 h-4 w-4" />
-                      <span>Profile</span>
+                    <DropdownMenuItem asChild>
+                      <Link href="/users/profile">
+                        <UserCircle2 className="mr-2 h-4 w-4" />
+                        <span className="cursor-pointer">Profile</span>
+                      </Link>
                     </DropdownMenuItem>
-                    <DropdownMenuItem>
-                      <ShoppingBag className="mr-2 h-4 w-4" />
-                      <span>Orders</span>
+                    <DropdownMenuItem asChild>
+                      <Link href="/users/orders">
+                        <ShoppingBag className="mr-2 h-4 w-4" />
+                        <span>Orders</span>
+                      </Link>
                     </DropdownMenuItem>
                     <DropdownMenuSeparator />
                     <DropdownMenuItem
