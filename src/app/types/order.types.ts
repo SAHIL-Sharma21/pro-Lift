@@ -1,3 +1,5 @@
+import { Product } from "./products.types";
+
 export interface Order {
   id: string;
   userId: string;
@@ -18,6 +20,7 @@ export interface Order {
 export interface OrderItem {
   id: string;
   productId: string;
+  product: Product;
   quantity: number;
   price: number;
 }

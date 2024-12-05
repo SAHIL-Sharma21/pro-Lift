@@ -29,7 +29,7 @@ export const getOrders = createAsyncThunk(
     try {
       const response = await apiCall(
         {
-          url: `${process.env.NEXT_PUBLIC_BACKEND_URI}/orders/getAllOrders`,
+          url: `${process.env.NEXT_PUBLIC_BACKEND_URI}/orders/`,
           method: "GET",
         },
         getState as () => RootState
@@ -38,9 +38,7 @@ export const getOrders = createAsyncThunk(
       if (!response.ok) {
         throw new Error("Failed to get orders");
       }
-
       const data = await response.json();
-      console.log("all orders--->", data);
       return data.data;
     } catch (error: any) {
       return rejectWithValue(error?.message);
