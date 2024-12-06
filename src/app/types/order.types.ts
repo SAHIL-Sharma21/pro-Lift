@@ -13,6 +13,7 @@ export interface Order {
     razorpayPaymentId?: string;
     status: PaymentStatus;
   };
+  paymentStatus: string;
   createdAt: string;
   updatedAt: string;
 }
