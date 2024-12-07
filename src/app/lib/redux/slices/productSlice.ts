@@ -38,7 +38,6 @@ export const fetchProducts = createAsyncThunk(
       if(!data || !data.data){
         throw new Error("Invalid data format recieved.");
       }
-      console.log(data.data);
       return data;
     } catch (error: any) {
       console.log("Error fetching products:", error?.message);
