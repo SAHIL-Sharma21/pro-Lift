@@ -49,3 +49,8 @@ export interface LoginResponse{
     message: string;
     success: boolean;
 }
+
+export interface ChangePassword {
+    oldPassword: string;
+    newPassword: string;
+}

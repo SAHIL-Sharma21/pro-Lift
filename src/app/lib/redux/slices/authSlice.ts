@@ -1,6 +1,9 @@
 //making auth slice here.
 import {createSlice, createAsyncThunk} from '@reduxjs/toolkit';
-import {Customer, RegisterUserCredentials, LoginUserCredentials, ApiCallCredentials} from '@/app/types/user.types';
+import {Customer, RegisterUserCredentials, LoginUserCredentials, ApiCallCredentials, ChangePassword} from '@/app/types/user.types';
+import { RootState } from '../store';
+import { apiCall } from '@/utils/apiCall';
+
 
 interface AuthState {
     user: Customer | null;
@@ -8,6 +11,7 @@ interface AuthState {
     error: string | null;
     accessToken?: string | null;
     refreshToken?: string | null;
+    changePassword?: boolean;
 }
 
 const initialState:AuthState = {
@@ -15,12 +19,13 @@ const initialState:AuthState = {
     loading: false,
     error: null,
     accessToken: null,
-    refreshToken: null
+    refreshToken: null,
+    changePassword: false,
 }
 
 
 //helper to handler auth tokens
-const apiCall = async(credentials: ApiCallCredentials) => {
+const apiCallUsers = async(credentials: ApiCallCredentials) => {
     const headers: HeadersInit = {
         'Content-Type': 'application/json'
     };
@@ -110,7 +115,7 @@ export const getLoggedInUser = createAsyncThunk('auth/getLoggedInUser', async(_,
         const state = getState() as {auth: AuthState}
 
         if(state.auth.accessToken){
-            const data = await apiCall({url: `${process.env.NEXT_PUBLIC_BACKEND_URI}/users/getUser`, method: "GET", token: state.auth.accessToken, body: undefined});
+            const data = await apiCallUsers({url: `${process.env.NEXT_PUBLIC_BACKEND_URI}/users/getUser`, method: "GET", token: state.auth.accessToken, body: undefined});
             return data;
         }
         throw new Error("No access token available");
@@ -125,7 +130,7 @@ export const logoutUser = createAsyncThunk('auth/logoutUser', async(_,{getState,
     try {
         const state = getState() as {auth: AuthState};
         if(state.auth.accessToken){
-            const data = await apiCall({url: `${process.env.NEXT_PUBLIC_BACKEND_URI}/users/logout`, method: "POST", token: state.auth.accessToken, body: undefined});
+            const data = await apiCallUsers({url: `${process.env.NEXT_PUBLIC_BACKEND_URI}/users/logout`, method: "POST", token: state.auth.accessToken, body: undefined});
             if(localStorage.getItem("accessToken")){
                 localStorage.removeItem("accessToken");
                 localStorage.removeItem("refreshToken");
@@ -161,6 +166,24 @@ export const googlLogin = createAsyncThunk('auth/googleLogin', async(token: stri
     }
 });
 
+export const changePassword = createAsyncThunk('auth/changePassword', async(payload: ChangePassword, {rejectWithValue, getState}) => {
+    try {
+        const response = await apiCall({
+            url: `${process.env.NEXT_PUBLIC_BACKEND_URI}/users/change-password`,
+            method: "POST",
+            body: payload,
+        }, getState as () => RootState);
+
+        if(!response.ok){
+            throw new Error("Failed to change password");
+        }
+        const data = await response.json();
+        console.log("password changed successfully", data);
+        return data.data;
+    } catch (error: any) {
+        return rejectWithValue(error?.message);        
+    }
+})
 
 export const authSlice = createSlice({
     name: "auth",
@@ -255,6 +278,19 @@ export const authSlice = createSlice({
             .addCase(googlLogin.rejected, (state, action) => {
                 state.loading = false;
                 state.error = action.error.message as string || "Failed to login with google";
+            })
+            .addCase(changePassword.pending, (state) => {
+                state.loading = true;
+                state.error = null;
+            })
+            .addCase(changePassword.fulfilled, (state) => {
+                state.loading = false;
+                state.changePassword = true;
+                state.error = null;
+            })
+            .addCase(changePassword.rejected, (state, action) => {
+                state.loading = false;
+                state.error = action.error.message as string || "Failed to change password";
             })
     }
 });

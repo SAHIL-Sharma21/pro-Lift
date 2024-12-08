@@ -14,7 +14,7 @@ import { Label } from "@radix-ui/react-label";
 import { Alert, AlertDescription, AlertTitle } from "@/components/ui/alert";
 import React, { useState } from "react";
 import { useAuth } from "../hooks/useAuth";
-import { AlertCircle, Dumbbell, Eye, EyeOff, Loader2 } from "lucide-react";
+import { AlertCircle, Eye, EyeOff, Loader2 } from "lucide-react";
 import Link from "next/link";
 import { useRouter } from "next/navigation";
 import PasswordStrengthIndicator from "@/app/components/PasswordStrengthIndicator";

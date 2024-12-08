@@ -2,8 +2,9 @@
 
 import {useDispatch, useSelector} from 'react-redux';
 import { AppDispatch, RootState } from '../lib/redux/store';
-import {registerUser, loginUser, logoutUser, getLoggedInUser,googlLogin, registerAdmin} from '@/app/lib/redux/slices/authSlice';
-import { RegisterUserCredentials, LoginUserCredentials } from '../types/user.types';
+import {registerUser, loginUser, logoutUser, getLoggedInUser,googlLogin, registerAdmin, changePassword} from '@/app/lib/redux/slices/authSlice';
+import { RegisterUserCredentials, LoginUserCredentials, ChangePassword } from '../types/user.types';
+import { useCallback } from 'react';
 
 
 export const useAuth = () => {
@@ -11,29 +12,33 @@ export const useAuth = () => {
     const {user, loading, error, accessToken} = useSelector((state: RootState) => state.auth);
 
 
-    const register = async(userData: RegisterUserCredentials) => {
+    const register = useCallback(async(userData: RegisterUserCredentials) => {
         return await dispatch(registerUser(userData));
-    }
+    }, [dispatch]);
 
-    const admin = async(userData: RegisterUserCredentials) => {
+    const admin = useCallback(async(userData: RegisterUserCredentials) => {
         return await dispatch(registerAdmin(userData));
-    }
+    }, [dispatch]);
 
-    const login = async(userData: LoginUserCredentials) => {
+    const login = useCallback(async(userData: LoginUserCredentials) => {
         return await dispatch(loginUser(userData));
-    }
+    }, [dispatch]);
 
-    const logout = async() => {
+    const logout = useCallback(async() => {
         return await dispatch(logoutUser());
-    }
+    }, [dispatch]);
 
-    const getCurrentUser = async() => {
+    const getCurrentUser = useCallback(async() => {
         return await dispatch(getLoggedInUser());
-    }
+    }, [dispatch]);
 
-    const googleLogin = async(token: string) => {
+    const googleLogin = useCallback(async(token: string) => {
         return await dispatch(googlLogin(token))
-    }
+    }, [dispatch]);
+
+    const passwordChange = useCallback(async(payload: ChangePassword) => {
+        return await dispatch(changePassword(payload));
+    }, [dispatch]);
 
     return {
         user,
@@ -46,7 +51,8 @@ export const useAuth = () => {
         register,
         admin,
         getCurrentUser,
-        googleLogin
+        googleLogin,
+        passwordChange
     };
 
 };
