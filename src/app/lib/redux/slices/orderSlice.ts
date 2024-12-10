@@ -29,7 +29,7 @@ export const getOrders = createAsyncThunk(
     try {
       const response = await apiCall(
         {
-          url: `${process.env.NEXT_PUBLIC_BACKEND_URI}/orders/`,
+          url: `${process.env.NEXT_PUBLIC_BACKEND_URI}/orders/admin/allOrders`,
           method: "GET",
         },
         getState as () => RootState
