@@ -1,5 +1,7 @@
 //products types which will fetch from the backend
 
+import { Category} from "./category.types";
+
 export interface Product {
     id: string;
     name: string;
@@ -8,6 +10,7 @@ export interface Product {
     categoryId?: string;
     image: string;
     quantity: number;
+    category?: Category;
     createdAt: string;
     updatedAt: string;
 }

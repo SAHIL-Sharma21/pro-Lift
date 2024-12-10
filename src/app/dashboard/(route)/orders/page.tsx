@@ -7,11 +7,11 @@ import { useEffect } from "react";
 
 export default function OrdersPage() {
 
-    const {loading, error, getOrders, orders} = useOrder();
+    const {loading, error, getAllOrders, orders} = useOrder();
 
     useEffect(() => {
-        getOrders();
-    }, [getOrders]);
+        getAllOrders();
+    }, [getAllOrders]);
 
     if(loading) return <div>Loading orders....</div>
     if(error) return <div>Error: {error}</div>

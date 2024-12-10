@@ -13,12 +13,16 @@ import { Input } from "@/components/ui/input";
 import { useState } from "react";
 import Link from "next/link";
 import { useCategory } from "@/app/hooks/useCategory";
+import { useToast } from "@/hooks/use-toast";
+import { Loader2 } from "lucide-react";
 
 export default function ProductsPage() {
   const [categoryName, setCategoryName] = useState("");
   const [categoryDescription, setCategoryDescription] = useState("");
-
   const { loading, addCategory } = useCategory();
+  const {toast} = useToast();
+  const [isOpen, setIsOpen] = useState(false);
+
 
   const handleCreateCategory = async (e: React.FormEvent) => {
     e.preventDefault();
@@ -31,10 +35,27 @@ export default function ProductsPage() {
       if (result.meta.requestStatus === "rejected") {
         throw new Error("Failed to create category");
       }
-      //TODO: show notification
+      if(result.meta.requestStatus === "fulfilled"){
+        toast({
+          title: "Category Created Successfully",
+          description: "The category has been created successfully.",
+          variant: "default",
+        })
+        setIsOpen(false);
+      } else {
+        toast({
+          title: "Category Creation Failed",
+          description: "There was an error creating the category. Please try again.",
+          variant: "destructive",
+        });
+      }
     } catch (error) {
       console.error("Error creating category: ", error);
-      //TODO: show notification
+      toast({
+        title: "Category Creation Failed",
+        description: "There was an error creating the category. Please try again.",
+        variant: "destructive",
+      });
     } finally {
       setCategoryName("");
       setCategoryDescription("");
@@ -47,7 +68,7 @@ export default function ProductsPage() {
         <div className="flex flex-col space-y-4 sm:flex-row sm:justify-between sm:items-center">
           <h1 className="text-3xl font-bold">Products</h1>
           <div className="flex flex-col space-y-2 sm:flex-row sm:space-y-0 sm:space-x-4">
-            <Popover>
+            <Popover open={isOpen} onOpenChange={setIsOpen}>
               <PopoverTrigger asChild>
                 <Button>Create category</Button>
               </PopoverTrigger>
@@ -78,7 +99,12 @@ export default function ProductsPage() {
                     />
                   </div>
                   <Button type="submit" disabled={loading}>
-                    {loading ? "creating..." : "Create Category"}
+                    {loading ? (
+                      <>
+                        <Loader2 className="mr-1 h-4 w-4 animate-spin" />
+                        Creating...
+                      </>
+                    ) : "Create Category"}
                   </Button>
                 </form>
               </PopoverContent>

@@ -53,7 +53,7 @@ export const useProduct = () => {
         removeProduct,
         fetchProductById,
         selectedProduct,
-        currentPage,
-        totalPage
+        currentPage : currentPage || 1,
+        totalPage: totalPage || 1
     };
 }
