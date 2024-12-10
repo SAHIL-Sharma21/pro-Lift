@@ -120,6 +120,24 @@ export const verifyPayment = createAsyncThunk(
   }
 );
 
+export const getOrderById = createAsyncThunk('order/getOrderById', async(orderId: string, {rejectWithValue, getState}) => {
+  try {
+    const response  = await apiCall({
+      url: `${process.env.NEXT_PUBLIC_BACKEND_URI}/orders/admin/order/${orderId}`,
+      method: "GET"
+    }, getState as () => RootState);
+
+    if(!response.ok){
+      throw new Error("Failed to get order");
+    }
+    const data = await response.json();
+    console.log("order data--->", data);
+    return data.data;
+  } catch (error: any) {
+      return rejectWithValue(error?.message);
+  }
+});
+
 export const orderSlice = createSlice({
   name: "order",
   initialState,
@@ -192,6 +210,19 @@ export const orderSlice = createSlice({
       .addCase(verifyPayment.rejected, (state, action) => {
         state.loading = false;
         state.error = action.error.message || "Failed to verify payment";
+      })
+      .addCase(getOrderById.pending, (state) => {
+        state.loading = true;
+        state.error = null;
+      })
+      .addCase(getOrderById.fulfilled, (state, action) => {
+        state.loading = false;
+        state.currentOrder = action.payload;
+        state.error = null;
+      })
+      .addCase(getOrderById.rejected, (state, action) => {
+        state.loading = false;
+        state.error = action.error.message || "Failed to get order";
       });
   },
 });

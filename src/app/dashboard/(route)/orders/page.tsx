@@ -22,6 +22,7 @@ import {
   TableRow,
 } from "@/components/ui/table";
 import { AlertCircle, Package } from "lucide-react";
+import Link from "next/link";
 import { useEffect } from "react";
 
 export default function OrdersPage() {
@@ -96,8 +97,10 @@ export default function OrdersPage() {
                       </TableCell>
                       <TableCell>Rs.{order.totalAmount}</TableCell>
                       <TableCell>
-                        <Button variant="default" size="sm">
-                          View Details
+                        <Button variant="default" size="sm" asChild>
+                            <Link href={`/dashboard/orders/${order.id}`}>
+                                View Details
+                            </Link>
                         </Button>
                       </TableCell>
                     </TableRow>
