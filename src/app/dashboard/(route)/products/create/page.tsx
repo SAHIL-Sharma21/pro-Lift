@@ -21,6 +21,7 @@ import {
   SelectValue,
 } from "@/components/ui/select";
 import { Textarea } from "@/components/ui/textarea";
+import { Loader2 } from "lucide-react";
 import { useRouter } from "next/navigation";
 import React, { useEffect, useState } from "react";
 
@@ -83,7 +84,7 @@ function ProductCreate() {
 
         
         const result = await addProducts(formData);
-        console.log("Product created-->", result);
+        console.log(result);
         router.push("/dashboard/products");
     }
     } catch (error) {
@@ -193,7 +194,12 @@ function ProductCreate() {
         </CardContent>
         <CardFooter>
           <Button type="submit" className="w-full" disabled={loading}>
-            {loading ? "Creating..." : "Create Product"}
+            {loading ? (
+              <>
+                <Loader2 className="mr-2 h-4 w-4 animate-spin" />
+                Creating..
+              </>
+            ) : "Create Product"}
           </Button>
         </CardFooter>
       </form>

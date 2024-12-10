@@ -28,7 +28,7 @@ export const useProduct = () => {
         try {
             const result = await dispatch(deleteProduct(productId)).unwrap();
             if (result && result.id) {
-                return result;
+                return { status: 200, id: result.id };;
             } else {
                 throw new Error('Delete operation did not return expected result');
             }

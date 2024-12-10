@@ -46,7 +46,7 @@ export const fetchProducts = createAsyncThunk(
   }
 );
 
-export const createProduct = createAsyncThunk('product/createProduct', async(formData: FormData, {rejectWithValue}) => {
+export const createProduct = createAsyncThunk('product/createProduct', async(formData: FormData, {rejectWithValue, getState}) => {
   try {
     const response = await fetch(`${process.env.NEXT_PUBLIC_BACKEND_URI}/products/create-product`, {
       method: "POST",
@@ -55,7 +55,6 @@ export const createProduct = createAsyncThunk('product/createProduct', async(for
       },
       body: formData
     });
-
     if(!response.ok){
       throw new Error("Failed to create product");
     }
@@ -63,6 +62,7 @@ export const createProduct = createAsyncThunk('product/createProduct', async(for
     if(!data || !data.data){
       throw new Error("Invalid data format recieved.");
     }
+    console.log("created prioduct data--->", data);
     return data.data;
   } catch (error:any) {
     console.log("Error creating product: ", error);
@@ -108,13 +108,13 @@ export const deleteProduct = createAsyncThunk<
         throw new Error(errorData.message || "Failed to delete product");
       }
       const data = await response.json();
-      return data;
+      // console.log("Deleted data --->", data);
     } else {
       // If response is not a standard Response object, assume it's already parsed
       console.log("Deleted data --->", response);
     }
     
-    return { id: productId };
+    return { id: productId, status: 200 };
   } catch (error: any) {
     console.log("Error deleting product: ", error);
     return rejectWithValue(error.message || "Failed to delete product");
@@ -200,6 +200,7 @@ export const productSlice = createSlice({
       })
       .addCase(deleteProduct.fulfilled, (state, action: PayloadAction<{id: string}>) => {
         state.loading = false;
+        console.log("action.payload-->", action.payload);
         if(action.payload && action.payload.id){
           state.products = state.products.filter((product) => product.id !== action.payload.id);
         } else {

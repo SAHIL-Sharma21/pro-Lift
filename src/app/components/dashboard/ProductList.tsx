@@ -5,10 +5,12 @@ import { useProduct } from '@/app/hooks/useProduct'
 import { Table, TableBody, TableCell, TableHead, TableHeader, TableRow } from '@/components/ui/table'
 import { Button } from '@/components/ui/button'
 import { Pencil, Trash2 } from 'lucide-react'
+import { useToast } from '@/hooks/use-toast'
 
 export default function ProductList() {
   const { loading, error, getAllProducts, products, removeProduct } = useProduct();
   const [deleteError, setDeleteError] = useState<string | null>(null);
+  const {toast} = useToast();
 
   useEffect(() => {
     getAllProducts();
@@ -16,13 +18,30 @@ export default function ProductList() {
 
   const handleDelete = async (productId: string) => {
     try {
-      await removeProduct(productId);
-      // Optionally refresh the product list
-      getAllProducts();
+      const data = await removeProduct(productId);
+      console.log(data);
+      if(data.status === 200){
+        toast({
+          title: 'Product Deleted Successfully',
+          description: 'The product has been deleted successfully.',
+          variant: 'default',
+        });
+        getAllProducts();
+      } else {
+        toast({
+          title: 'Product Deletion Failed',
+          description: 'There was an error deleting the product. Please try again.',
+          variant: 'destructive',
+        });
+      }
       setDeleteError(null);
     } catch (error) {
-      console.error('Error deleting product:', error);
       setDeleteError('Failed to delete product. Please try again.');
+      toast({
+        title: 'Product Deletion Failed',
+        description: 'There was an error deleting the product. Please try again.',
+        variant: 'destructive',
+      });
     }
   };
 
