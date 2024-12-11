@@ -1,4 +1,6 @@
+import { Address } from "./address.types";
 import { Product } from "./products.types";
+import { User } from "./user.types";
 
 export interface Order {
   id: string;
@@ -7,6 +9,8 @@ export interface Order {
   status: OrderStatus;
   totalAmount: number;
   addressId: string;
+  shippingAddress?: Address;
+  user?: User;
   paymentDetails: {
     id: string;
     razorpayOrderId: string;
@@ -44,4 +48,17 @@ export interface VerifyPaymentData {
   razorpayOrderId: string;
   razorpayPaymentId: string;
   razorpaySignature: string;
+}
+
+export interface SingleOrder {
+  addressId: string;
+  createdAt: string;
+  id: string;
+  items: OrderItem[];
+  shippingAddress: Address;
+  status: OrderStatus;
+  totalAmount: number;
+  user: User;
+  updatedAt: string;
+  userId: string;
 }
