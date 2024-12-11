@@ -3,7 +3,7 @@
 import React, { useState } from 'react'
 import { useRouter } from 'next/navigation'
 import Link from 'next/link'
-import { Eye, EyeOff, Loader2 } from 'lucide-react'
+import { AlertCircle, Eye, EyeOff, Loader2 } from 'lucide-react'
 import { Card, CardContent, CardDescription, CardFooter, CardHeader, CardTitle } from '@/components/ui/card'
 import { Label } from '@/components/ui/label'
 import { Input } from '@/components/ui/input'
@@ -12,13 +12,14 @@ import { useAuth } from '@/app/hooks/useAuth'
 import { useCart } from '@/app/hooks/useCart'
 import { useToast } from '@/hooks/use-toast'
 import GoogleLoginButton from './GoogleLoginButton'
+import { Alert, AlertDescription, AlertTitle } from '@/components/ui/alert'
 
 const LoginForm = () => {
   const [email, setEmail] = useState('')
   const [password, setPassword] = useState('')
   const [showPassword, setShowPassword] = useState(false)
 
-  const { login, loading } = useAuth()
+  const { login, loading, error } = useAuth()
   const router = useRouter()
   const { cart } = useCart()
   const { toast } = useToast()
@@ -84,9 +85,9 @@ const LoginForm = () => {
                 onClick={() => setShowPassword(!showPassword)}
               >
                 {showPassword ? (
-                  <EyeOff className="h-4 w-4" />
-                ) : (
                   <Eye className="h-4 w-4" />
+                ) : (
+                  <EyeOff className="h-4 w-4" />
                 )}
                 <span className="sr-only">
                   {showPassword ? 'Hide password' : 'Show password'}
@@ -104,6 +105,13 @@ const LoginForm = () => {
               'Log In'
             )}
           </Button>
+          {error && (
+            <Alert variant="destructive" className='mt-4'>
+              <AlertCircle className="h-4 w-4" />
+              <AlertTitle>Error:</AlertTitle>
+              <AlertDescription>{error}</AlertDescription>
+            </Alert>
+          )}
         </form>
       </CardContent>
       <CardFooter className="flex flex-col space-y-4">

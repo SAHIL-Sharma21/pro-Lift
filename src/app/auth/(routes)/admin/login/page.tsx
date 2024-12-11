@@ -1,7 +1,11 @@
-'use client'
+"use client";
 
-import Admin from '@/app/components/AdminLogin';
+import LoginAdmin from "@/app/components/AdminLogin";
 
-export default function AdminLogin(){
-    return <Admin />
+export default function AdminLogin() {
+  return (
+    <div className="w-full max-w-md">
+      <LoginAdmin />
+    </div>
+  );
 }

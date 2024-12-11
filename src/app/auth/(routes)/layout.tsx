@@ -18,7 +18,7 @@ export default function AuthLayout({
           Get fit, stay healthy, and shop for the best gym equipment!
         </p>
       </div>
-      <div className="flex flex-col justify-center items-center w-full lg:w-1/2 p-8">
+      <div className="flex flex-col justify-center items-center w-full lg:w-1/2 p-8 bg-blue-100">
         {children}
       </div>
     </div>

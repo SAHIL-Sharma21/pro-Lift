@@ -15,8 +15,10 @@ import React, { useState } from "react";
 import { useAuth } from "../hooks/useAuth";
 import { useRouter } from "next/navigation";
 import PasswordStrengthIndicator from "./PasswordStrengthIndicator";
-import { EyeIcon, EyeOff } from "lucide-react";
+import { AlertCircle, Eye, EyeIcon, EyeOff, Loader2 } from "lucide-react";
 import Link from "next/link";
+import { Alert, AlertDescription, AlertTitle } from "@/components/ui/alert";
+import { useToast } from "@/hooks/use-toast";
 
 const AdminRegister = () => {
   const [firstName, setFirstName] = useState<string>("");
@@ -26,9 +28,10 @@ const AdminRegister = () => {
   const [role, setRole] = useState("ADMIN");
   const [phoneNumber, setPhoneNumber] = useState("");
   const [showPassword, setShowPassword] = useState<boolean>(false);
-
   const { loading, error, admin } = useAuth();
   const router = useRouter();
+  const {toast} = useToast();
+
 
   const handleRegisterAdmin = async (e: React.FormEvent) => {
     e.preventDefault();
@@ -41,20 +44,40 @@ const AdminRegister = () => {
         role,
         phoneNumber,
       });
-      console.log(data);
-      //TODO:check for api response and then move to login...
-      router.push("/auth/admin/login"); //pusing to admin login page.
+      if(data.meta.requestStatus === "fulfilled"){
+        toast({
+          title: "Admin Registered Successfully",
+          description: "You can now login to your account",
+          variant: "default",
+        });
+      } else {
+        toast({
+          title: "Admin Registration Failed",
+          description: "There was a error registering admin, Try Again",
+          variant: "destructive",
+        });
+      }
+      router.push("/auth/admin/login");
     } catch (error: any) {
-      console.error("Register admin failed: ", error.message);
+      toast({
+        title: "Admin Registration Failed",
+        description:
+          error.message || "There was a error registering admin, Try Again",
+        variant: "destructive",
+      });
     } finally {
-      setFirstName("");
-      setLastName("");
-      setEmail("");
-      setPassword("");
-      setRole("ADMIN");
-      setPhoneNumber("");
+      resetForm();
     }
   };
+
+  const resetForm = () => {
+    setFirstName("");
+    setLastName("");
+    setEmail("");
+    setPassword("");
+    setRole("ADMIN");
+    setPhoneNumber("");
+  }
 
   const handleShowPassword = () => {
     setShowPassword(!showPassword);
@@ -64,16 +87,16 @@ const AdminRegister = () => {
 
   return (
     <>
-      <div className="flex items-center justify-center min-h-screen bg-gray-900">
-        <Card className="w-[450px]">
+        <Card className="w-full">
           <CardHeader>
-            <CardTitle>Admin Register</CardTitle>
+            <CardTitle className="text-2xl font-bold">Admin Register</CardTitle>
             <CardDescription>
               Enter details to register as Admin
             </CardDescription>
           </CardHeader>
           <CardContent>
             <form onSubmit={handleRegisterAdmin} className="space-y-4">
+              <div className="grid grid-cols-2 gap-4">
               <div className="flex flex-col space-y-2">
                 <Label htmlFor="firstName">First Name</Label>
                 <Input
@@ -81,6 +104,7 @@ const AdminRegister = () => {
                   id="firstName"
                   value={firstName}
                   onChange={(e) => setFirstName(e.target.value)}
+                  className="font-semibold"
                   placeholder="Enter your first name"
                   required
                 />
@@ -91,9 +115,11 @@ const AdminRegister = () => {
                   type="text"
                   id="lastName"
                   value={lastName}
+                  className="font-semibold"
                   onChange={(e) => setLastName(e.target.value)}
                   placeholder="Enter your last name"
                 />
+              </div>
               </div>
               <div className="flex flex-col space-y-2">
                 <Label htmlFor="email">Email</Label>
@@ -101,6 +127,7 @@ const AdminRegister = () => {
                   type="email"
                   id="email"
                   value={email}
+                  className="font-semibold"
                   onChange={(e) => setEmail(e.target.value)}
                   placeholder="Enter your email"
                   required
@@ -108,24 +135,31 @@ const AdminRegister = () => {
               </div>
               <div className="flex flex-col space-y-2">
                 <Label htmlFor="password">Password</Label>
-                <div className="flex justify-between">
+                <div className="relative">
                   <Input
                     type={showPassword ? "text" : "password"}
                     id="password"
                     value={password}
                     onChange={(e) => setPassword(e.target.value)}
+                    className="font-semibold"
                     placeholder="Enter your password"
                     required
                   />
-                  <Button type="button" onClick={handleShowPassword}>
+                  <Button type="button"
+                  className="absolute right-0 top-0 h-full px-3 py-2 hover:bg-transparent"
+                  variant="ghost"
+                  size="sm"
+                  onClick={handleShowPassword}>
                     {showPassword ? (
-                      <EyeIcon className="h-4 w-4" />
+                      <Eye className="h-4 w-4" />
                     ) : (
                       <EyeOff className="h-4 w-4" />
                     )}
+                  <span className="sr-only">
+                    {showPassword ? "Hide password" : "Show password"}
+                  </span>
                   </Button>
                 </div>
-
                 <PasswordStrengthIndicator password={password} />
               </div>
               <div className="flex flex-col space-y-2">
@@ -145,29 +179,43 @@ const AdminRegister = () => {
                   type="text"
                   id="phoneNumber"
                   value={phoneNumber}
+                  className="font-semibold"
                   onChange={(e) => setPhoneNumber(e.target.value)}
                   placeholder="Enter your Phone number"
                   required
                 />
               </div>
               <Button
-                className="w-full"
+                className="w-full mt-6"
                 type="submit"
-                variant="default"
                 disabled={loading}
               >
-                {loading ? "Creating Account...." : "Create Account"}
+                {loading ? (
+                  <>
+                    <Loader2 className="mr-2 h-4 w-4 animate-spin" />
+                    Creating Account...
+                  </>
+                ) : "Create Account"}
               </Button>
+              {error && (
+                <Alert className="mt-4" variant="destructive">
+                  <AlertCircle className="h-4 w-4" />
+                  <AlertTitle>Error</AlertTitle>
+                  <AlertDescription>{error}</AlertDescription>
+                </Alert>
+              )}
             </form>
           </CardContent>
           <CardFooter className="flex flex-row justify-center">
-            {"Already have an account? "}
-            <Link href="/auth/admin/login" className="underline text-blue-500">
-              Login
-            </Link>
+            <p className="text-sm text-center">
+            Already have an account?{" "}
+              <Link href="/auth/admin/login" className="text-primary hover:underline">
+                Login
+              </Link>
+            </p>
+
           </CardFooter>
         </Card>
-      </div>
     </>
   );
 };

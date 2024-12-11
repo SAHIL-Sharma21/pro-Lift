@@ -142,9 +142,9 @@ const RegisterUser = () => {
                   onClick={handleShowPassword}
                 >
                   {showPassword ? (
-                    <EyeOff className="h-4 w-4" />
-                  ) : (
                     <Eye className="h-4 w-4" />
+                  ) : (
+                    <EyeOff className="h-4 w-4" />
                   )}
                   <span className="sr-only">
                     {showPassword ? "Hide password" : "Show password"}

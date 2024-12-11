@@ -14,9 +14,10 @@ import { Label } from "@/components/ui/label";
 import React, { useState } from "react";
 import { useAuth } from "../hooks/useAuth";
 import { Alert, AlertDescription, AlertTitle } from "@/components/ui/alert";
-import { AlertCircle, Eye, EyeOff } from "lucide-react";
+import { AlertCircle, Eye, EyeOff, Loader2 } from "lucide-react";
 import { useRouter } from "next/navigation";
 import Link from "next/link";
+import { useToast } from "@/hooks/use-toast";
 
 const AdminLogin = () => {
   const [email, setEmail] = useState<string>("");
@@ -25,19 +26,44 @@ const AdminLogin = () => {
   const [showPassword, setShowPassword] = useState<boolean>(false);
 
   const router = useRouter();
+  const { toast } = useToast();
 
   const handleSubmit = async (e: React.FormEvent) => {
     e.preventDefault();
     try {
-      const user: any = await login({ email, password });
-      if (user.payload.user.role === "ADMIN") {
-        router.push("/dashboard");
+      const response = await login({ email, password });
+
+      if (response.payload && response.payload.user) {
+        if (response.payload.user.role === "ADMIN") {
+          toast({
+            title: "Login Successful",
+            description: "Welcome to the admin dashboard",
+            variant: "default",
+            className: "bg-green-100 border-green-400 text-green-900",
+          });
+          router.push("/dashboard");
+        } else {
+          toast({
+            title: "Unauthorized Access",
+            description: "You are not authorized to access the admin dashboard",
+            variant: "destructive",
+          });
+          router.push("/");
+        }
       } else {
-        //can show us toast notification
-        throw new Error("Unauthorized Admin");
+        toast({
+          title: "Login Failed",
+          description: "Invalid credentials. Please try again.",
+          variant: "destructive",
+        });
       }
     } catch (error: any) {
-      console.log("Login failed: ", error);
+      toast({
+        title: "Login Error",
+        description:
+          error.message || "An unexpected error occurred. Please try again.",
+        variant: "destructive",
+      });
     } finally {
       setEmail("");
       setPassword("");
@@ -50,74 +76,88 @@ const AdminLogin = () => {
 
   return (
     <>
-      <div className="flex items-center justify-center min-h-screen bg-gray-900">
-        <Card className="w-[350px]">
-          <CardHeader>
-            <CardTitle>Admin Login</CardTitle>
-            <CardDescription>
-              Enter your credentials to access admin dashboard
-            </CardDescription>
-          </CardHeader>
-          <CardContent>
-            <form onSubmit={handleSubmit}>
-              <div className="grid w-full items-center gap-4">
-                <div className="flex flex-col space-y-2">
-                  <Label htmlFor="email">Email</Label>
-                  <Input
-                    type="email"
-                    id="email"
-                    name="email"
-                    placeholder="Enter your email"
-                    required
-                    value={email}
-                    onChange={(e) => setEmail(e.target.value)}
-                  />
-                </div>
-                <div className="flex flex-col space-y-2">
-                  <Label htmlFor="password">Password</Label>
-                  <div className="flex justify-between">
-                    <Input
-                      type={showPassword ? "text" : "password"}
-                      id="password"
-                      name="password"
-                      placeholder="Enter your password"
-                      required
-                      value={password}
-                      onChange={(e) => setPassword(e.target.value)}
-                    />
-                    <Button type="button" onClick={handleShowPassword}>
-                      {showPassword ? (
-                        <EyeOff className="h-4 w-4" />
-                      ) : (
-                        <Eye className="h-4 w-4" />
-                      )}
-                    </Button>
-                  </div>
-                </div>
+      <Card className="w-full">
+        <CardHeader>
+          <CardTitle>Admin Login</CardTitle>
+          <CardDescription>
+            Enter your credentials to access admin dashboard
+          </CardDescription>
+        </CardHeader>
+        <CardContent>
+          <form onSubmit={handleSubmit} className="space-y-4">
+            <div className="space-y-2">
+              <Label htmlFor="email">Email</Label>
+              <Input
+                type="email"
+                id="email"
+                name="email"
+                placeholder="Enter your email"
+                required
+                value={email}
+                onChange={(e) => setEmail(e.target.value)}
+              />
+            </div>
+            <div className="space-y-2">
+              <Label htmlFor="password">Password</Label>
+              <div className="relative">
+                <Input
+                  type={showPassword ? "text" : "password"}
+                  id="password"
+                  name="password"
+                  placeholder="Enter your password"
+                  required
+                  value={password}
+                  onChange={(e) => setPassword(e.target.value)}
+                />
+                <Button
+                  type="button"
+                  size="sm"
+                  variant="ghost"
+                  className="absolute right-0 top-0 h-full px-3 py-2 hover:bg-transparent"
+                  onClick={handleShowPassword}
+                >
+                  {showPassword ? (
+                    <Eye className="h-4 w-4" />
+                  ) : (
+                    <EyeOff className="h-4 w-4" />
+                  )}
+                  <span className="sr-only">
+                    {showPassword ? "Hide password" : "Show password"}
+                  </span>
+                </Button>
               </div>
-              <Button className="w-full mt-4" type="submit" disabled={loading}>
-                {loading ? "Logging in...." : "Login"}
-              </Button>
-              {error && (
-                <Alert variant="destructive" className="mt-4">
-                  <AlertCircle className="h-4 w-4" />
-                  <AlertTitle>Error</AlertTitle>
-                  <AlertDescription>{error}</AlertDescription>
-                </Alert>
+            </div>
+            <Button className="w-full mt-4" type="submit" disabled={loading}>
+              {loading ? (
+                <>
+                  <Loader2 className="mr-2 h-4 w-4 animate-spin" />
+                  Logging In...
+                </>
+              ) : (
+                "Login"
               )}
-            </form>
-          </CardContent>
-          <CardFooter className=" flex flex-row  justify-center">
-            {"Don't have an account? "}
+            </Button>
+            {error && (
+              <Alert variant="destructive" className="mt-4">
+                <AlertCircle className="h-4 w-4" />
+                <AlertTitle>Error</AlertTitle>
+                <AlertDescription>{error}</AlertDescription>
+              </Alert>
+            )}
+          </form>
+        </CardContent>
+        <CardFooter className="flex flex-col space-y-4">
+          <p className="text-sm text-center">
+            Don&apos;t have an account?{" "}
             <Link
               href="/auth/admin/register"
-              className="underline text-blue-500"
+              className="text-primary hover:underline"
             >
               Signup
             </Link>
-          </CardFooter>
-        </Card>
-      </div>
+          </p>
+        </CardFooter>
+      </Card>
     </>
   );
 };
