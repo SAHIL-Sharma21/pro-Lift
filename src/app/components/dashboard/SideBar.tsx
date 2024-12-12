@@ -1,18 +1,14 @@
 'use client'
 
-import { useAuth } from '@/app/hooks/useAuth';
 import { Button } from '@/components/ui/button';
 import { cn } from '@/lib/utils';
-import { FileText, LayoutDashboard, LogOut, Settings, ShoppingBag } from 'lucide-react';
+import { Dumbbell, FileText, LayoutDashboard, LogOut, Settings, ShoppingBag } from 'lucide-react';
 import Link from 'next/link';
 import { usePathname } from 'next/navigation'
 import React from 'react'
 
 const SideBar = () => {
-
     const pathName =  usePathname();
-    const {logout, loading} = useAuth();
-
     const navItems = [
         {icon: LayoutDashboard, label: 'Dashboard', href: '/dashboard'},
         {icon: ShoppingBag, label: 'Products', href: '/dashboard/products'},
@@ -24,7 +20,7 @@ const SideBar = () => {
     <>
         <div className='flex flex-col h-full bg-gray-900 text-white w-64'>
             <div className='p-4'>
-                <h1 className='text-3xl font-bold'>Pro Lifts</h1>
+                <Dumbbell className='h-8 w-8 text-white' />
             </div>
             <nav className='flex-1'>
                 <ul className='space-y-2 p-4'>
@@ -46,12 +42,6 @@ const SideBar = () => {
                     ))}
                 </ul>
             </nav>
-            <div className='p-4'>
-                <Button variant="ghost" className='w-full justify-start hover:bg-red-500 hover:text-white font-medium' onClick={logout}>
-                    <LogOut className='mr-1 h-3 w-3'/>
-                    {loading ? "Logging out..." : "Logout"}
-                </Button>
-            </div>
         </div>
     </>
   )

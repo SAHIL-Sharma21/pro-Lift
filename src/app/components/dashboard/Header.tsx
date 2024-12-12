@@ -1,79 +1,30 @@
-"use client";
+'use client'
 
 import { useAuth } from "@/app/hooks/useAuth";
 import { Button } from "@/components/ui/button";
-import {
-  DropdownMenu,
-  DropdownMenuContent,
-  DropdownMenuItem,
-  DropdownMenuLabel,
-  DropdownMenuSeparator,
-  DropdownMenuTrigger,
-} from "@/components/ui/dropdown-menu";
-import { Bell, User } from "lucide-react";
-import { useRouter } from "next/navigation";
-import React, { useEffect } from "react";
+import { LogOut } from 'lucide-react';
 
 const Header = () => {
-  const { user, logout, loading } = useAuth();
-  const router = useRouter();
-
-  useEffect(() => {
-      if(!loading && !user || localStorage.getItem("accessToken") === null){
-        router.push("/auth/admin/login");
-      }
-  }, [user, loading, router]);
-
-if(loading){
-    return <div>Loading...</div>
-}
+  const { logout } = useAuth();
 
   return (
-    <>
-      <header className="bg-gray-800 text-white p-4">
-        <div className="flex justify-between items-center">
-          <h2 className="text-xl font-semibold">Admin Dashboard</h2>
-          <div className="flex items-center space-x-4">
-            <Button variant="ghost" size="icon">
-              <Bell className="h-5 w-5" />
-            </Button>
-            <DropdownMenu>
-              <DropdownMenuTrigger asChild>
-                <Button
-                  variant="ghost"
-                  className="relative h-8 w-8 rounded-full"
-                >
-                  <User className="h-5 w-5" />
-                </Button>
-              </DropdownMenuTrigger>
-              <DropdownMenuContent className="w-56" align="end" forceMount>
-                <DropdownMenuLabel className="font-normal">
-                  <div className="flex flex-col space-y-1">
-                    <p className="text-2xl font-semibold leading-none">
-                      {user?.firstName || "Not Found"}
-                    </p>
-                    <p className="text-sm text-red-800 leading-none text-gray">
-                      {user?.email || "Not Found"}
-                    </p>
-                  </div>
-                </DropdownMenuLabel>
-                <DropdownMenuSeparator />
-                <DropdownMenuItem>Profile</DropdownMenuItem>
-                <DropdownMenuItem>Settings</DropdownMenuItem>
-                <Button
-                  onClick={logout}
-                  className="w-full font-semibold hover:bg-white hover:border hover:text-red-600"
-                  variant="destructive"
-                >
-                  {loading ? "Logging Out..." : "Logout"}
-                </Button>
-              </DropdownMenuContent>
-            </DropdownMenu>
-          </div>
+    <header className="bg-gray-800 text-white shadow-md sticky top-0 z-10">
+      <div className="max-w-7xl mx-auto px-2 sm:px-4 lg:px-8">
+        <div className="flex justify-between items-center py-3 md:py-4">
+          <h2 className="text-xl md:text-2xl font-bold">Admin Dashboard</h2>
+          <Button
+            onClick={logout}
+            variant="ghost"
+            className="flex items-center text-gray-300 hover:text-red-500 focus:outline-none focus:ring-2 focus:ring-white focus:ring-offset-2 focus:ring-offset-gray-800 transition-colors duration-200"
+          >
+            <LogOut className="mr-2 h-5 w-5" />
+            <span>Logout</span>
+          </Button>
         </div>
-      </header>
-    </>
+      </div>
+    </header>
   );
 };
 
 export default Header;
+

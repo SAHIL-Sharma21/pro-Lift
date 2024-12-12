@@ -66,7 +66,7 @@ export default function ProductsPage() {
     <>
       <div className="space-y-6">
         <div className="flex flex-col space-y-4 sm:flex-row sm:justify-between sm:items-center">
-          <h1 className="text-3xl font-bold">Products</h1>
+          <h1 className="text-3xl font-bold text-white">Products</h1>
           <div className="flex flex-col space-y-2 sm:flex-row sm:space-y-0 sm:space-x-4">
             <Popover open={isOpen} onOpenChange={setIsOpen}>
               <PopoverTrigger asChild>
