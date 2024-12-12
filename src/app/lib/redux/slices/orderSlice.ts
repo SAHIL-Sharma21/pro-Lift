@@ -29,7 +29,7 @@ export const getOrders = createAsyncThunk(
     try {
       const response = await apiCall(
         {
-          url: `${process.env.NEXT_PUBLIC_BACKEND_URI}/orders/admin/allOrders`,
+          url: `${process.env.NEXT_PUBLIC_BACKEND_URI}/orders/`,
           method: "GET",
         },
         getState as () => RootState
@@ -45,6 +45,24 @@ export const getOrders = createAsyncThunk(
     }
   }
 );
+
+export const getAdminOrder = createAsyncThunk('order/getAdminOrder', async(_, {rejectWithValue, getState}) => {
+  try {
+    const response = await apiCall({
+      url: `${process.env.NEXT_PUBLIC_BACKEND_URI}/orders/admin/allOrders`,
+      method: "GET",
+    }, getState as () => RootState);
+
+    if(!response.ok){
+      throw new Error("Failed to get Admin orders");
+    }
+
+    const data = await response.json();
+    return data.data;
+  } catch (error: any) {
+    return rejectWithValue(error?.message);
+  }
+});
 
 export const createOrder = createAsyncThunk(
   "order/createOrder",
@@ -131,7 +149,6 @@ export const getOrderById = createAsyncThunk('order/getOrderById', async(orderId
       throw new Error("Failed to get order");
     }
     const data = await response.json();
-    console.log("order data--->", data);
     return data.data;
   } catch (error: any) {
       return rejectWithValue(error?.message);
@@ -160,6 +177,19 @@ export const orderSlice = createSlice({
       .addCase(getOrders.rejected, (state, action) => {
         state.loading = false;
         state.error = action.error.message || "Failed to get orders";
+      })
+      .addCase(getAdminOrder.pending, (state) => {
+        state.loading = true;
+        state.error = null;
+      })
+      .addCase(getAdminOrder.fulfilled, (state, action) => {
+        state.loading = false;
+        state.orders = action.payload;
+        state.error = null;
+      })
+      .addCase(getAdminOrder.rejected, (state, action) => {
+        state.loading = false;
+        state.error = action.error.message || "Failed to get admin orders";
       })
       .addCase(createOrder.pending, (state) => {
         state.loading = true;

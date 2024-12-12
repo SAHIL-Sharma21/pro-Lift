@@ -62,7 +62,7 @@ export default function OrderPage() {
 
     return (
         <div className="container mx-auto px-4 py-8">
-            <h1 className="text-3xl font-bold mb-6">Order Details</h1>
+            <h1 className="text-3xl font-bold mb-6 text-white">Order Details</h1>
             <div className="grid gap-6 md:grid-cols-2">
                 <CurrentOrder order={orderToDisplay} />
                 <CustomerDetails order={orderToDisplay} />

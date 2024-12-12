@@ -9,7 +9,8 @@ import {
   createPaymentOrder,
   verifyPayment,
   clearCurrentOrder,
-  getOrderById
+  getOrderById,
+  getAdminOrder
 } from "@/app/lib/redux/slices/orderSlice";
 import { useCallback } from "react";
 
@@ -23,6 +24,10 @@ export const useOrder = () => {
     return dispatch(getOrders());
   }, [dispatch]);
 
+  const getAllAdminOrder = useCallback(() => {
+    return dispatch(getAdminOrder());
+  }, [dispatch]);
+  
   const createNewOrder = useCallback(
     (orderData: CreateOrderData) => {
       return dispatch(createOrder(orderData));
@@ -62,6 +67,7 @@ export const useOrder = () => {
     createNewPaymentOrder,
     verifyPaymentOrder,
     clearCurrentOrderAction,
-    fetchOrderById
+    fetchOrderById,
+    getAllAdminOrder
   };
 };

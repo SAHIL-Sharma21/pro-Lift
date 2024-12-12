@@ -1,15 +1,7 @@
 "use client";
 
 import { useOrder } from "@/app/hooks/useOrder";
-import {
-  AlertCircle,
-  CheckCircle,
-  ChevronDown,
-  CreditCard,
-  Loader2,
-  Package,
-  XCircle,
-} from "lucide-react";
+import { AlertCircle, CheckCircle, CreditCard, Loader2, Package, XCircle } from 'lucide-react';
 import React, { useEffect } from "react";
 import { motion, AnimatePresence } from "framer-motion";
 import { Button } from "@/components/ui/button";
@@ -18,9 +10,9 @@ import {
   Card,
   CardContent,
   CardDescription,
-  CardFooter,
   CardHeader,
   CardTitle,
+  CardFooter,
 } from "@/components/ui/card";
 import { Badge } from "@/components/ui/badge";
 import { OrderStatus } from "@/app/types/order.types";
@@ -33,6 +25,7 @@ import {
 
 function UserOrders() {
   const { getAllOrders, orders, loading } = useOrder();
+  
   useEffect(() => {
     getAllOrders();
   }, [getAllOrders]);
@@ -117,7 +110,7 @@ function UserOrders() {
                           key={item.id}
                           className="border-b last:border-b-0 dark:border-zinc-700 hover:bg-zinc-50 dark:hover:bg-zinc-800 transition-colors"
                         >
-                          <td className="py-3 px-4">{item.product.name}</td>
+                          <td className="py-3 px-4">{item.product?.name || 'Product Unavailable'}</td>
                           <td className="py-3 px-4">{item.quantity}</td>
                           <td className="py-3 px-4 text-right">
                             Rs. {item.price}
@@ -179,27 +172,8 @@ function UserOrders() {
   );
 }
 
-function getOrderStatusVariant(
-  status: OrderStatus
-): "outline" | "default" | "destructive" | "secondary" {
-  switch (status) {
-    case "PENDING":
-      return "outline";
-    case "PROCESSING":
-      return "default";
-    case "SHIPPED":
-      return "secondary";
-    case "COMPLETED":
-      return "secondary";
-    case "CANCELLED":
-      return "destructive";
-    default:
-      return "outline";
-  }
-}
-
-function getPaymentStatusStyle(status: string): string {
-  switch (status.toUpperCase()) {
+function getPaymentStatusStyle(status: string | undefined): string {
+  switch (status?.toUpperCase() ?? '') {
     case "SUCCESS":
       return "bg-green-100 text-green-800 dark:bg-green-800 dark:text-green-100";
     case "PENDING":
@@ -211,30 +185,47 @@ function getPaymentStatusStyle(status: string): string {
   }
 }
 
-function getPaymentStatusIcon(status: string) {
-  switch (status.toUpperCase()) {
+function getPaymentStatusIcon(status: string | undefined) {
+  switch (status?.toUpperCase() ?? '') {
     case "SUCCESS":
-      return <CheckCircle className="w-4 h-4 mr-1" />;
+      return <CheckCircle className="w-4 h-4 text-green-500 dark:text-green-400" />;
     case "PENDING":
-      return <AlertCircle className="w-4 h-4 mr-1" />;
+      return <AlertCircle className="w-4 h-4 text-yellow-500 dark:text-yellow-400" />;
     case "FAILED":
-      return <XCircle className="w-4 h-4 mr-1" />;
+      return <XCircle className="w-4 h-4 text-red-500 dark:text-red-400" />;
     default:
-      return null;
+      return <AlertCircle className="w-4 h-4 text-gray-500 dark:text-gray-400" />;
   }
 }
 
-function getPaymentStatusDescription(status: string) {
-  switch (status.toUpperCase()) {
+function getPaymentStatusDescription(status: string | undefined) {
+  switch (status?.toUpperCase() ?? '') {
     case "SUCCESS":
-      return "Payment has been successfully processed.";
+      return "Payment successful";
     case "PENDING":
-      return "Payment is being processed. Please wait.";
+      return "Payment pending";
     case "FAILED":
-      return "Payment failed. Please try again or contact support.";
+      return "Payment failed";
     default:
-      return "Unknown payment status.";
+      return "Payment status unknown";
+  }
+}
+
+function getOrderStatusVariant(status: OrderStatus): "default" | "secondary" | "destructive" | "outline" {
+  switch (status) {
+    case "PENDING":
+      return "outline";
+    case "PROCESSING":
+      return "secondary";
+    case "SHIPPED":
+    case "COMPLETED":
+      return "default";
+    case "CANCELLED":
+      return "destructive";
+    default:
+      return "default";
   }
 }
 
 export default UserOrders;
+

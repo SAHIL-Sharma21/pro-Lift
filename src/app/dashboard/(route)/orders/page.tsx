@@ -26,11 +26,11 @@ import Link from "next/link";
 import { useEffect } from "react";
 
 export default function OrdersPage() {
-  const { loading, error, getAllOrders, orders } = useOrder();
+  const { loading, error, getAllAdminOrder, orders } = useOrder();
 
   useEffect(() => {
-    getAllOrders();
-  }, [getAllOrders]);
+    getAllAdminOrder();
+  }, [getAllAdminOrder]);
 
   const getStatusColor = (status: OrderStatus) => {
     switch (status.toLowerCase()) {
