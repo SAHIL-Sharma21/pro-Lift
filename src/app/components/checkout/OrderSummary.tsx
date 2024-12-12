@@ -78,20 +78,6 @@ const OrderSummary: React.FC<OrderSummaryProps> = ({
               razorpayPaymentId: response.razorpay_payment_id,
               razorpaySignature: response.razorpay_signature,
             });
-            console.log("Payment verified--->", response);
-            if (response.meta.requestStatus === "rejected") {
-              toast({
-                title: "Payment Verification Failed",
-                description: "Please try again.",
-                variant: "destructive",
-              });
-            } else {
-              toast({
-                title: "Payment Verified and Order Placed Successfully",
-                description: "Thank you for your Time.",
-                variant: "default",
-              });
-            }
             await clearCartItems();
             router.push("/order-confirmation");
           } catch (error) {

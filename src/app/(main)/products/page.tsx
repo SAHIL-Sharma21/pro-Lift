@@ -18,21 +18,21 @@ export default function ProductPage() {
   const [isCartOpen, setIsCartOpen] = useState(false);
   const { cart } = useCart();
 
-useEffect(() => {
-    dispatch(fetchProducts({limit: 10, page}));
-}, [dispatch, page])
+  useEffect(() => {
+    dispatch(fetchProducts({ limit: 10, page }));
+  }, [dispatch, page]);
 
-useEffect(() => {
-    if(cart && cart.items.length > 0){
-        setIsCartOpen(true);
+  useEffect(() => {
+    if (cart && cart.items.length > 0) {
+      setIsCartOpen(true);
     }
-}, [cart]);
+  }, [cart]);
 
-const loadMore = () => {
-  setPage(prevPage => prevPage + 1);
-}
+  const loadMore = () => {
+    setPage((prevPage) => prevPage + 1);
+  };
 
-//adding custom loader or designed page or showing loader to user 
+  //adding custom loader or designed page or showing loader to user
   if (loading) return <div>Loading...</div>;
   if (error) {
     return (
@@ -55,28 +55,34 @@ const loadMore = () => {
           <>
             <div className="grid grid-cols-1 sm:grid-cols-2 md:grid-cols-3 lg:grid-cols-4 gap-6">
               {products.map((product) => (
-                <ProductCard key={product.id} product={product} setIsCartOpen={setIsCartOpen} />
+                <ProductCard
+                  key={product.id}
+                  product={product}
+                  setIsCartOpen={setIsCartOpen}
+                />
               ))}
             </div>
             <div className="mt-8 flex justify-center">
-                <Button onClick={loadMore} disabled={loading}>
-                  {loading ? (
-                    <>
-                      <Loader2 className="mr-2 h-4 w-4 animate-spin"/>
-                      Loading...
-                    </>
-                  ) : (
-                    'Load More'
-                  )}
-                </Button>
+              <Button onClick={loadMore} disabled={loading}>
+                {loading ? (
+                  <>
+                    <Loader2 className="mr-2 h-4 w-4 animate-spin" />
+                    Loading...
+                  </>
+                ) : (
+                  "Load More"
+                )}
+              </Button>
             </div>
           </>
         ) : (
           <div className="text-center py-12">
-            <h2 className="text-2xl font-semibold text-gray-700">No products found</h2>
+            <h2 className="text-2xl font-semibold text-gray-700">
+              No products found
+            </h2>
           </div>
         )}
       </div>
-    </>   
+    </>
   );
 }

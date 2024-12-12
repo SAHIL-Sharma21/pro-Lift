@@ -5,12 +5,20 @@ import { useProduct } from "@/app/hooks/useProduct";
 import { Button } from "@/components/ui/button";
 import { Card, CardContent } from "@/components/ui/card";
 import { Skeleton } from "@/components/ui/skeleton";
-import { ArrowLeft, MinusCircle, Package, PlusCircle, ShoppingCart, Trash2 } from 'lucide-react';
+import {
+  ArrowLeft,
+  MinusCircle,
+  Package,
+  PlusCircle,
+  ShoppingCart,
+  Trash2,
+} from "lucide-react";
 import Image from "next/image";
 import Link from "next/link";
 import { useParams } from "next/navigation";
 import React, { useEffect, useState, useCallback } from "react";
-import debounce from 'lodash/debounce';
+import debounce from "lodash/debounce";
+import { useToast } from "@/hooks/use-toast";
 
 function ProductPage() {
   const params = useParams();
@@ -27,6 +35,7 @@ function ProductPage() {
   const [imageLoaded, setImageLoaded] = useState(false);
   const [quantity, setQuantity] = useState(1);
   const [localCartLoading, setLocalCartLoading] = useState(false);
+  const { toast } = useToast();
 
   useEffect(() => {
     if (params.id) {
@@ -44,10 +53,32 @@ function ProductPage() {
     debounce(async (cartItemId: string, newQuantity: number) => {
       setLocalCartLoading(true);
       try {
-        await updateItemToCart({ cartItemId, quantity: newQuantity });
+        const response = await updateItemToCart({
+          cartItemId,
+          quantity: newQuantity,
+        });
+        if (response.meta.requestStatus === "fulfilled") {
+          toast({
+            title: "Cart updated",
+            description: "The cart has been updated successfully.",
+            variant: "default",
+            className: "bg-green-100 border-green-400 text-green-900",
+          });
+        } else {
+          toast({
+            title: "Failed to update cart",
+            description: "Failed to update the cart.",
+            variant: "destructive",
+          });
+        }
         await getCart();
       } catch (error) {
         console.error("Failed to update cart:", error);
+        toast({
+          title: "Failed to update cart",
+          description: "Failed to update the cart.",
+          variant: "destructive",
+        });
       } finally {
         setLocalCartLoading(false);
       }
@@ -59,20 +90,42 @@ function ProductPage() {
     if (selectedProduct) {
       setLocalCartLoading(true);
       try {
-        await addItemToCart({ productId: selectedProduct.id, quantity });
+        const response = await addItemToCart({
+          productId: selectedProduct.id,
+          quantity,
+        });
+        if (response.meta.requestStatus === "fulfilled") {
+          toast({
+            title: "Product added to cart",
+            description: "The product has been added to your cart.",
+            variant: "default",
+            className: "bg-green-100 border-green-400 text-green-900",
+          });
+        } else {
+          toast({
+            title: "Failed to add product to cart",
+            description: "Please try again later.",
+            variant: "destructive",
+          });
+        }
         await getCart();
-        alert("Product added to cart");
         setQuantity(1);
-      } catch (error) {
+      } catch (error: any) {
         console.error("Failed to add product to cart:", error);
-        alert("Failed to add product to cart");
+        toast({
+          title: "Failed to add product to cart",
+          description: error.message || "Please try again later.",
+          variant: "destructive",
+        });
       } finally {
         setLocalCartLoading(false);
       }
     }
   };
 
-  const isInCart = selectedProduct && cart?.items.some((item) => item.productId === selectedProduct.id);
+  const isInCart =
+    selectedProduct &&
+    cart?.items.some((item) => item.productId === selectedProduct.id);
 
   const handleRemoveFromCart = async () => {
     if (selectedProduct && cart) {
@@ -82,13 +135,30 @@ function ProductPage() {
       if (cartItem) {
         setLocalCartLoading(true);
         try {
-          await removeItemFromCart(cartItem.id);
+          const response = await removeItemFromCart(cartItem.id);
+          if (response.meta.requestStatus === "fulfilled") {
+            toast({
+              title: "Product removed from cart",
+              description: "The product has been removed from your cart.",
+              variant: "default",
+              className: "bg-green-100 border-green-400 text-green-900",
+            });
+          } else {
+            toast({
+              title: "Failed to remove product from cart",
+              description: "Please try again later.",
+              variant: "destructive",
+            });
+          }
           await getCart();
-          alert("Product removed from cart");
           setQuantity(1);
-        } catch (error) {
+        } catch (error: any) {
           console.error("Failed to remove product from cart:", error);
-          alert("Failed to remove product from cart");
+          toast({
+            title: "Failed to remove product from cart",
+            description: error.message || "Please try again later.",
+            variant: "destructive",
+          });
         } finally {
           setLocalCartLoading(false);
         }
@@ -97,10 +167,16 @@ function ProductPage() {
   };
 
   const handleQuantityChange = (newQuantity: number) => {
-    if (selectedProduct && newQuantity >= 1 && newQuantity <= selectedProduct.quantity) {
+    if (
+      selectedProduct &&
+      newQuantity >= 1 &&
+      newQuantity <= selectedProduct.quantity
+    ) {
       setQuantity(newQuantity);
       if (isInCart && cart) {
-        const cartItem = cart.items.find((item) => item.productId === selectedProduct.id);
+        const cartItem = cart.items.find(
+          (item) => item.productId === selectedProduct.id
+        );
         if (cartItem) {
           debouncedUpdateCart(cartItem.id, newQuantity);
         }
@@ -230,7 +306,9 @@ function ProductPage() {
                     variant="outline"
                     size="icon"
                     onClick={() => handleQuantityChange(quantity + 1)}
-                    disabled={quantity === selectedProduct.quantity || localCartLoading}
+                    disabled={
+                      quantity === selectedProduct.quantity || localCartLoading
+                    }
                     aria-label="Increment quantity"
                   >
                     <PlusCircle className="h-4 w-4" />
@@ -241,7 +319,9 @@ function ProductPage() {
                   <Button
                     className="w-full sm:w-auto"
                     onClick={handleAddToCart}
-                    disabled={localCartLoading || cartLoading || isInCart as boolean}
+                    disabled={
+                      localCartLoading || cartLoading || (isInCart as boolean)
+                    }
                   >
                     <ShoppingCart className="mr-2 h-4 w-4" />
                     {localCartLoading || cartLoading
@@ -267,9 +347,7 @@ function ProductPage() {
                 </div>
                 <div className="mt-6 p-4 bg-gray-100 rounded-lg">
                   <h2 className="text-xl font-semibold mb-2">Cart Summary</h2>
-                  <p className="text-lg">
-                    Total Price: Rs:{totalPrice}
-                  </p>
+                  <p className="text-lg">Total Price: Rs:{totalPrice}</p>
                 </div>
               </div>
             </div>
