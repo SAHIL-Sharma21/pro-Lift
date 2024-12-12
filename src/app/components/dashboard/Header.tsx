@@ -1,8 +1,8 @@
-'use client'
+"use client";
 
 import { useAuth } from "@/app/hooks/useAuth";
 import { Button } from "@/components/ui/button";
-import { LogOut } from 'lucide-react';
+import { LogOut } from "lucide-react";
 
 const Header = () => {
   const { logout } = useAuth();
@@ -27,4 +27,3 @@ const Header = () => {
 };
 
 export default Header;
-

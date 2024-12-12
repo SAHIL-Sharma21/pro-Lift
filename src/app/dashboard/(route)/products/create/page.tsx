@@ -21,6 +21,7 @@ import {
   SelectValue,
 } from "@/components/ui/select";
 import { Textarea } from "@/components/ui/textarea";
+import { useToast } from "@/hooks/use-toast";
 import { Loader2 } from "lucide-react";
 import { useRouter } from "next/navigation";
 import React, { useEffect, useState } from "react";
@@ -37,6 +38,7 @@ function ProductCreate() {
   const { loading, addProducts } = useProduct();
   const { categories, fetchAllCategories } = useCategory();
   const router = useRouter();
+  const { toast } = useToast();
 
   useEffect(() => {
     fetchAllCategories();
@@ -75,20 +77,46 @@ function ProductCreate() {
       const formData = new FormData();
 
       formData.append("image", image);
-      if (name && description && price >= 0 && quantity >= 0 && categoryId && image) {
+      if (
+        name &&
+        description &&
+        price >= 0 &&
+        quantity >= 0 &&
+        categoryId &&
+        image
+      ) {
         formData.append("name", name);
         formData.append("description", description);
         formData.append("price", price.toString());
         formData.append("quantity", quantity.toString());
         formData.append("categoryId", categoryId);
 
-        
         const result = await addProducts(formData);
-        console.log(result);
+        if (result.meta.requestStatus === "rejected") {
+          toast({
+            title: "Product Creation Failed",
+            description:
+              "There was an error creating the product. Please try again.",
+            variant: "destructive",
+          });
+        } else {
+          toast({
+            title: "Product Created Successfully",
+            description: "The product has been created successfully.",
+            variant: "default",
+            className: "bg-green-100 border-green-400 text-green-900",
+          });
+        }
         router.push("/dashboard/products");
-    }
+      }
     } catch (error) {
       console.error("Error creating product: ", error);
+      toast({
+        title: "Product Creation Failed",
+        description:
+          "There was an error creating the product. Please try again.",
+        variant: "destructive",
+      });
     } finally {
       resetForm();
     }
@@ -161,10 +189,7 @@ function ProductCreate() {
           </div>
           <div className="space-y-2">
             <Label htmlFor="category">Category</Label>
-            <Select
-              value={categoryId}
-              onValueChange={setCategoryId}
-            >
+            <Select value={categoryId} onValueChange={setCategoryId}>
               <SelectTrigger>
                 <SelectValue placeholder="Select a category" />
               </SelectTrigger>
@@ -188,7 +213,11 @@ function ProductCreate() {
               required
             />
             {imagePreview && (
-              <img src={imagePreview} alt="Preview" className="mt-2 max-w-full h-auto" />
+              <img
+                src={imagePreview}
+                alt="Preview"
+                className="mt-2 max-w-full h-auto"
+              />
             )}
           </div>
         </CardContent>
@@ -196,10 +225,12 @@ function ProductCreate() {
           <Button type="submit" className="w-full" disabled={loading}>
             {loading ? (
               <>
-                <Loader2 className="mr-2 h-4 w-4 animate-spin" />
+                <Loader2 className="mr-1 h-4 w-4 animate-spin" />
                 Creating..
               </>
-            ) : "Create Product"}
+            ) : (
+              "Create Product"
+            )}
           </Button>
         </CardFooter>
       </form>

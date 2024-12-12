@@ -1,7 +1,17 @@
 import { Button } from "@/components/ui/button";
 import { Input } from "@/components/ui/input";
 import { Separator } from "@/components/ui/separator";
-import { DumbbellIcon, Facebook, Instagram, Mail, MapPin, Phone, ShoppingBag, Twitter, User } from 'lucide-react';
+import {
+  DumbbellIcon,
+  Facebook,
+  Instagram,
+  Mail,
+  MapPin,
+  Phone,
+  ShoppingBag,
+  Twitter,
+  User,
+} from "lucide-react";
 import Link from "next/link";
 
 export default function Footer() {
@@ -72,7 +82,11 @@ export default function Footer() {
                 placeholder="Enter your email"
                 className="bg-gray-800 border-gray-700 text-gray-200"
               />
-              <Button type="submit" variant="outline" className="text-black hover:bg-black hover:text-gray-200  ">
+              <Button
+                type="submit"
+                variant="outline"
+                className="text-black hover:bg-black hover:text-gray-200  "
+              >
                 Subscribe
               </Button>
             </form>
@@ -99,4 +113,3 @@ export default function Footer() {
     </footer>
   );
 }
-

@@ -7,6 +7,7 @@ import { useCart } from "../hooks/useCart";
 import { Card, CardContent, CardHeader, CardTitle } from "@/components/ui/card";
 import { Button } from "@/components/ui/button";
 import Link from "next/link";
+import { useToast } from "@/hooks/use-toast";
 
 interface ProductCardProps {
   product: Product;
@@ -15,15 +16,37 @@ interface ProductCardProps {
 
 const ProductCard = ({ product, setIsCartOpen }: ProductCardProps) => {
   const { addItemToCart } = useCart();
+  const { toast } = useToast();
 
   const handleAddToCart = async (e: React.MouseEvent) => {
     e.preventDefault();
     try {
-      await addItemToCart({ productId: product.id, quantity: 1 });
+      const response = await addItemToCart({
+        productId: product.id,
+        quantity: 1,
+      });
+      if (response.meta.requestStatus === "fulfilled") {
+        toast({
+          title: "Product added to cart",
+          description: "The product has been added to your cart.",
+          variant: "default",
+          className: "bg-green-100 border-green-400 text-green-900",
+        });
+      } else {
+        toast({
+          title: "Failed to add product to cart",
+          description: "Please try again later.",
+          variant: "destructive",
+        });
+      }
       setIsCartOpen(true);
-    } catch (error) {
+    } catch (error: any) {
       console.error("Failed to add product to cart:", error);
-      alert("Failed to add product to cart");
+      toast({
+        title: "Failed to add product to cart",
+        description: error.message || "Please try again later.",
+        variant: "destructive",
+      });
     }
   };
 

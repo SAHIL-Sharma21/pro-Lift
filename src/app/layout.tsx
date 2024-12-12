@@ -35,7 +35,7 @@ export default function RootLayout({
         <AppProvider>
           <Navbar />
           {children}
-          <Toaster/>
+          <Toaster />
           <Footer />
         </AppProvider>
       </body>

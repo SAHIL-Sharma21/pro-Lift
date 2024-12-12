@@ -1,7 +1,6 @@
 "use client";
 
 import { Button } from "@/components/ui/button";
-
 import ProductList from "@/app/components/dashboard/ProductList";
 import {
   Popover,
@@ -40,6 +39,7 @@ export default function ProductsPage() {
           title: "Category Created Successfully",
           description: "The category has been created successfully.",
           variant: "default",
+          className: "bg-green-100 border-green-400 text-green-900"
         })
         setIsOpen(false);
       } else {

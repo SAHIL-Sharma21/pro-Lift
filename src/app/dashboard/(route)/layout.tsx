@@ -3,6 +3,7 @@
 import Header from "@/app/components/dashboard/Header";
 import SideBar from "@/app/components/dashboard/SideBar"
 import { useAuth } from "@/app/hooks/useAuth";
+import { Loader2 } from "lucide-react";
 import { useRouter } from "next/navigation";
 import { useEffect } from "react";
 
@@ -18,7 +19,14 @@ export default function DahboardLayout({children}:{children: React.ReactNode}) {
 
 
     if(loading){
-        return <div className="flex items-center justify-center h-screen">Loading...</div>
+        return (
+            <>
+                <div className="flex items-center justify-center h-screen">
+                    <Loader2 className="mr-2 h-4 w-4 animate-spin" />    
+                    Loading...
+                </div>
+            </>
+        );
     }
 
     return(

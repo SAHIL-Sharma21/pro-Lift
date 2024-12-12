@@ -65,11 +65,12 @@ export default function ProductList() {
       } else {
         throw new Error("Failed to delete product");
       }
-    } catch (error) {
+    } catch (error: any) {
       setDeleteError("Failed to delete product. Please try again.");
       toast({
         title: "Product Deletion Failed",
         description:
+          error.message ||
           "There was an error deleting the product. Please try again.",
         variant: "destructive",
       });

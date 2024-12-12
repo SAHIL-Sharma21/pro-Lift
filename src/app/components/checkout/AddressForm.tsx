@@ -7,21 +7,22 @@ import { Input } from "@/components/ui/input";
 import { Label } from "@/components/ui/label";
 import React, { useState } from "react";
 import { useAuth } from "@/app/hooks/useAuth";
+import { useToast } from "@/hooks/use-toast";
+import { Loader2 } from "lucide-react";
 
 interface AddressFormProps {
-    onAddressAdded: () => void
+  onAddressAdded: () => void;
 }
 
-
-const AddressForm: React.FC<AddressFormProps> = ({onAddressAdded}) => {
+const AddressForm: React.FC<AddressFormProps> = ({ onAddressAdded }) => {
   const [addressLine1, setAddressLine1] = useState("");
   const [city, setCity] = useState("");
   const [state, setState] = useState("");
   const [country, setCountry] = useState("");
   const [postalCode, setPostalCode] = useState("");
-
   const { addAddress, loading, error } = useAddress();
   const { isAuthenticated } = useAuth();
+  const { toast } = useToast();
 
   if (error) {
     return (
@@ -39,11 +40,15 @@ const AddressForm: React.FC<AddressFormProps> = ({onAddressAdded}) => {
   const handleCreateAddress = async (e: React.FormEvent) => {
     e.preventDefault();
     if (!isAuthenticated) {
-      alert("You must be logged in to create an address.");
+      toast({
+        title: "You are not logged in",
+        description: "Please log in to create an address",
+        variant: "destructive",
+      });
       return;
     }
     try {
-      await addAddress({
+      const response = await addAddress({
         addressLine1,
         city,
         country,
@@ -51,11 +56,30 @@ const AddressForm: React.FC<AddressFormProps> = ({onAddressAdded}) => {
         state,
       });
       onAddressAdded();
-      // Clear form fields after successful submission
+      if (response.meta.requestStatus === "fulfilled") {
+        toast({
+          title: "Address Created Successfully",
+          description: "The address has been created successfully.",
+          variant: "default",
+          className: "bg-green-100 border-green-400 text-green-900",
+        });
+      } else {
+        toast({
+          title: "Address Creation Failed",
+          description:
+            "There was an error creating the address. Please try again.",
+          variant: "destructive",
+        });
+      }
       resetFrom();
     } catch (err: any) {
       console.log("Error creating address: ", err);
-      alert("Error creating address");
+      toast({
+        title: "Address Creation Failed",
+        description:
+          "There was an error creating the address. Please try again.",
+        variant: "destructive",
+      });
     }
   };
 
@@ -129,7 +153,14 @@ const AddressForm: React.FC<AddressFormProps> = ({onAddressAdded}) => {
             variant="outline"
             disabled={!isAuthenticated || loading}
           >
-            {loading ? "Creating..." : "Create Address"}
+            {loading ? (
+              <>
+                <Loader2 className="mr-2 h-4 w-4 animate-spin" />
+                Creating...
+              </>
+            ) : (
+              "Create Address"
+            )}
           </Button>
         </form>
       </CardContent>

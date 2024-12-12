@@ -48,6 +48,7 @@ const RegisterUser = () => {
         title: "User Registered Successfully",
         description: "You can now login to your account",
         variant: "default",
+        className: "bg-green-100 border-green-400 text-green-900",
       });
       router.push(role === "ADMIN" ? "/auth/admin/login" : "/auth/login");
     } catch (error: any) {

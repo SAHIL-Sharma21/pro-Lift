@@ -1,4 +1,4 @@
-'use client';
+"use client";
 
 import { Cart } from "@/app/types/cart.types";
 import {
@@ -15,7 +15,7 @@ import { Button } from "@/components/ui/button";
 import { useOrder } from "@/app/hooks/useOrder";
 import { useCart } from "@/app/hooks/useCart";
 import { useRouter } from "next/navigation";
-// import { toast } from 'react-hot-toast';
+import { useToast } from "@/hooks/use-toast";
 
 interface OrderSummaryProps {
   cart: Cart | null;
@@ -28,13 +28,19 @@ const OrderSummary: React.FC<OrderSummaryProps> = ({
   totalPrice,
   selectedAddress,
 }) => {
-  const { createNewOrder, createNewPaymentOrder, verifyPaymentOrder } = useOrder();
+  const { createNewOrder, createNewPaymentOrder, verifyPaymentOrder } =
+    useOrder();
   const { clearCartItems } = useCart();
   const router = useRouter();
+  const { toast } = useToast();
 
   const handleProceedToPayment = async () => {
     if (!cart || !selectedAddress) {
-      // toast.error("Please select an address");
+      toast({
+        title: "Error",
+        description: "Please select an address before proceeding to payment.",
+        variant: "destructive",
+      });
       return;
     }
     try {
@@ -48,10 +54,10 @@ const OrderSummary: React.FC<OrderSummaryProps> = ({
         throw new Error("Failed to create order");
       }
 
-      console.log("Created order--->", orderResponse);
-
       // Initiate payment
-      const paymentResponse = await createNewPaymentOrder(orderResponse.payload.order.id);
+      const paymentResponse = await createNewPaymentOrder(
+        orderResponse.payload.order.id
+      );
 
       if (!paymentResponse.payload.razorpayOrderId) {
         throw new Error("Failed to initiate payment");
@@ -73,12 +79,28 @@ const OrderSummary: React.FC<OrderSummaryProps> = ({
               razorpaySignature: response.razorpay_signature,
             });
             console.log("Payment verified--->", response);
-            // toast.success("Payment successful!");
+            if (response.meta.requestStatus === "rejected") {
+              toast({
+                title: "Payment Verification Failed",
+                description: "Please try again.",
+                variant: "destructive",
+              });
+            } else {
+              toast({
+                title: "Payment Verified and Order Placed Successfully",
+                description: "Thank you for your Time.",
+                variant: "default",
+              });
+            }
             await clearCartItems();
             router.push("/order-confirmation");
           } catch (error) {
             console.error("Error verifying payment: ", error);
-            // toast.error("Payment verification failed. Please contact support.");
+            toast({
+              title: "Payment Verification Failed",
+              description: "Please try again.",
+              variant: "destructive",
+            });
           }
         },
         prefill: {
@@ -93,9 +115,15 @@ const OrderSummary: React.FC<OrderSummaryProps> = ({
 
       const paymentObject = new (window as any).Razorpay(options);
       paymentObject.open();
-    } catch (error) {
+    } catch (error: any) {
       console.error("Error creating payment order: ", error);
-      // toast.error("An error occurred during the payment process. Please try again.");
+      toast({
+        title: "Payment Creation Failed",
+        description:
+          error.message ||
+          "There was an error creating the payment order. Please try again.",
+        variant: "destructive",
+      });
     }
   };
 
@@ -150,4 +178,3 @@ const OrderSummary: React.FC<OrderSummaryProps> = ({
 };
 
 export default OrderSummary;
-

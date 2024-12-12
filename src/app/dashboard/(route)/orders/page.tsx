@@ -98,9 +98,9 @@ export default function OrdersPage() {
                       <TableCell>Rs.{order.totalAmount}</TableCell>
                       <TableCell>
                         <Button variant="default" size="sm" asChild>
-                            <Link href={`/dashboard/orders/${order.id}`}>
-                                View Details
-                            </Link>
+                          <Link href={`/dashboard/orders/${order.id}`}>
+                            View Details
+                          </Link>
                         </Button>
                       </TableCell>
                     </TableRow>
