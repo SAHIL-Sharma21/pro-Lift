@@ -1,5 +1,6 @@
 "use client";
 
+import ChangePassword from "@/app/components/ChangePassword";
 import { useAddress } from "@/app/hooks/useAddress";
 import { useAuth } from "@/app/hooks/useAuth";
 import { Avatar, AvatarFallback, AvatarImage } from "@/components/ui/avatar";
@@ -8,12 +9,13 @@ import { Card, CardContent, CardHeader, CardTitle } from "@/components/ui/card";
 import { Separator } from "@/components/ui/separator";
 import { MapPin } from "lucide-react";
 import { useRouter } from "next/navigation";
-import React, { useEffect } from "react";
+import React, { useEffect, useState } from "react";
 
 function UserProfile() {
   const { user, loading } = useAuth();
   const { addresses, getAllAdress } = useAddress();
   const router = useRouter();
+  const [isChangePasswordOpen, setIsChangePasswordOpen] = useState(false);
 
   useEffect(() => {
     getAllAdress();
@@ -94,7 +96,11 @@ function UserProfile() {
               <CardTitle>Account Settings</CardTitle>
             </CardHeader>
             <CardContent className="space-y-4">
-              <Button variant="outline" className="w-full justify-start">
+              <Button
+                variant="outline"
+                className="w-full justify-start"
+                onClick={() => setIsChangePasswordOpen(true)}
+              >
                 Change Password
               </Button>
               <Button variant="outline" className="w-full justify-start">
@@ -110,16 +116,27 @@ function UserProfile() {
           </Card>
 
           <Card>
-          <CardHeader>
-            <CardTitle>Order History</CardTitle>
-          </CardHeader>
-          <CardContent>
-            <p className="text-zinc-400">Your recent orders will appear here.</p>
-            <Button className="mt-4" onClick={() => router.push("/users/orders")}>View All Orders</Button>
-          </CardContent>
-        </Card>
+            <CardHeader>
+              <CardTitle>Order History</CardTitle>
+            </CardHeader>
+            <CardContent>
+              <p className="text-zinc-400">
+                Your recent orders will appear here.
+              </p>
+              <Button
+                className="mt-4"
+                onClick={() => router.push("/users/orders")}
+              >
+                View All Orders
+              </Button>
+            </CardContent>
+          </Card>
         </div>
       </div>
+      <ChangePassword
+        isOpen={isChangePasswordOpen}
+        onClose={() => setIsChangePasswordOpen(false)}
+      />
     </>
   );
 }
