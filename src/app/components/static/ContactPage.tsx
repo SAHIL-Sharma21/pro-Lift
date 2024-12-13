@@ -143,6 +143,7 @@ export default function ContactPage() {
                       </Label>
                       <Textarea
                         id="message"
+                        rows={4}
                         placeholder="Your message"
                         required
                         value={userMessage}

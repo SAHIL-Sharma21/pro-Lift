@@ -45,7 +45,7 @@ export default function AboutContent() {
   return (
     <>
       <div className="min-h-screen bg-gray-900 text-gray-100">
-        <header className="py-12">
+        <header className="py-10">
           <motion.div
             className="container mx-auto text-center px-4"
             initial="hidden"
@@ -69,16 +69,16 @@ export default function AboutContent() {
             variants={fadeIn}
             transition={{ duration: 0.5, delay: 0.2 }}
           >
-            <h2 className="text-3xl font-bold mb-6 text-blue-400">
+            <h2 className="text-4xl font-bold mb-6 text-blue-400 text-center md:text-left">
               Our Mission
             </h2>
-            <p className="text-lg mb-4 text-gray-300">
+            <p className="text-lg mb-4 text-gray-300 text-justify">
               At Pro Lifts, we're dedicated to empowering fitness enthusiasts
               and professionals with top-quality gym equipment. Our mission is
               to make premium fitness gear accessible to everyone, from home gym
               heroes to commercial facility owners.
             </p>
-            <p className="text-lg text-gray-300">
+            <p className="text-lg text-gray-300 text-justify">
               We believe that the right equipment can transform your workout
               experience and help you achieve your fitness goals faster and more
               efficiently.
@@ -91,7 +91,7 @@ export default function AboutContent() {
             variants={fadeIn}
             transition={{ duration: 0.5, delay: 0.4 }}
           >
-            <h2 className="text-3xl font-bold mb-6 text-blue-400">
+            <h2 className="text-3xl font-bold mb-6 text-blue-400 text-center md:text-left">
               Why Choose Pro Lifts
             </h2>
             {cardContent.length > 0 && (
@@ -123,16 +123,18 @@ export default function AboutContent() {
             variants={fadeIn}
             transition={{ duration: 0.5, delay: 0.6 }}
           >
-            <h2 className="text-3xl font-bold mb-6 text-blue-400">Our Story</h2>
+            <h2 className="text-4xl font-bold mb-6 text-blue-400 text-center md:text-left">
+              Our Story
+            </h2>
             <div className="flex flex-col md:flex-row items-center gap-8">
               <div className="md:w-1/2">
-                <p className="text-lg mb-4 text-gray-300">
+                <p className="text-lg mb-4 text-gray-300 text-justify">
                   Founded in 2010 by a group of passionate fitness enthusiasts,
                   Pro Lifts started as a small local gym equipment supplier.
                   Over the years, we've grown into a nationwide e-commerce
                   platform, serving thousands of satisfied customers.
                 </p>
-                <p className="text-lg text-gray-300">
+                <p className="text-lg text-gray-300 text-justify">
                   Our journey has been fueled by our commitment to quality,
                   customer satisfaction, and the belief that everyone deserves
                   access to professional-grade fitness equipment.
@@ -155,10 +157,10 @@ export default function AboutContent() {
             variants={fadeIn}
             transition={{ duration: 0.5, delay: 0.8 }}
           >
-            <h2 className="text-3xl font-bold mb-6 text-blue-400">
+            <h2 className="text-3xl font-bold mb-6 text-blue-400 text-center md:text-left">
               Join the Pro Lifts Community
             </h2>
-            <p className="text-lg mb-6 text-gray-300">
+            <p className="text-lg mb-6 text-gray-300 text-justify">
               Whether you're setting up a home gym, upgrading your commercial
               facility, or looking for the perfect addition to your workout
               routine, Pro Lifts is here to support your fitness journey. Join
@@ -167,7 +169,7 @@ export default function AboutContent() {
             </p>
             <Button
               size="lg"
-              className="bg-blue-600 hover:bg-blue-700 text-white"
+              className="w-full md:w-auto bg-blue-600 hover:bg-blue-700 text-white"
             >
               <Link href="/products">Shop Now</Link>
             </Button>

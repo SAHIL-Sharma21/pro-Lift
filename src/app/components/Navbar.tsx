@@ -2,7 +2,13 @@
 
 import { Button } from "@/components/ui/button";
 import { Sheet, SheetContent, SheetTrigger } from "@/components/ui/sheet";
-import { Dumbbell, LogOut, MenuSquare, ShoppingBag, ShoppingCart, User, UserCircle2 } from 'lucide-react';
+import {
+  Dumbbell,
+  LogOut,
+  MenuSquare,
+  ShoppingBag,
+  UserCircle2,
+} from "lucide-react";
 import Link from "next/link";
 import React, { useState } from "react";
 import { useAuth } from "../hooks/useAuth";
@@ -52,14 +58,13 @@ export default function Navbar() {
   ];
   const isAdmin = user?.role === "ADMIN";
 
-
   return (
     <>
-    <header className="sticky top-0 z-50 w-full border-b border-zinc-700 bg-zinc-900 text-zinc-100">
+      <header className="sticky top-0 z-50 w-full border-b border-zinc-700 bg-zinc-900 text-zinc-100">
         <div className="container mx-auto flex h-16 items-center justify-between">
           <Link href="/" className="hidden md:flex items-center space-x-2">
-            <Dumbbell className="mr-2 h-6 w-6 sm:ml-4" />
-            <span className="font-bold text-2xl">Pro Lifts</span>
+            <Dumbbell className="mr-1 h-6 w-6 sm:ml-4 text-blue-400" />
+            <span className="font-bold text-2xl ">Pro Lifts</span>
           </Link>
 
           {!isAdmin && (
@@ -170,7 +175,7 @@ export default function Navbar() {
                 <Button
                   variant="ghost"
                   size="sm"
-                  className="text-zinc-100 hover:bg-orange-400 hover:text-white"
+                  className="text-zinc-100 hover:bg-blue-400 hover:text-white"
                   asChild
                 >
                   <Link href="/auth/login">
@@ -180,7 +185,7 @@ export default function Navbar() {
                 <Button
                   variant="ghost"
                   size="sm"
-                  className="text-zinc-100 hover:bg-orange-400 hover:text-white"
+                  className="text-zinc-100 hover:bg-blue-400 hover:text-white"
                   asChild
                 >
                   <Link href="/auth/register">
@@ -195,4 +200,3 @@ export default function Navbar() {
     </>
   );
 }
-
