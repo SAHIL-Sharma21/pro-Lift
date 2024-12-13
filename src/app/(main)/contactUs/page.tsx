@@ -1,7 +1,12 @@
+import ContactPage from '@/app/components/static/ContactPage'
 import React from 'react'
 
 export default function ContactUs() {
   return (
-    <div>page</div>
+    <>
+      <div className='dark:text-white'>
+        <ContactPage />
+      </div>
+    </>
   )
 }
