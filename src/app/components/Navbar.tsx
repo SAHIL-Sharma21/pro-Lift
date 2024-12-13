@@ -2,15 +2,7 @@
 
 import { Button } from "@/components/ui/button";
 import { Sheet, SheetContent, SheetTrigger } from "@/components/ui/sheet";
-import {
-  Dumbbell,
-  LogOut,
-  MenuSquare,
-  ShoppingBag,
-  ShoppingCart,
-  User,
-  UserCircle2,
-} from "lucide-react";
+import { Dumbbell, LogOut, MenuSquare, ShoppingBag, ShoppingCart, User, UserCircle2 } from 'lucide-react';
 import Link from "next/link";
 import React, { useState } from "react";
 import { useAuth } from "../hooks/useAuth";
@@ -23,7 +15,6 @@ import {
   DropdownMenuTrigger,
 } from "@/components/ui/dropdown-menu";
 import SideBar from "@/app/components/cart/SidebarCart";
-import { useRouter } from "next/navigation";
 
 interface MobileLinkProps extends React.PropsWithChildren {
   href: string;
@@ -59,66 +50,82 @@ export default function Navbar() {
     { title: "About", path: "/aboutUs" },
     { title: "Contact", path: "/contactUs" },
   ];
+  const isAdmin = user?.role === "ADMIN";
+
 
   return (
     <>
-      <header className="sticky top-0 z-50 w-full border-b border-zinc-700 bg-zinc-900 text-zinc-100">
+    <header className="sticky top-0 z-50 w-full border-b border-zinc-700 bg-zinc-900 text-zinc-100">
         <div className="container mx-auto flex h-16 items-center justify-between">
-          <Link href="/" className="flex items-center space-x-2">
-            <Dumbbell className="h-6 w-6" />
+          <Link href="/" className="hidden md:flex items-center space-x-2">
+            <Dumbbell className="mr-2 h-6 w-6 sm:ml-4" />
             <span className="font-bold text-2xl">Pro Lifts</span>
           </Link>
-          <nav className="hidden md:flex items-center space-x-6 text-base font-medium">
-            {navItems.map((item, index) => (
-              <Link
-                href={item.path}
-                key={index}
-                className="transition-colors hover:text-zinc-300"
-              >
-                {item.title}
-              </Link>
-            ))}
-          </nav>
-          <Sheet open={isOpen} onOpenChange={setIsOpen}>
-            <SheetTrigger asChild>
-              <Button
-                variant="ghost"
-                className="px-0 text-base hover:bg-transparent focus-visible:bg-transparent focus-visible:ring-0 focus-visible:ring-offset-0 md:hidden"
-              >
-                <MenuSquare className="h-6 w-6" />
-                <span className="sr-only">Toggle Menu</span>
-              </Button>
-            </SheetTrigger>
-            <SheetContent
-              side="left"
-              className="w-[300px] bg-zinc-900 text-zinc-100"
-            >
-              <MobileLink
-                href="/"
-                className="flex items-center"
-                onOpenChange={setIsOpen}
-              >
-                <span className="font-bold text-xl">Pro Lifts</span>
-              </MobileLink>
-              <div className="my-4 h-[calc(100vh-8rem)] pb-10 pl-6">
-                <div className="flex flex-col space-y-3">
-                  {navItems.map((item, index) => (
-                    <MobileLink
-                      key={index}
-                      href={item.path}
-                      onOpenChange={setIsOpen}
+
+          {!isAdmin && (
+            <>
+              <nav className="hidden md:flex items-center space-x-6 text-base font-medium">
+                {navItems.map((item, index) => (
+                  <Link
+                    href={item.path}
+                    key={index}
+                    className="transition-colors hover:text-zinc-300"
+                  >
+                    {item.title}
+                  </Link>
+                ))}
+              </nav>
+
+              {/* Mobile Menu */}
+              <Sheet open={isOpen} onOpenChange={setIsOpen}>
+                <SheetTrigger asChild>
+                  <div className="flex items-center md:hidden">
+                    <MenuSquare className="h-6 w-6 ml-4" />
+                    <Button
+                      variant="ghost"
+                      className="px-0 text-base hover:bg-transparent focus-visible:bg-transparent focus-visible:ring-0 focus-visible:ring-offset-0"
                     >
-                      {item.title}
-                    </MobileLink>
-                  ))}
-                </div>
-              </div>
-            </SheetContent>
-          </Sheet>
+                      <span className="sr-only">Toggle Menu</span>
+                    </Button>
+                  </div>
+                </SheetTrigger>
+                <SheetContent
+                  side="left"
+                  className="w-[300px] bg-zinc-900 text-zinc-100"
+                >
+                  <MobileLink
+                    href="/"
+                    className="flex items-center mb-4"
+                    onOpenChange={setIsOpen}
+                  >
+                    <Dumbbell className="mr-2 h-6 w-6" />
+                    <span className="font-bold text-xl">Pro Lifts</span>
+                  </MobileLink>
+                  <div className="my-4 h-[calc(100vh-8rem)] pb-10">
+                    <div className="flex flex-col space-y-3">
+                      {navItems.map((item, index) => (
+                        <MobileLink
+                          key={index}
+                          href={item.path}
+                          className="py-2 border-b border-zinc-700 flex items-center"
+                          onOpenChange={setIsOpen}
+                        >
+                          {item.title}
+                        </MobileLink>
+                      ))}
+                    </div>
+                  </div>
+                </SheetContent>
+              </Sheet>
+            </>
+          )}
+
           <div className="flex items-center space-x-4">
-            <div className="relative text-black bg-none">
-              <SideBar isOpen={isCartOpen} setIsOpen={setIsCartOpen} />
-            </div>
+            {!isAdmin && (
+              <div className="relative text-black bg-none">
+                <SideBar isOpen={isCartOpen} setIsOpen={setIsCartOpen} />
+              </div>
+            )}
             {loading ? (
               <div className="w-24 h-6 bg-zinc-800 animate-pulse rounded"></div>
             ) : user ? (
@@ -188,3 +195,4 @@ export default function Navbar() {
     </>
   );
 }
+
