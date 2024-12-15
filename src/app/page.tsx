@@ -3,39 +3,19 @@
 import { Button } from "@/components/ui/button";
 import { Card, CardContent, CardFooter, CardHeader, CardTitle } from "@/components/ui/card";
 import { Input } from "@/components/ui/input";
-import { ArrowRight, ShoppingCart, Star, Check } from "lucide-react";
+import { ArrowRight, ShoppingCart, Star, Check } from 'lucide-react';
 import Image from "next/image";
 import Link from "next/link";
 import { useProduct } from "./hooks/useProduct";
 import { useEffect, useState } from "react";
 import { Product } from "./types/products.types";
+import { testimonials } from "@/utils/testimonial";
+import { InfiniteMovingCards } from "@/components/ui/infinite-moving-cards";
 
 export default function Home() {
   const { loading: productLoading, getAllProducts, products } = useProduct();
   const [featuredProducts, setFeaturedProducts] = useState<Product[]>([]);
   const [email, setEmail] = useState('');
-
-  // Hardcoded testimonials for demonstration
-  const testimonials = [
-    {
-      quote: "GymGear has completely transformed my home workouts. The quality of their equipment is unmatched!",
-      name: "Sarah J.",
-      title: "Fitness Enthusiast",
-      image: "/testimonial-1.jpg" // Replace with actual image path
-    },
-    {
-      quote: "Best investment in my fitness journey. The equipment is durable and feels professional-grade.",
-      name: "Mike T.",
-      title: "Personal Trainer",
-      image: "/testimonial-2.jpg" // Replace with actual image path
-    },
-    {
-      quote: "Incredible customer service and top-notch gym equipment. Highly recommend!",
-      name: "Emily R.",
-      title: "Crossfit Coach",
-      image: "/testimonial-3.jpg" // Replace with actual image path
-    }
-  ];
 
   useEffect(() => {
     getAllProducts(1, 4);
@@ -49,44 +29,42 @@ export default function Home() {
 
   const handleNewsletterSignup = (e: React.FormEvent) => {
     e.preventDefault();
-    // Implement newsletter signup logic here
     console.log('Signing up with email:', email);
-    // Reset email after submission
     setEmail('');
   };
 
   return (
-    <div className="flex flex-col min-h-screen bg-gray-50">
+    <div className="flex flex-col min-h-screen">
       {/* Hero Section */}
       <section className="relative h-[700px] flex items-center justify-center text-white overflow-hidden">
         <Image
-          src="/hero-gym-background.jpg" // Replace with high-quality gym background
+          src="https://images.unsplash.com/photo-1709976142774-ce1ef41a8378?q=80&w=2070&auto=format&fit=crop&ixlib=rb-4.0.3&ixid=M3wxMjA3fDB8MHxwaG90by1wYWdlfHx8fGVufDB8fHx8fA%3D%3D"
           alt="Gym Equipment"
           fill
           priority
           className="object-cover absolute z-0"
         />
-        <div className="absolute inset-0 bg-gradient-to-r from-blue-900/70 to-blue-600/70 z-10"></div>
+        <div className="absolute inset-0 bg-gradient-to-r from-slate-900/90 to-slate-800/80 z-10"></div>
         <div className="relative z-20 text-center max-w-3xl px-4">
-          <h1 className="text-5xl font-bold mb-6 text-white drop-shadow-lg">
+          <h1 className="text-4xl sm:text-5xl lg:text-6xl font-bold mb-6 text-white drop-shadow-lg bg-clip-text text-transparent bg-gradient-to-r from-white to-gray-200">
             Transform Your Fitness, Elevate Your Potential
           </h1>
-          <p className="text-xl mb-8 text-gray-100 max-w-2xl mx-auto">
-            Premium gym equipment designed for professionals and fitness enthusiasts. 
-            Engineered for performance, built to last.
+          <p className="text-lg sm:text-xl mb-8 text-gray-200 max-w-2xl mx-auto">
+            Premium gym equipment designed for professionals and fitness
+            enthusiasts. Engineered for performance, built to last.
           </p>
-          <div className="flex justify-center space-x-4">
-            <Button 
-              size="lg" 
-              className="bg-orange-500 hover:bg-orange-600 transition-colors"
+          <div className="flex flex-col sm:flex-row justify-center space-y-4 sm:space-y-0 sm:space-x-4">
+            <Button
+              size="lg"
+              className="bg-blue-600 hover:bg-blue-700 text-white border-0 transition-colors w-full sm:w-auto"
               asChild
             >
               <Link href="/products">Shop Equipment</Link>
             </Button>
-            <Button 
-              size="lg" 
-              variant="outline" 
-              className="text-white border-white hover:bg-white/20 transition-colors"
+            <Button
+              size="lg"
+              variant="outline"
+              className="border-2 text-white border-white/20 bg-white/10 hover:bg-white/20 backdrop-blur-sm transition-all w-full sm:w-auto"
               asChild
             >
               <Link href="/aboutUs">Learn More</Link>
@@ -96,22 +74,22 @@ export default function Home() {
       </section>
 
       {/* Featured Products */}
-      <section className="py-16 bg-white">
+      <section className="py-20 bg-gradient-to-b from-slate-900 to-slate-800">
         <div className="container mx-auto px-4">
           <div className="text-center mb-12">
-            <h2 className="text-4xl font-bold text-gray-800 mb-4">Featured Products</h2>
-            <p className="text-gray-600 max-w-2xl mx-auto">
+            <h2 className="text-4xl font-bold mb-4 text-white">Featured Products</h2>
+            <p className="text-gray-300 max-w-2xl mx-auto">
               Discover our top-rated gym equipment, meticulously selected to enhance your training experience.
             </p>
           </div>
           {productLoading ? (
-            <div className="text-center text-gray-600">Loading products...</div>
+            <div className="text-center text-gray-300">Loading products...</div>
           ) : (
-            <div className="grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-4 gap-8">
+            <div className="grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-3 xl:grid-cols-4 gap-6 lg:gap-8">
               {featuredProducts.map((product) => (
                 <Card 
                   key={product.id} 
-                  className="border-2 border-gray-100 rounded-xl overflow-hidden shadow-lg hover:shadow-2xl transition-all duration-300 ease-in-out transform hover:-translate-y-2"
+                  className="bg-slate-800/50 border-slate-700 backdrop-blur-sm rounded-xl overflow-hidden hover:shadow-2xl hover:shadow-orange-500/10 transition-all duration-300 ease-in-out transform hover:-translate-y-2 flex flex-col h-full"
                 >
                   <CardHeader className="p-0">
                     <Image
@@ -122,31 +100,31 @@ export default function Home() {
                       className="w-full h-64 object-cover"
                     />
                   </CardHeader>
-                  <CardContent className="p-6">
-                    <CardTitle className="text-xl font-semibold mb-2 line-clamp-1">
+                  <CardContent className="p-6 flex-grow">
+                    <CardTitle className="text-xl font-semibold mb-2 line-clamp-1 text-white">
                       {product.name}
                     </CardTitle>
-                    <p className="text-gray-600 mb-4 line-clamp-2">
+                    <p className="text-gray-300 mb-4 line-clamp-2">
                       {product.description}
                     </p>
                     <div className="flex items-center justify-between mb-4">
-                      <div className="flex text-yellow-500">
+                      <div className="flex text-orange-500">
                         {[1, 2, 3, 4, 5].map((star) => (
                           <Star key={star} className="h-5 w-5 fill-current" />
                         ))}
-                        <span className="text-gray-600 ml-2 text-sm">(24)</span>
+                        <span className="text-gray-400 ml-2 text-sm">(24)</span>
                       </div>
                     </div>
                   </CardContent>
-                  <CardFooter className="flex justify-between items-center p-6 pt-0">
-                    <span className="text-2xl font-bold text-blue-600">
+                  <CardFooter className="flex justify-between items-center p-6 pt-4 border-t border-slate-700/50 mt-auto">
+                    <span className="text-2xl font-bold text-white">
                       Rs: {product.price}
                     </span>
                     <Button 
-                      size="lg" 
-                      variant="default"
+                      size="sm" 
+                      className="bg-[#60A5FA] hover:bg-[#3B82F6] text-white border-0 transition-colors"
                     >
-                      <ShoppingCart className="mr-2 h-5 w-5" /> Add to Cart
+                      <ShoppingCart className="mr-2 h-4 w-4" /> Add to Cart
                     </Button>
                   </CardFooter>
                 </Card>
@@ -157,7 +135,8 @@ export default function Home() {
             <Button 
               asChild 
               size="lg" 
-              variant="ghost"
+              variant="outline"
+              className="border-2 text-white border-[#60A5FA]/20 bg-[#60A5FA]/10 hover:bg-[#60A5FA]/20 backdrop-blur-sm transition-all"
             >
               <Link href="/products">
                 View All Products <ArrowRight className="ml-2 h-5 w-5" />
@@ -168,66 +147,60 @@ export default function Home() {
       </section>
 
       {/* Testimonials */}
-      <section className="py-16 bg-gray-100">
+      <section className="py-20 bg-gradient-to-b from-slate-800 to-slate-900 overflow-hidden">
         <div className="container mx-auto px-4">
           <div className="text-center mb-12">
-            <h2 className="text-4xl font-bold text-gray-800 mb-4">Customer Experiences</h2>
-            <p className="text-gray-600 max-w-2xl mx-auto">
-              Real stories from fitness professionals and enthusiasts who have transformed their training with our equipment.
+            <h2 className="text-3xl sm:text-4xl font-bold mb-4 text-white">
+              Customer Experiences
+            </h2>
+            <p className="text-gray-300 max-w-2xl mx-auto">
+              Real stories from fitness professionals and enthusiasts who have
+              transformed their training with our equipment.
             </p>
           </div>
-          <div className="grid md:grid-cols-3 gap-8">
-            {testimonials.map((testimonial, index) => (
-              <div 
-                key={index} 
-                className="bg-white p-8 rounded-xl shadow-lg hover:shadow-xl transition-all duration-300 ease-in-out"
-              >
-                <div className="flex items-center mb-6">
-                  <Image 
-                    src={testimonial.image} 
-                    alt={testimonial.name} 
-                    width={80} 
-                    height={80} 
-                    className="rounded-full mr-4 object-cover" 
-                  />
-                  <div>
-                    <h3 className="font-semibold text-lg">{testimonial.name}</h3>
-                    <p className="text-gray-600 text-sm">{testimonial.title}</p>
-                  </div>
-                </div>
-                <p className="italic text-gray-700 mb-4">"{testimonial.quote}"</p>
-              </div>
-            ))}
+          <div className="h-[400px] w-full overflow-hidden">
+            <InfiniteMovingCards
+              items={testimonials}
+              direction="left"
+              speed="slow"
+            />
           </div>
         </div>
       </section>
 
       {/* Newsletter Signup */}
-      <section className="py-16 bg-blue-600 text-white">
-        <div className="container mx-auto px-4 text-center">
-          <h2 className="text-4xl font-bold mb-6">Stay Ahead of Your Fitness Game</h2>
-          <p className="text-xl mb-8 max-w-2xl mx-auto">
-            Get exclusive deals, workout tips, and be the first to know about new equipment releases.
-          </p>
-          <form onSubmit={handleNewsletterSignup} className="max-w-md mx-auto flex space-x-4">
-            <Input
-              type="email"
-              placeholder="Enter your email"
-              value={email}
-              onChange={(e) => setEmail(e.target.value)}
-              required
-              className="flex-grow text-black"
-            />
-            <Button 
-              type="submit" 
-              size="lg" 
-              className="bg-orange-500 hover:bg-orange-600 transition-colors"
+      <section className="relative py-20 overflow-hidden">
+        <div className="absolute inset-0 bg-[#60A5FA]"></div>
+        <div className="container relative z-10 mx-auto px-4 text-center">
+          <div className="max-w-3xl mx-auto backdrop-blur-sm bg-white/10 rounded-2xl p-8 border border-white/10">
+            <h2 className="text-4xl font-bold mb-6 text-white">Stay Ahead of Your Fitness Game</h2>
+            <p className="text-xl mb-8 text-white/90 max-w-2xl mx-auto">
+              Get exclusive deals, workout tips, and be the first to know about new equipment releases.
+            </p>
+            <form
+              onSubmit={handleNewsletterSignup}
+              className="max-w-md mx-auto flex flex-col sm:flex-row space-y-4 sm:space-y-0 sm:space-x-4"
             >
-              <Check className="mr-2 h-5 w-5" /> Subscribe
-            </Button>
-          </form>
+              <Input
+                type="email"
+                placeholder="Enter your email"
+                value={email}
+                onChange={(e) => setEmail(e.target.value)}
+                required
+                className="bg-white/20 border-white/20 text-white placeholder:text-white/70 focus:border-white flex-grow"
+              />
+              <Button
+                type="submit"
+                size="lg"
+                className="bg-white text-[#60A5FA] hover:bg-[#3B82F6] hover:text-white transition-colors font-semibold w-full sm:w-auto"
+              >
+                <Check className="mr-2 h-5 w-5" /> Subscribe
+              </Button>
+            </form>
+          </div>
         </div>
       </section>
     </div>
   );
 }
+
