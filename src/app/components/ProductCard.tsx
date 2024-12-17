@@ -52,8 +52,8 @@ const ProductCard = ({ product, setIsCartOpen }: ProductCardProps) => {
 
   return (
     <>
-      <Link href={`/products/${product.id}`} passHref>
-        <Card className="overflow-hidden hover:scale-105  transition duration-300 cursor-pointer">
+      <Link href={`/products/${product.id}`} passHref className="block h-full">
+        <Card className="overflow-hidden hover:scale-105  transition duration-300 cursor-pointer h-full flex flex-col">
           <CardHeader className="p-0">
             <div className="relative h-48 w-full">
               <Image
@@ -66,12 +66,12 @@ const ProductCard = ({ product, setIsCartOpen }: ProductCardProps) => {
               />
             </div>
           </CardHeader>
-          <CardContent className="p-4">
+          <CardContent className="p-4 flex flex-col flex-grow">
             <CardTitle className="mb-2">{product.name}</CardTitle>
-            <p className="text-sm text-muted-foreground mb-4">
+            <p className="text-sm text-muted-foreground mb-4 flex-grow overflow-hidden">
               {product.description}
             </p>
-            <div className="flex justify-between items-center">
+            <div className="flex justify-between items-center mt-auto">
               <span className="text-lg font-bold">Rs: {product.price}</span>
               <Button
                 onClick={handleAddToCart}
