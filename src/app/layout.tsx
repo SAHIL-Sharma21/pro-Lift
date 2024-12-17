@@ -1,10 +1,8 @@
 import type { Metadata } from "next";
 import localFont from "next/font/local";
 import "./globals.css";
-import AppProvider from '@/app/AppProvider';
-import Navbar from '@/app/components/Navbar';
-import Footer from '@/app/components/Footer';
-import {Toaster} from '@/components/ui/toaster';
+import AppProvider from "@/app/AppProvider";
+import ClientWrapper from "./ClientWrapper";
 
 const geistSans = localFont({
   src: "./fonts/GeistVF.woff",
@@ -19,7 +17,8 @@ const geistMono = localFont({
 
 export const metadata: Metadata = {
   title: "Pro Lift",
-  description: "Pro lift application is for buying gym products which will make your life easier",
+  description:
+    "Pro lift application is for buying gym products which will make your life easier",
 };
 
 export default function RootLayout({
@@ -33,10 +32,9 @@ export default function RootLayout({
         className={`${geistSans.variable} ${geistMono.variable} antialiased flex min-h-screen flex-col`}
       >
         <AppProvider>
-          <Navbar />
-          {children}
-          <Toaster />
-          <Footer />
+          <ClientWrapper>
+            {children}
+          </ClientWrapper>
         </AppProvider>
       </body>
     </html>
