@@ -40,7 +40,7 @@ const GoogleLoginButton = () => {
             variant: "destructive",
           });
         }}
-        useOneTap
+        useOneTap={false}
         cancel_on_tap_outside
         theme="outline"
         shape="circle"

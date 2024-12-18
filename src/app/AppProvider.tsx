@@ -6,6 +6,7 @@ import {Provider} from 'react-redux';
 import Navbar from "./components/Navbar";
 import { Toaster } from "@/components/ui/toaster";
 import Footer from "./components/Footer";
+import { GoogleOAuthProvider } from "@react-oauth/google";
 
 export default function AppProvider({children}: {children: React.ReactNode}){
 
@@ -30,10 +31,12 @@ export default function AppProvider({children}: {children: React.ReactNode}){
 
     return (
         <Provider store={store}>
-            <Navbar/>
-            {children}
-            <Toaster />
-            <Footer/>
+            <GoogleOAuthProvider clientId={process.env.NEXT_PUBLIC_GOOGLE_CLIENT_ID!}>
+                <Navbar/>
+                {children}
+                <Toaster />
+                <Footer/>
+            </GoogleOAuthProvider>
         </Provider>
     );
 }
