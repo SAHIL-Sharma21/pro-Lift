@@ -21,6 +21,7 @@ import {
   DropdownMenuTrigger,
 } from "@/components/ui/dropdown-menu";
 import SideBar from "@/app/components/cart/SidebarCart";
+import { usePathname } from "next/navigation";
 
 interface MobileLinkProps extends React.PropsWithChildren {
   href: string;
@@ -49,6 +50,8 @@ export default function Navbar() {
   const [isOpen, setIsOpen] = useState(false);
   const { user, loading, logout } = useAuth();
   const [isCartOpen, setIsCartOpen] = useState<boolean>(false);
+  const pathname = usePathname();
+
 
   const navItems = [
     { title: "Home", path: "/" },
@@ -74,7 +77,7 @@ export default function Navbar() {
                   <Link
                     href={item.path}
                     key={index}
-                    className="transition-colors hover:text-zinc-300"
+                    className={`transition-colors hover:text-blue-400 ${pathname === item.path ? "text-blue-400 font-semibold" : "text-zinc-100"}`}
                   >
                     {item.title}
                   </Link>
@@ -112,7 +115,7 @@ export default function Navbar() {
                         <MobileLink
                           key={index}
                           href={item.path}
-                          className="py-2 border-b border-zinc-700 flex items-center"
+                          className={`py-2 border-b border-zinc-700 transition-colors hover:text-blue-400 ${pathname === item.path ? "text-blue-400 font-semibold" : "text-zinc-100"}`}
                           onOpenChange={setIsOpen}
                         >
                           {item.title}

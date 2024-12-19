@@ -115,8 +115,8 @@ const OrderSummary: React.FC<OrderSummaryProps> = ({
 
   return (
     <Card className="mb-6 overflow-hidden">
-      <CardHeader className="bg-gray-500">
-        <CardTitle className="text-2xl">Order Summary</CardTitle>
+      <CardHeader className="bg-gray-950">
+        <CardTitle className="text-2xl text-white">Order Summary</CardTitle>
       </CardHeader>
       <CardContent className="divide-y">
         {cart && cart.items.length > 0 ? (
@@ -147,7 +147,7 @@ const OrderSummary: React.FC<OrderSummaryProps> = ({
             </div>
           </>
         ) : (
-          <p>Cart is empty. Please add items to your cart</p>
+          <p className="mt-4 text-center font-bold text-lg">Cart is empty. Please add items to your cart</p>
         )}
       </CardContent>
       <CardFooter className="bg-gray-50">
