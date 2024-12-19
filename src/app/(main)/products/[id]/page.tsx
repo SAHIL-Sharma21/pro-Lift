@@ -19,6 +19,12 @@ import { useParams } from "next/navigation";
 import React, { useEffect, useState, useCallback } from "react";
 import debounce from "lodash/debounce";
 import { useToast } from "@/hooks/use-toast";
+import { AnimatePresence, motion } from "framer-motion";
+
+const fadeIn = {
+  hidden: { opacity: 0, y: 20 },
+  visible: { opacity: 1, y: 0 },
+};
 
 function ProductPage() {
   const params = useParams();
@@ -186,7 +192,12 @@ function ProductPage() {
 
   if (loading) {
     return (
-      <div className="container mx-auto py-8 px-4">
+      <motion.div
+        className="container mx-auto py-8 px-4"
+        initial="hidden"
+        animate="visible"
+        variants={fadeIn}
+      >
         <Card className="max-w-4xl mx-auto">
           <CardContent className="p-6">
             <div className="flex flex-col md:flex-row gap-8">
@@ -200,13 +211,18 @@ function ProductPage() {
             </div>
           </CardContent>
         </Card>
-      </div>
+      </motion.div>
     );
   }
 
   if (error) {
     return (
-      <div className="flex items-center justify-center h-screen">
+      <motion.div
+        className="flex items-center justify-center h-screen"
+        initial="hidden"
+        animate="visible"
+        variants={fadeIn}
+      >
         <div className="text-center">
           <h2 className="text-2xl font-bold text-red-600 mb-4">Error</h2>
           <p className="text-gray-600">{error}</p>
@@ -217,13 +233,18 @@ function ProductPage() {
             </Button>
           </Link>
         </div>
-      </div>
+      </motion.div>
     );
   }
 
   if (!selectedProduct) {
     return (
-      <div className="flex items-center justify-center h-screen">
+      <motion.div
+        className="flex items-center justify-center h-screen"
+        initial="hidden"
+        animate="visible"
+        variants={fadeIn}
+      >
         <div className="text-center">
           <h2 className="text-2xl font-bold text-gray-800 mb-4">
             Product not found
@@ -235,13 +256,18 @@ function ProductPage() {
             </Button>
           </Link>
         </div>
-      </div>
+      </motion.div>
     );
   }
 
   return (
     <>
-      <div className="container mx-auto py-8 px-4">
+      <motion.div
+        className="container mx-auto py-8 px-4"
+        initial="hidden"
+        animate="visible"
+        variants={fadeIn}
+      >
         <Link href="/products">
           <Button variant="outline" className="mb-4">
             <ArrowLeft className="mr-2 h-4 w-4" />
@@ -252,7 +278,12 @@ function ProductPage() {
         <Card className="max-w-4xl mx-auto">
           <CardContent className="p-6">
             <div className="flex flex-col md:flex-row gap-8">
-              <div className="w-full md:w-1/2 relative">
+              <motion.div
+                className="w-full md:w-1/2 relative"
+                initial={{ opacity: 0, x: -50 }}
+                animate={{ opacity: 1, x: 0 }}
+                transition={{ duration: 0.5 }}
+              >
                 <div className="aspect-square relative rounded-lg overflow-hidden">
                   {!imageLoaded && (
                     <div className="absolute inset-0 bg-gray-200 animate-pulse justify-center items-center">
@@ -270,10 +301,15 @@ function ProductPage() {
                     onLoad={() => setImageLoaded(true)}
                   />
                 </div>
-              </div>
+              </motion.div>
 
               {/* product details  */}
-              <div className="w-full md:w-1/2">
+              <motion.div
+                className="w-full md:w-1/2"
+                initial={{ opacity: 0, y: 20 }}
+                animate={{ opacity: 1, y: 0 }}
+                transition={{ duration: 0.5, delay: 0.2 }}
+              >
                 <h1 className="text-2xl font-bold mb-2">
                   {selectedProduct.name}
                 </h1>
@@ -284,14 +320,24 @@ function ProductPage() {
                   Rs: {selectedProduct.price}
                 </p>
 
-                <div className="flex items-center gap-4 mb-6">
+                <motion.div
+                  className="flex items-center gap-4 mb-6"
+                  initial={{ opacity: 0, y: 20 }}
+                  animate={{ opacity: 1, y: 0 }}
+                  transition={{ duration: 0.5, delay: 0.4 }}
+                >
                   <Package className="h-6 w-6 text-gray-500" />
                   <span className="text-gray-600 text-sm">
                     In Stock: {selectedProduct.quantity}
                   </span>
-                </div>
+                </motion.div>
 
-                <div className="flex items-center gap-4 mb-6">
+                <motion.div
+                  className="flex items-center gap-4 mb-6"
+                  initial={{ opacity: 0, y: 20 }}
+                  animate={{ opacity: 1, y: 0 }}
+                  transition={{ duration: 0.5, delay: 0.6 }}
+                >
                   <Button
                     variant="outline"
                     size="icon"
@@ -313,9 +359,14 @@ function ProductPage() {
                   >
                     <PlusCircle className="h-4 w-4" />
                   </Button>
-                </div>
+                </motion.div>
 
-                <div className="flex flex-col sm:flex-row gap-4">
+                <motion.div
+                  className="flex flex-col sm:flex-row gap-4"
+                  initial={{ opacity: 0, y: 20 }}
+                  animate={{ opacity: 1, y: 0 }}
+                  transition={{ duration: 0.5, delay: 0.8 }}
+                >
                   <Button
                     className="w-full sm:w-auto"
                     onClick={handleAddToCart}
@@ -331,29 +382,43 @@ function ProductPage() {
                       : "Add to cart"}
                   </Button>
 
-                  {isInCart && (
-                    <Button
-                      variant="destructive"
-                      className="w-full sm:w-auto"
-                      onClick={handleRemoveFromCart}
-                      disabled={localCartLoading || cartLoading}
-                    >
-                      <Trash2 className="mr-2 h-4 w-4" />
-                      {localCartLoading || cartLoading
-                        ? "Processing..."
-                        : "Remove from cart"}
-                    </Button>
-                  )}
-                </div>
-                <div className="mt-6 p-4 bg-gray-100 rounded-lg">
+                  <AnimatePresence>
+                    {isInCart && (
+                      <motion.div
+                        initial={{ opacity: 0, scale: 0.8 }}
+                        animate={{ opacity: 1, scale: 1 }}
+                        exit={{ opacity: 0, scale: 0.8 }}
+                        transition={{ duration: 0.3 }}
+                      >
+                        <Button
+                          variant="destructive"
+                          className="w-full sm:w-auto"
+                          onClick={handleRemoveFromCart}
+                          disabled={localCartLoading || cartLoading}
+                        >
+                          <Trash2 className="mr-2 h-4 w-4" />
+                          {localCartLoading || cartLoading
+                            ? "Processing..."
+                            : "Remove from cart"}
+                        </Button>
+                      </motion.div>
+                    )}
+                  </AnimatePresence>
+                </motion.div>
+                <motion.div
+                  className="mt-6 p-4 bg-gray-100 rounded-lg"
+                  initial={{ opacity: 0, y: 20 }}
+                  animate={{ opacity: 1, y: 0 }}
+                  transition={{ duration: 0.5, delay: 1 }}
+                >
                   <h2 className="text-xl font-semibold mb-2">Cart Summary</h2>
                   <p className="text-lg">Total Price: Rs:{totalPrice}</p>
-                </div>
-              </div>
+                </motion.div>
+              </motion.div>
             </div>
           </CardContent>
         </Card>
-      </div>
+      </motion.div>
     </>
   );
 }
