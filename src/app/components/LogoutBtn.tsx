@@ -30,11 +30,10 @@ const LogoutBtn = () => {
         });
       }
       router.push("/auth/login");
-    } catch (error: any) {
-      console.error("Error logging out user: ", error);
+    } catch (error) {
       toast({
         title: "Logout Failed",
-        description: "There was an error logging out. Please try again.",
+        description: error instanceof Error ? error.message : "There was an error logging out. Please try again.",
         variant: "destructive",
       });
     }

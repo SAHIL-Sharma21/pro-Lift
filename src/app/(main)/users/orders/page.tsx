@@ -49,7 +49,7 @@ function UserOrders() {
         <Package className="h-16 w-16 text-zinc-400 mb-4" />
         <h2 className="text-2xl font-semibold mb-2">No orders yet</h2>
         <p className="text-zinc-400 mb-4">
-          Looks like you haven't placed any orders yet
+          Looks like you haven&apos;t placed any orders yet
         </p>
         <Button asChild>
           <Link href="/products">Start shopping</Link>

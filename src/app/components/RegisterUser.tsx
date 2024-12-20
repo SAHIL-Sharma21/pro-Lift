@@ -51,11 +51,11 @@ const RegisterUser = () => {
         className: "bg-green-100 border-green-400 text-green-900",
       });
       router.push(role === "ADMIN" ? "/auth/admin/login" : "/auth/login");
-    } catch (error: any) {
+    } catch (error) {
       toast({
         title: "User Registration Failed",
         description:
-          error.message || "There was a error registering user, Try Again",
+          error instanceof Error ? error.message : "There was a error registering user, Try Again",
         variant: "destructive",
       });
     } finally {

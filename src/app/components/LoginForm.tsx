@@ -46,11 +46,11 @@ const LoginForm = () => {
       } else {
         router.push("/products");
       }
-    } catch (error: any) {
+    } catch (error) {
       toast({
         title: "Login Failed",
         description:
-          error.message || "There was an error logging in. Please try again.",
+          error instanceof Error ? error.message : "There was an error logging in. Please try again.",
         variant: "destructive",
       });
     }

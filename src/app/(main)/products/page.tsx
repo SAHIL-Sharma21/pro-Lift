@@ -45,8 +45,9 @@ export default function ProductPage() {
   useEffect(() => {
     if (cart && cart.items.length > 0) {
       setIsCartOpen(true);
+      console.log(isCartOpen);
     }
-  }, [cart]);
+  }, [cart, isCartOpen]);
 
   const categories: CategoryWithProducts[] = useMemo(() => {
     const categorySet = new Set(products.map((product) => product.category));
@@ -230,7 +231,7 @@ export default function ProductPage() {
               No products found
             </h2>
             <p className="text-gray-500 text-center max-w-md">
-              We couldn't find any products matching your criteria. Please try a
+              We couldn&apos;t find any products matching your criteria. Please try a
               different category or search term.
             </p>
           </motion.div>

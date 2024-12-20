@@ -15,7 +15,7 @@ import React, { useState } from "react";
 import { useAuth } from "../hooks/useAuth";
 import { useRouter } from "next/navigation";
 import PasswordStrengthIndicator from "./PasswordStrengthIndicator";
-import { AlertCircle, Eye, EyeIcon, EyeOff, Loader2 } from "lucide-react";
+import { AlertCircle, Eye, EyeOff, Loader2 } from "lucide-react";
 import Link from "next/link";
 import { Alert, AlertDescription, AlertTitle } from "@/components/ui/alert";
 import { useToast } from "@/hooks/use-toast";
@@ -58,11 +58,11 @@ const AdminRegister = () => {
         });
       }
       router.push("/auth/admin/login");
-    } catch (error: any) {
+    } catch (error) {
       toast({
         title: "Admin Registration Failed",
         description:
-          error.message || "There was a error registering admin, Try Again",
+          error instanceof Error ? error.message : "There was a error registering admin, Try Again",
         variant: "destructive",
       });
     } finally {

@@ -1,19 +1,20 @@
 "use client";
 
 import React from "react";
-import { GoogleLogin } from "@react-oauth/google";
+import { GoogleLogin, CredentialResponse } from "@react-oauth/google";
 import { useAuth } from "../hooks/useAuth";
 import { useRouter } from "next/navigation";
 import { useToast } from "@/hooks/use-toast";
+
 
 const GoogleLoginButton = () => {
   const router = useRouter();
   const { toast } = useToast();
   const { googleLogin } = useAuth();
 
-  const handleGoogleLoginSuccess = async (credentialResponse: any) => {
+  const handleGoogleLoginSuccess = async (credentialResponse: CredentialResponse) => {
     try {
-      await googleLogin(credentialResponse.credential);
+      await googleLogin(credentialResponse.credential!);
       toast({
         title: "Login Successful",
         description: "You are now logged in with google",
@@ -23,7 +24,7 @@ const GoogleLoginButton = () => {
     } catch (error) {
       toast({
         title: "Login Failed",
-        description: "There was an error logging in with google",
+        description: error instanceof Error ? error.message : "There was an error logging in with google",
         variant: "destructive",
       });
     }

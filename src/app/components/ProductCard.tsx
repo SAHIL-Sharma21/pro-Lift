@@ -41,11 +41,10 @@ const ProductCard = ({ product, setIsCartOpen }: ProductCardProps) => {
         });
       }
       setIsCartOpen(true);
-    } catch (error: any) {
-      console.error("Failed to add product to cart:", error);
+    } catch (error) {
       toast({
         title: "Failed to add product to cart",
-        description: error.message || "Please try again later.",
+        description: error instanceof Error ? error.message : "Please try again later.",
         variant: "destructive",
       });
     }

@@ -57,11 +57,11 @@ const AdminLogin = () => {
           variant: "destructive",
         });
       }
-    } catch (error: any) {
+    } catch (error) {
       toast({
         title: "Login Error",
         description:
-          error.message || "An unexpected error occurred. Please try again.",
+          error instanceof Error ? error.message : "An unexpected error occurred. Please try again.",
         variant: "destructive",
       });
     } finally {

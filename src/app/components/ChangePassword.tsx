@@ -19,7 +19,7 @@ const ChangePassword = ({
   isOpen,
   onClose,
 }: {
-  isOpen: Boolean;
+  isOpen: boolean;
   onClose: () => void;
 }) => {
   const [oldPassword, setOldPassword] = useState("");
@@ -45,11 +45,11 @@ const ChangePassword = ({
           variant: "destructive",
         });
       }
-    } catch (error: any) {
+    } catch (error) {
       toast({
         title: "Password Change Failed",
         description:
-          error.message ||
+          error instanceof Error ? error.message :
           "There was an error changing your password. Please try again.",
         variant: "destructive",
       });

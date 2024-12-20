@@ -56,40 +56,44 @@ function ProductPage() {
   }, [cart, getCart]);
 
   const debouncedUpdateCart = useCallback(
-    debounce(async (cartItemId: string, newQuantity: number) => {
-      setLocalCartLoading(true);
-      try {
-        const response = await updateItemToCart({
-          cartItemId,
-          quantity: newQuantity,
-        });
-        if (response.meta.requestStatus === "fulfilled") {
-          toast({
-            title: "Cart updated",
-            description: "The cart has been updated successfully.",
-            variant: "default",
-            className: "bg-green-100 border-green-400 text-green-900",
+    (cartItemId: string, newQuantity: number) => {
+      const updateCart = async () => {
+        setLocalCartLoading(true);
+        try {
+          const response = await updateItemToCart({
+            cartItemId,
+            quantity: newQuantity,
           });
-        } else {
+          if (response.meta.requestStatus === "fulfilled") {
+            toast({
+              title: "Cart updated",
+              description: "The cart has been updated successfully.",
+              variant: "default",
+              className: "bg-green-100 border-green-400 text-green-900",
+            });
+          } else {
+            toast({
+              title: "Failed to update cart",
+              description: "Failed to update the cart.",
+              variant: "destructive",
+            });
+          }
+          await getCart();
+        } catch (error) {
+          console.error("Failed to update cart:", error);
           toast({
             title: "Failed to update cart",
             description: "Failed to update the cart.",
             variant: "destructive",
           });
+        } finally {
+          setLocalCartLoading(false);
         }
-        await getCart();
-      } catch (error) {
-        console.error("Failed to update cart:", error);
-        toast({
-          title: "Failed to update cart",
-          description: "Failed to update the cart.",
-          variant: "destructive",
-        });
-      } finally {
-        setLocalCartLoading(false);
-      }
-    }, 500),
-    [updateItemToCart, getCart]
+      };
+
+      debounce(updateCart, 500)();
+    },
+    [updateItemToCart, getCart, toast, setLocalCartLoading]
   );
 
   const handleAddToCart = async () => {
@@ -116,11 +120,11 @@ function ProductPage() {
         }
         await getCart();
         setQuantity(1);
-      } catch (error: any) {
+      } catch (error) {
         console.error("Failed to add product to cart:", error);
         toast({
           title: "Failed to add product to cart",
-          description: error.message || "Please try again later.",
+          description: error instanceof Error ? error.message : "Please try again later.",
           variant: "destructive",
         });
       } finally {
@@ -158,11 +162,11 @@ function ProductPage() {
           }
           await getCart();
           setQuantity(1);
-        } catch (error: any) {
+        } catch (error) {
           console.error("Failed to remove product from cart:", error);
           toast({
             title: "Failed to remove product from cart",
-            description: error.message || "Please try again later.",
+            description: error instanceof Error ? error.message : "Please try again later.",
             variant: "destructive",
           });
         } finally {
