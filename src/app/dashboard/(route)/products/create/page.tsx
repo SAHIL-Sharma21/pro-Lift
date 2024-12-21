@@ -23,6 +23,7 @@ import {
 import { Textarea } from "@/components/ui/textarea";
 import { useToast } from "@/hooks/use-toast";
 import { Loader2 } from "lucide-react";
+import Image from "next/image";
 import { useRouter } from "next/navigation";
 import React, { useEffect, useState } from "react";
 
@@ -213,10 +214,12 @@ function ProductCreate() {
               required
             />
             {imagePreview && (
-              <img
+              <Image
                 src={imagePreview}
                 alt="Preview"
                 className="mt-2 max-w-full h-auto"
+                width={200}
+                height={200}
               />
             )}
           </div>

@@ -48,10 +48,10 @@ export default function ContactPage() {
                 variant:"default",
                 className: "bg-green-100 border-green-400 text-green-900"
             });
-        } catch (error:any) {
+        } catch (error) {
             toast({
                 title: "Message not sent successfully",
-                description: error.message || "Error sending message",
+                description: error instanceof Error ? error.message : "Error sending message",
                 variant: "destructive"
             });
         } finally {
@@ -95,7 +95,7 @@ export default function ContactPage() {
                     Get in Touch
                   </CardTitle>
                   <CardDescription className="text-gray-300">
-                    Fill out the form below to reach out to us and we'll get
+                    Fill out the form below to reach out to us and we&apos;ll get
                     back to you as soon as possible.
                   </CardDescription>
                 </CardHeader>

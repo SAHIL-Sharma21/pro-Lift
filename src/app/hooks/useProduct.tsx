@@ -4,7 +4,7 @@ import {useDispatch, useSelector} from 'react-redux'
 import {AppDispatch, RootState} from '@/app/lib/redux/store';
 import { useCallback } from 'react';
 import {fetchProducts, createProduct, deleteProduct, getProductById, updateProduct} from '@/app/lib/redux/slices/productSlice';
-import { ProductUpdate, ProductCreate} from '../types/products.types';
+import { ProductUpdate} from '../types/products.types';
 
 
 export const useProduct = () => {
@@ -32,7 +32,7 @@ export const useProduct = () => {
             } else {
                 throw new Error('Delete operation did not return expected result');
             }
-        } catch (error: any) {
+        } catch (error) {
             console.error('Failed to delete product:', error);
             throw error;
         }

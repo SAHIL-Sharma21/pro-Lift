@@ -6,7 +6,6 @@ import { Button } from "@/components/ui/button";
 import {
   Card,
   CardContent,
-  CardFooter,
   CardHeader,
   CardTitle,
 } from "@/components/ui/card";
@@ -43,7 +42,7 @@ const CartPage = () => {
       const cartItem = cart.items.find((item) => item.id === cartItemId);
       if (cartItemId) {
         try {
-          const responee = await removeItemFromCart(cartItem?.id!);
+          const responee = await removeItemFromCart(cartItem?.id || "");
           if (responee.meta.requestStatus === "fulfilled") {
             toast({
               title: "Product removed from cart",
@@ -60,10 +59,9 @@ const CartPage = () => {
           }
           await getCart();
         } catch (error) {
-          console.error("Failed to remove product from cart:", error);
           toast({
             title: "Failed to remove product from cart",
-            description: "Please try again later.",
+            description: error instanceof Error ? error.message : "Please try again later.",
             variant: "destructive",
           });
         }
@@ -72,34 +70,37 @@ const CartPage = () => {
   };
 
   const debounceCartUpdate = useCallback(
-    debounce(async (cartItemId: string, quantity: number) => {
-      try {
-        const response = await updateItemToCart({ cartItemId, quantity });
-        if (response.meta.requestStatus === "fulfilled") {
-          toast({
-            title: "Cart updated",
-            description: "The cart has been updated successfully.",
-            variant: "default",
-            className: "bg-green-100 border-green-400 text-green-900",
-          });
-        } else {
+    (cartItemId: string, quantity: number) => {
+      const updateCart = async () => {
+        try {
+          const response = await updateItemToCart({ cartItemId, quantity });
+          if (response.meta.requestStatus === "fulfilled") {
+            toast({
+              title: "Cart updated",
+              description: "The cart has been updated successfully.",
+              variant: "default",
+              className: "bg-green-100 border-green-400 text-green-900",
+            });
+          } else {
+            toast({
+              title: "Failed to update the cart item",
+              description: "Please try again later.",
+              variant: "destructive",
+            });
+          }
+          await getCart();
+        } catch (error) {
           toast({
             title: "Failed to update the cart item",
-            description: "Please try again later.",
+            description: error instanceof Error ? error.message : "Please try again later.",
             variant: "destructive",
           });
         }
-        await getCart();
-      } catch (error: any) {
-        console.error("Failed to update the cart item:", error);
-        toast({
-          title: "Failed to update the cart item",
-          description: error.message || "Please try again later.",
-          variant: "destructive",
-        });
-      }
-    }, 500),
-    [updateItemToCart, getCart]
+      };
+      
+      debounce(updateCart, 500)();
+    },
+    [updateItemToCart, getCart, toast]
   );
 
   const handleUpdateQuantity = async (
@@ -129,11 +130,11 @@ const CartPage = () => {
         });
       }
       await getCart();
-    } catch (error: any) {
+    } catch (error) {
       console.error("Failed to clear the cart:", error);
       toast({
         title: "Failed to clear the cart",
-        description: error.message || "Please try again later.",
+        description: error instanceof Error ? error.message : "Please try again later.",
         variant: "destructive",
       });
     }
@@ -185,7 +186,6 @@ const CartPage = () => {
   }
 
   return (
-    <>
       <div className="mx-auto py-10">
         <Card className="bg-card text-card-foreground">
           <CardHeader>
@@ -297,7 +297,6 @@ const CartPage = () => {
           </div>
         </Card>
       </div>
-    </>
   );
 };
 

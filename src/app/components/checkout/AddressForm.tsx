@@ -72,12 +72,11 @@ const AddressForm: React.FC<AddressFormProps> = ({ onAddressAdded }) => {
         });
       }
       resetFrom();
-    } catch (err: any) {
-      console.log("Error creating address: ", err);
+    } catch (err) {
       toast({
         title: "Address Creation Failed",
         description:
-          "There was an error creating the address. Please try again.",
+          err instanceof Error ? err.message : "There was an error creating the address. Please try again.",
         variant: "destructive",
       });
     }

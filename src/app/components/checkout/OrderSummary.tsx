@@ -23,6 +23,40 @@ interface OrderSummaryProps {
   selectedAddress: string | null;
 }
 
+interface RazorpayResponse {
+  razorpay_payment_id: string;
+  razorpay_order_id: string;
+  razorpay_signature: string;
+}
+
+
+interface RazorpayOptions {
+  key: string | undefined;
+  amount: number;
+  currency: string;
+  name: string;
+  description: string;
+  order_id: string;
+  handler: (response: RazorpayResponse) => Promise<void>;
+  prefill: {
+    name: string;
+    email: string;
+    contact: string;
+  };
+  theme: {
+    color: string;
+  };
+}
+
+declare global {
+  interface Window {
+    Razorpay: new (options: RazorpayOptions) => {
+      open: () => void;
+    }
+  }
+}
+
+
 const OrderSummary: React.FC<OrderSummaryProps> = ({
   cart,
   totalPrice,
@@ -71,7 +105,7 @@ const OrderSummary: React.FC<OrderSummaryProps> = ({
         name: "Pro Lifts",
         description: "Purchase of products",
         order_id: paymentResponse.payload.razorpayOrderId,
-        handler: async function (response: any) {
+        handler: async function (response: RazorpayResponse) {
           try {
             await verifyPaymentOrder({
               razorpayOrderId: paymentResponse.payload.razorpayOrderId,
@@ -99,14 +133,13 @@ const OrderSummary: React.FC<OrderSummaryProps> = ({
         },
       };
 
-      const paymentObject = new (window as any).Razorpay(options);
+      const paymentObject = new window.Razorpay(options);
       paymentObject.open();
-    } catch (error: any) {
-      console.error("Error creating payment order: ", error);
+    } catch (error) {
       toast({
         title: "Payment Creation Failed",
         description:
-          error.message ||
+          error instanceof Error ? error.message :
           "There was an error creating the payment order. Please try again.",
         variant: "destructive",
       });

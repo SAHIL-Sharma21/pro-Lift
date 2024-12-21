@@ -26,7 +26,7 @@ import {
 } from "@/components/ui/table";
 import { AlertCircle } from "lucide-react";
 import { useParams } from "next/navigation";
-import { useEffect, useState } from "react";
+import { useEffect } from "react";
 
 interface FullOrder extends SingleOrder {
   payment?: {
@@ -42,9 +42,6 @@ interface FullOrder extends SingleOrder {
 export default function OrderPage() {
   const { orderId } = useParams();
   const { fetchOrderById, loading, error, currentOrder } = useOrder();
-  const [orderWithPayment, setOrderWithPayment] = useState<FullOrder | null>(
-    null
-  );
 
   useEffect(() => {
     if (orderId && typeof orderId === "string") {
@@ -76,7 +73,7 @@ export default function OrderPage() {
     );
   }
 
-  const orderToDisplay = orderWithPayment || (currentOrder as FullOrder);
+  const orderToDisplay = currentOrder as FullOrder;
 
   return (
     <div className="container mx-auto px-4 py-8">
@@ -113,7 +110,7 @@ function CurrentOrder({ order }: { order: FullOrder }) {
           </div>
           <div className="flex justify-between">
             <span className="font-semibold">Payment Status:</span>
-            <span>{order.payment?.status || "N/A"}</span>
+            <PaymentStatusBadge status={order.payment?.status} />
           </div>
         </div>
       </CardContent>
@@ -130,7 +127,7 @@ function CustomerDetails({ order }: { order: FullOrder }) {
       <CardContent>
         <div className="space-y-2">
           <p>
-            <span className="font-semibold">User Name: </span>{" "}
+            <span className="font-semibold">User Name: </span>
             {order.user.firstName} {order.user.lastName}
           </p>
           <p>
@@ -157,6 +154,12 @@ function CustomerDetails({ order }: { order: FullOrder }) {
 }
 
 function OrderItems({ order }: { order: FullOrder }) {
+  const calculateItemTotal = (price: number, quantity: number) => {
+    const subtotal = price * quantity;
+    const tax = subtotal * 0.05; // 5% tax
+    return (subtotal + tax).toFixed(2);
+  };
+
   return (
     <Card className="mt-6">
       <CardHeader>
@@ -166,10 +169,10 @@ function OrderItems({ order }: { order: FullOrder }) {
         <Table>
           <TableHeader>
             <TableRow>
-              <TableHead>Product ID</TableHead>
+              <TableHead>Product Name</TableHead>
               <TableHead>Quantity</TableHead>
               <TableHead>Price</TableHead>
-              <TableHead>Total</TableHead>
+              <TableHead>Total (inc. Tax)</TableHead>
             </TableRow>
           </TableHeader>
           <TableBody>
@@ -178,9 +181,8 @@ function OrderItems({ order }: { order: FullOrder }) {
                 <TableCell>{item.product.name}</TableCell>
                 <TableCell>{item.quantity}</TableCell>
                 <TableCell>Rs:{item.price}</TableCell>
-                {/* total amout we have add tax p[rice here ] */}
                 <TableCell className="font-semibold">
-                  Rs:{Math.round(item.price * item.quantity * 105) / 100}
+                  Rs:{calculateItemTotal(item.price, item.quantity)}
                 </TableCell>
               </TableRow>
             ))}
@@ -198,6 +200,18 @@ function OrderStatusBadge({ status }: { status: OrderStatus }) {
     SHIPPED: "bg-purple-100 text-purple-800",
     COMPLETED: "bg-green-100 text-green-800",
     CANCELLED: "bg-red-100 text-red-800",
+  };
+
+  return <Badge className={statusColors[status]}>{status}</Badge>;
+}
+
+function PaymentStatusBadge({ status }: { status?: PaymentStatus }) {
+  if (!status) return <Badge className="bg-gray-100 text-gray-800">N/A</Badge>;
+
+  const statusColors: Record<PaymentStatus, string> = {
+    PENDING: "bg-yellow-100 text-yellow-800",
+    COMPLETED: "bg-green-100 text-green-800",
+    FAILED: "bg-red-100 text-red-800",
   };
 
   return <Badge className={statusColors[status]}>{status}</Badge>;

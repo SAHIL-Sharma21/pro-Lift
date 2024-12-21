@@ -45,34 +45,38 @@ const SidebarCart = ({
   }, [cart, setIsOpen]);
 
   const debounceCartUpdate = useCallback(
-    debounce(async (cartItemId: string, quantity: number) => {
-      try {
-        const response = await updateItemToCart({ cartItemId, quantity });
-        if (response.meta.requestStatus === "fulfilled") {
-          toast({
-            title: "Cart item updated",
-            description: "The cart item has been updated successfully.",
-            variant: "default",
-            className: "bg-green-100 border-green-400 text-green-900",
-          });
-        } else {
+    (cartItemId: string, quantity: number) => {
+      const updateCart = async () => {
+        try {
+          const response = await updateItemToCart({ cartItemId, quantity });
+          if (response.meta.requestStatus === "fulfilled") {
+            toast({
+              title: "Cart item updated",
+              description: "The cart item has been updated successfully.",
+              variant: "default",
+              className: "bg-green-100 border-green-400 text-green-900",
+            });
+          } else {
+            toast({
+              title: "Failed to update the cart item",
+              description: "Please try again later.",
+              variant: "destructive",
+            });
+          }
+          await getCart();
+        } catch (error) {
+          console.error("Failed to update the cart item:", error);
           toast({
             title: "Failed to update the cart item",
-            description: "Please try again later.",
+            description: error instanceof Error ? error.message : "Please try again later.",
             variant: "destructive",
           });
         }
-        await getCart();
-      } catch (error: any) {
-        console.error("Failed to update the cart item:", error);
-        toast({
-          title: "Failed to update the cart item",
-          description: error.message || "Please try again later.",
-          variant: "destructive",
-        });
-      }
-    }, 500),
-    [updateItemToCart, getCart]
+      };
+  
+      debounce(updateCart, 500)();
+    },
+    [updateItemToCart, getCart, toast]
   );
 
   const handleUpdateQuantity = async (
@@ -83,11 +87,10 @@ const SidebarCart = ({
       if (newQuantity > 0) {
         debounceCartUpdate(cartItemId, newQuantity);
       }
-    } catch (error: any) {
-      console.error("Failed to update the cart item:", error);
+    } catch (error) {
       toast({
         title: "Failed to update the cart item",
-        description: error.message || "Please try again later.",
+        description: error instanceof Error ? error.message : "Please try again later.",
         variant: "destructive",
       });
     }
@@ -112,11 +115,10 @@ const SidebarCart = ({
           });
         }
         await getCart();
-      } catch (error: any) {
-        console.error("Failed to remove product from cart:", error);
+      } catch (error) {
         toast({
           title: "Failed to remove product from cart",
-          description: error.message || "Please try again later.",
+          description: error instanceof Error ? error.message : "Please try again later.",
           variant: "destructive",
         });
       }
@@ -147,17 +149,15 @@ const SidebarCart = ({
       }
       await getCart();
     } catch (error) {
-      console.error("Failed to clear the cart:", error);
       toast({
         title: "Failed to clear the cart",
-        description: "Please try again later.",
+        description: error instanceof Error ? error.message : "Please try again later.",
         variant: "destructive",
       });
     }
   };
 
   return (
-    <>
       <Sheet open={isOpen} onOpenChange={setIsOpen}>
         <SheetTrigger asChild>
           <div className="relative cursor-pointer p-2 rounded-full hover:bg-zinc-600 transition-colors">
@@ -253,7 +253,6 @@ const SidebarCart = ({
           )}
         </SheetContent>
       </Sheet>
-    </>
   );
 };
 

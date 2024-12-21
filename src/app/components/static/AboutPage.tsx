@@ -73,7 +73,7 @@ export default function AboutContent() {
               Our Mission
             </h2>
             <p className="text-lg mb-4 text-gray-300 text-justify">
-              At Pro Lifts, we're dedicated to empowering fitness enthusiasts
+              At Pro Lifts, we&apos;re dedicated to empowering fitness enthusiasts
               and professionals with top-quality gym equipment. Our mission is
               to make premium fitness gear accessible to everyone, from home gym
               heroes to commercial facility owners.
@@ -131,7 +131,7 @@ export default function AboutContent() {
                 <p className="text-lg mb-4 text-gray-300 text-justify">
                   Founded in 2010 by a group of passionate fitness enthusiasts,
                   Pro Lifts started as a small local gym equipment supplier.
-                  Over the years, we've grown into a nationwide e-commerce
+                  Over the years, we&apos;ve grown into a nationwide e-commerce
                   platform, serving thousands of satisfied customers.
                 </p>
                 <p className="text-lg text-gray-300 text-justify">
@@ -161,7 +161,7 @@ export default function AboutContent() {
               Join the Pro Lifts Community
             </h2>
             <p className="text-lg mb-6 text-gray-300 text-justify">
-              Whether you're setting up a home gym, upgrading your commercial
+              Whether you&apos;re setting up a home gym, upgrading your commercial
               facility, or looking for the perfect addition to your workout
               routine, Pro Lifts is here to support your fitness journey. Join
               our community of fitness enthusiasts and experience the Pro Lifts

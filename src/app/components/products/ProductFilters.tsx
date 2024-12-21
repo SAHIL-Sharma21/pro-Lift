@@ -25,12 +25,16 @@ export function ProductFilter({
   onCategoryChange,
   onSearch,
 }: ProductFilterProps) {
-  const [searchTerm, setSearchTerm] = useState("");
 
+  const [searchTerm, setSearchTerm] = useState("");
   const debouncedSearch = useCallback(
-    debounce((value: string) => {
-      onSearch(value);
-    }, 300),
+    (value: string) => {
+      const delayedSearch = debounce((searchValue: string) => {
+        onSearch(searchValue);
+      }, 300);
+
+      delayedSearch(value);
+    },
     [onSearch]
   );
 

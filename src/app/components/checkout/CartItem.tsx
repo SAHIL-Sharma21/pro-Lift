@@ -2,6 +2,7 @@
 
 import { CartItem as CartType } from "@/app/types/cart.types";
 import { motion } from "framer-motion";
+import Image from "next/image";
 import React from "react";
 
 interface CartItemProps {
@@ -17,10 +18,12 @@ const CartItem: React.FC<CartItemProps> = ({ item }) => {
       transition={{ duration: 0.3 }}
     >
       <div className="flex items-center space-x-4">
-        <img
+        <Image
           src={item.product.image}
           alt={item.product.name}
           className="w-16 h-16 object-cover rounded-md"
+          width={64}
+          height={64}
         />
         <div>
           <h3 className="font-semibold">{item.product.name}</h3>
