@@ -16,7 +16,7 @@ import { useProduct } from "./hooks/useProduct";
 import { useEffect, useState } from "react";
 import { Product } from "./types/products.types";
 import { testimonials } from "@/utils/testimonial";
-import { InfiniteMovingCards } from "@/components/ui/infinite-moving-cards";
+import InfiniteMovingCards from "@/components/ui/infinite-moving-cards";
 import { motion } from "framer-motion";
 
 const fadeIn = {
@@ -239,8 +239,9 @@ export default function Home() {
           >
             <InfiniteMovingCards
               items={testimonials}
-              direction="left"
-              speed="slow"
+              direction="right"
+              speed={150}
+              pauseOnHover={true}
             />
           </motion.div>
         </div>

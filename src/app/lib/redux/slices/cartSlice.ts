@@ -22,13 +22,14 @@ export const fetchCart = createAsyncThunk(
   async (_, { rejectWithValue }) => {
     try {
       const response = await fetch(
-        `${process.env.NEXT_PUBLIC_BACKEND_URI}/cart/get-cart`, {
+        `${process.env.NEXT_PUBLIC_BACKEND_URI}/cart/get-cart`,
+        {
           credentials: "include",
         }
       );
       if (!response.ok) {
-        if(response.status === 400){
-          return {items: [], id: null}
+        if (response.status === 400) {
+          return { items: [], id: null };
         }
         throw new Error("Failed to get the user cart");
       }
@@ -36,7 +37,9 @@ export const fetchCart = createAsyncThunk(
       return data.data;
     } catch (error) {
       console.error("Error fetching cart:", error);
-      return rejectWithValue(error instanceof Error ? error.message : "Failed to fetch cart");
+      return rejectWithValue(
+        error instanceof Error ? error.message : "Failed to fetch cart"
+      );
     }
   }
 );
@@ -62,7 +65,9 @@ export const addToCart = createAsyncThunk(
       return data.data;
     } catch (error) {
       console.error("Error adding product to cart:", error);
-      return rejectWithValue(error instanceof Error ? error.message : "Failed to add product to cart");
+      return rejectWithValue(
+        error instanceof Error ? error.message : "Failed to add product to cart"
+      );
     }
   }
 );
@@ -88,7 +93,11 @@ export const updateCartItem = createAsyncThunk(
       return data.data;
     } catch (error) {
       console.error("Error updating the cart item:", error);
-      return rejectWithValue(error instanceof Error ? error.message : "Failed to update the cart item");
+      return rejectWithValue(
+        error instanceof Error
+          ? error.message
+          : "Failed to update the cart item"
+      );
     }
   }
 );
@@ -97,7 +106,6 @@ export const removeFromCart = createAsyncThunk(
   "cart/removeFromCart",
   async (cartItemId: string, { rejectWithValue }) => {
     try {
-
       const response = await fetch(
         `${process.env.NEXT_PUBLIC_BACKEND_URI}/cart/delete-cart/${cartItemId}`,
         {
@@ -118,7 +126,11 @@ export const removeFromCart = createAsyncThunk(
       return data.data.updatedCart.id;
     } catch (error) {
       console.error("Error removing item from the cart:", error);
-      return rejectWithValue(error instanceof Error ? error.message : "Failed to remove item from the cart");
+      return rejectWithValue(
+        error instanceof Error
+          ? error.message
+          : "Failed to remove item from the cart"
+      );
     }
   }
 );
@@ -139,7 +151,9 @@ export const clearCart = createAsyncThunk(
       return data;
     } catch (error) {
       console.error("Error clearing the cart:", error);
-      return rejectWithValue(error instanceof Error ? error.message : "Failed to clear the cart");
+      return rejectWithValue(
+        error instanceof Error ? error.message : "Failed to clear the cart"
+      );
     }
   }
 );
@@ -252,7 +266,7 @@ export const cartSlice = createSlice({
               (total, item) => total + item.quantity * item.product.price,
               0
             );
-            if(state.cart.items.length === 0){
+            if (state.cart.items.length === 0) {
               state.cart = null;
             }
           }

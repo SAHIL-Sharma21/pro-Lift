@@ -5,7 +5,7 @@ import {RootState} from '@/app/lib/redux/store';
 interface ApiCallOptions {
     url: string;
     method: "GET" | "POST" | "PATCH" | "DELETE";
-    body?: any;
+    body?: object;
 }
 
 export const apiCall  = async(options: ApiCallOptions, getState: () => RootState) => {

@@ -19,10 +19,13 @@ export interface LoginUserCredentials {
     email: string;
     password: string;
 }
+
+type ApiCallBody = RegisterUserCredentials | LoginUserCredentials | ChangePassword;
+
 export interface ApiCallCredentials {
     url: string;
     method: string;
-    body?: any;
+    body?: ApiCallBody;
     token?: string;
 }
 

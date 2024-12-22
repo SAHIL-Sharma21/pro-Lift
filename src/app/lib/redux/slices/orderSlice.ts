@@ -41,28 +41,38 @@ export const getOrders = createAsyncThunk(
       const data = await response.json();
       return data.data;
     } catch (error) {
-      return rejectWithValue(error instanceof Error ? error.message : "Failed to get orders");
+      return rejectWithValue(
+        error instanceof Error ? error.message : "Failed to get orders"
+      );
     }
   }
 );
 
-export const getAdminOrder = createAsyncThunk('order/getAdminOrder', async(_, {rejectWithValue, getState}) => {
-  try {
-    const response = await apiCall({
-      url: `${process.env.NEXT_PUBLIC_BACKEND_URI}/orders/admin/allOrders`,
-      method: "GET",
-    }, getState as () => RootState);
+export const getAdminOrder = createAsyncThunk(
+  "order/getAdminOrder",
+  async (_, { rejectWithValue, getState }) => {
+    try {
+      const response = await apiCall(
+        {
+          url: `${process.env.NEXT_PUBLIC_BACKEND_URI}/orders/admin/allOrders`,
+          method: "GET",
+        },
+        getState as () => RootState
+      );
 
-    if(!response.ok){
-      throw new Error("Failed to get Admin orders");
+      if (!response.ok) {
+        throw new Error("Failed to get Admin orders");
+      }
+
+      const data = await response.json();
+      return data.data;
+    } catch (error) {
+      return rejectWithValue(
+        error instanceof Error ? error.message : "Failed to get Admin orders"
+      );
     }
-
-    const data = await response.json();
-    return data.data;
-  } catch (error) {
-    return rejectWithValue(error instanceof Error ? error.message : "Failed to get Admin orders");
   }
-});
+);
 
 export const createOrder = createAsyncThunk(
   "order/createOrder",
@@ -85,7 +95,9 @@ export const createOrder = createAsyncThunk(
       return data.data;
     } catch (error) {
       console.error("Error creating order: ", error);
-      return rejectWithValue(error instanceof Error ? error.message : "Failed to create order");
+      return rejectWithValue(
+        error instanceof Error ? error.message : "Failed to create order"
+      );
     }
   }
 );
@@ -98,7 +110,7 @@ export const createPaymentOrder = createAsyncThunk(
         {
           url: `${process.env.NEXT_PUBLIC_BACKEND_URI}/payments/create-order`,
           method: "POST",
-          body: {orderId},
+          body: { orderId },
         },
         getState as () => RootState
       );
@@ -109,7 +121,11 @@ export const createPaymentOrder = createAsyncThunk(
       return data.data;
     } catch (error) {
       console.error("Error creating payment order: ", error);
-      return rejectWithValue(error instanceof Error ? error.message : "Failed to create payment order");
+      return rejectWithValue(
+        error instanceof Error
+          ? error.message
+          : "Failed to create payment order"
+      );
     }
   }
 );
@@ -133,27 +149,37 @@ export const verifyPayment = createAsyncThunk(
       return data.data;
     } catch (error) {
       console.error("Error verifying payment: ", error);
-      return rejectWithValue(error instanceof Error ? error.message : "Failed to verify payment");
+      return rejectWithValue(
+        error instanceof Error ? error.message : "Failed to verify payment"
+      );
     }
   }
 );
 
-export const getOrderById = createAsyncThunk('order/getOrderById', async(orderId: string, {rejectWithValue, getState}) => {
-  try {
-    const response  = await apiCall({
-      url: `${process.env.NEXT_PUBLIC_BACKEND_URI}/orders/admin/order/${orderId}`,
-      method: "GET"
-    }, getState as () => RootState);
+export const getOrderById = createAsyncThunk(
+  "order/getOrderById",
+  async (orderId: string, { rejectWithValue, getState }) => {
+    try {
+      const response = await apiCall(
+        {
+          url: `${process.env.NEXT_PUBLIC_BACKEND_URI}/orders/admin/order/${orderId}`,
+          method: "GET",
+        },
+        getState as () => RootState
+      );
 
-    if(!response.ok){
-      throw new Error("Failed to get order");
+      if (!response.ok) {
+        throw new Error("Failed to get order");
+      }
+      const data = await response.json();
+      return data.data;
+    } catch (error) {
+      return rejectWithValue(
+        error instanceof Error ? error.message : "Failed to get order"
+      );
     }
-    const data = await response.json();
-    return data.data;
-  } catch (error) {
-      return rejectWithValue(error instanceof Error ? error.message : "Failed to get order");
   }
-});
+);
 
 export const orderSlice = createSlice({
   name: "order",

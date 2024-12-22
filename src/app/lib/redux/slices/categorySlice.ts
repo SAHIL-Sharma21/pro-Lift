@@ -39,7 +39,9 @@ export const createCategory = createAsyncThunk<
     return data.data;
   } catch (error) {
     console.log("Error creating category: ", error);
-    return rejectWithValue(error instanceof Error ? error.message : "Failed to create category");
+    return rejectWithValue(
+      error instanceof Error ? error.message : "Failed to create category"
+    );
   }
 });
 
@@ -63,7 +65,9 @@ export const updateCategory = createAsyncThunk<
       return data.data;
     } catch (error) {
       console.log("Error updating category: ", error);
-      return rejectWithValue(error instanceof Error ? error.message : "Failed to update category");
+      return rejectWithValue(
+        error instanceof Error ? error.message : "Failed to update category"
+      );
     }
   }
 );
@@ -87,7 +91,9 @@ export const deleteCategory = createAsyncThunk<
       return data.data;
     } catch (error) {
       console.log("Error deleting category: ", error);
-      return rejectWithValue(error instanceof Error ? error.message : "Failed to delete category");
+      return rejectWithValue(
+        error instanceof Error ? error.message : "Failed to delete category"
+      );
     }
   }
 );
@@ -109,7 +115,9 @@ export const getAllCategories = createAsyncThunk<
     return data.data;
   } catch (error) {
     console.log("Error getting all categories: ", error);
-    return rejectWithValue(error instanceof Error ? error.message : "Failed to get all categories");
+    return rejectWithValue(
+      error instanceof Error ? error.message : "Failed to get all categories"
+    );
   }
 });
 
@@ -132,7 +140,9 @@ export const getCategoryById = createAsyncThunk<
       return data.data;
     } catch (error) {
       console.log("Error getting category by id: ", error);
-      return rejectWithValue(error instanceof Error ? error.message : "Failed to get category by id");
+      return rejectWithValue(
+        error instanceof Error ? error.message : "Failed to get category by id"
+      );
     }
   }
 );
