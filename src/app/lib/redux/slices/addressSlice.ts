@@ -29,9 +29,9 @@ export const createAddress = createAsyncThunk('address/createAddress', async(pay
         }
         const data = await response.json();
         return data.data;
-    } catch (error: any) {
+    } catch (error) {
         console.log("Error creating address: ", error);
-        rejectWithValue(error?.message);
+        rejectWithValue(error instanceof Error ? error.message : "Failed to create address");
     }
 });
 
@@ -50,9 +50,9 @@ export const updateAddress = createAsyncThunk('address/updateAddress', async({pa
         const data = await response.json();
         console.log("updated data--->", data);
         return data.data;
-    } catch (error: any) {
+    } catch (error) {
         console.log("Error updating address: ", error);
-        rejectWithValue(error?.message);
+        rejectWithValue(error instanceof Error ? error.message : "Failed to update address");
     }
 });
 
@@ -67,11 +67,10 @@ export const deleteAddress = createAsyncThunk('address/deleteAddress', async(add
             throw new Error("Failed to delete address");
         }
         const data = await response.json();
-        console.log("deleted data--->", data);
         return data.data;
-    } catch (error: any) {
+    } catch (error) {
         console.log("Error deleting address: ", error);
-        rejectWithValue(error?.message);
+        rejectWithValue(error instanceof Error ? error.message : "Failed to delete address");
     }
 });
 
@@ -88,9 +87,9 @@ export const getAllAddresses = createAsyncThunk('address/getAllAddresses', async
         }
         const data = await response.json();
         return data.data || [];
-    } catch (error: any) {
+    } catch (error) {
         console.log("Error getting all addresses: ", error);
-        rejectWithValue(error?.message);
+        rejectWithValue(error instanceof Error ? error.message : "Failed to get all addresses");
     }
 });
 

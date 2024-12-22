@@ -60,9 +60,9 @@ export const registerUser = createAsyncThunk('auth/registerUser', async(userData
 
        const data = await response.json();
        return data;
-    } catch (error: any) {
-        console.log("Error registering user: ", error?.message);
-        return rejectWithValue(error?.message); //this have to change when implement axios
+    } catch (error) {
+        console.log("Error registering user: ", error);
+        return rejectWithValue(error instanceof Error ? error.message : "Failed to register user");
     }
 });
 
@@ -79,9 +79,9 @@ export const registerAdmin = createAsyncThunk('auth/registerAdmin', async(userDa
         }
         const data = await response.json();
         return data;
-    } catch (error: any) {
-        console.error("Error registering admin: ", error?.message);
-        return rejectWithValue(error?.message);
+    } catch (error) {
+        console.error("Error registering admin: ", error);
+        return rejectWithValue(error instanceof Error ? error.message : "Failed to register admin");
     }
 });
 
@@ -103,9 +103,9 @@ export const loginUser = createAsyncThunk("auth/loginUser", async(credentials: L
             localStorage.setItem("refreshToken", data.data.refreshToken);
         }
         return data.data;
-    } catch (error: any) {
-        console.log("Error logging in user: ", error?.message)
-        return rejectWithValue(error?.message);
+    } catch (error) {
+        console.log("Error logging in user: ", error)
+        return rejectWithValue(error instanceof Error ? error.message : "Failed to login user");
     }
 });
 
@@ -119,9 +119,9 @@ export const getLoggedInUser = createAsyncThunk('auth/getLoggedInUser', async(_,
             return data;
         }
         throw new Error("No access token available");
-    } catch (error: any) {
-        console.log("Error getting logged in user: ", error?.message)
-        return rejectWithValue(error?.message);
+    } catch (error) {
+        console.log("Error getting logged in user: ", error)
+        return rejectWithValue(error instanceof Error ? error.message : "Failed to get logged in user");
     }
 });
 
@@ -137,9 +137,9 @@ export const logoutUser = createAsyncThunk('auth/logoutUser', async(_,{getState,
             };
             return data;
         }
-    } catch (error: any) {
-        console.log("Error logging out User: ", error?.message)
-        return rejectWithValue(error?.message);
+    } catch (error) {
+        console.log("Error logging out User: ", error)
+        return rejectWithValue(error instanceof Error ? error.message : "Failed to logout user");
     }
 });
 
@@ -160,9 +160,9 @@ export const googlLogin = createAsyncThunk('auth/googleLogin', async(token: stri
         localStorage.setItem("accessToken", data.data.accessToken);
         localStorage.setItem("refreshToken", data.data.refreshToken);
         return data.data;
-    } catch (error: any) {
-        console.log("Error logging in with google: ", error?.message)
-        return rejectWithValue(error?.message);
+    } catch (error) {
+        console.log("Error logging in with google: ", error)
+        return rejectWithValue(error instanceof Error ? error.message : "Failed to login with google");
     }
 });
 
@@ -178,10 +178,9 @@ export const changePassword = createAsyncThunk('auth/changePassword', async(payl
             throw new Error("Failed to change password");
         }
         const data = await response.json();
-        console.log("password changed successfully", data);
         return data.data;
-    } catch (error: any) {
-        return rejectWithValue(error?.message);        
+    } catch (error) {
+        return rejectWithValue(error instanceof Error ? error.message : "Failed to change password");        
     }
 })
 
@@ -269,10 +268,10 @@ export const authSlice = createSlice({
                 state.error = null;
             })
             .addCase(googlLogin.fulfilled, (state, action) => {
-                state.loading = false;;
-                state.user = action.payload.user,
-                state.accessToken = action.payload.accessToken,
-                state.refreshToken = action.payload.refreshToken
+                state.loading = false;
+                state.user = action.payload.user;
+                state.accessToken = action.payload.accessToken;
+                state.refreshToken = action.payload.refreshToken;
                 state.error = null;
             })
             .addCase(googlLogin.rejected, (state, action) => {
