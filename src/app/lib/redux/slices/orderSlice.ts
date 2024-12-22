@@ -40,8 +40,8 @@ export const getOrders = createAsyncThunk(
       }
       const data = await response.json();
       return data.data;
-    } catch (error: any) {
-      return rejectWithValue(error?.message);
+    } catch (error) {
+      return rejectWithValue(error instanceof Error ? error.message : "Failed to get orders");
     }
   }
 );
@@ -59,8 +59,8 @@ export const getAdminOrder = createAsyncThunk('order/getAdminOrder', async(_, {r
 
     const data = await response.json();
     return data.data;
-  } catch (error: any) {
-    return rejectWithValue(error?.message);
+  } catch (error) {
+    return rejectWithValue(error instanceof Error ? error.message : "Failed to get Admin orders");
   }
 });
 
@@ -83,9 +83,9 @@ export const createOrder = createAsyncThunk(
 
       const data = await response.json();
       return data.data;
-    } catch (error: any) {
+    } catch (error) {
       console.error("Error creating order: ", error);
-      return rejectWithValue(error?.message);
+      return rejectWithValue(error instanceof Error ? error.message : "Failed to create order");
     }
   }
 );
@@ -107,9 +107,9 @@ export const createPaymentOrder = createAsyncThunk(
       }
       const data = await response.json();
       return data.data;
-    } catch (error: any) {
+    } catch (error) {
       console.error("Error creating payment order: ", error);
-      return rejectWithValue(error?.message);
+      return rejectWithValue(error instanceof Error ? error.message : "Failed to create payment order");
     }
   }
 );
@@ -131,9 +131,9 @@ export const verifyPayment = createAsyncThunk(
       }
       const data = await response.json();
       return data.data;
-    } catch (error: any) {
+    } catch (error) {
       console.error("Error verifying payment: ", error);
-      return rejectWithValue(error?.message);
+      return rejectWithValue(error instanceof Error ? error.message : "Failed to verify payment");
     }
   }
 );
@@ -150,8 +150,8 @@ export const getOrderById = createAsyncThunk('order/getOrderById', async(orderId
     }
     const data = await response.json();
     return data.data;
-  } catch (error: any) {
-      return rejectWithValue(error?.message);
+  } catch (error) {
+      return rejectWithValue(error instanceof Error ? error.message : "Failed to get order");
   }
 });
 
@@ -225,7 +225,7 @@ export const orderSlice = createSlice({
         state.loading = true;
         state.error = null;
       })
-      .addCase(verifyPayment.fulfilled, (state, _) => {
+      .addCase(verifyPayment.fulfilled, (state) => {
         state.loading = false;
         state.currentOrder = {
           ...state.currentOrder!,

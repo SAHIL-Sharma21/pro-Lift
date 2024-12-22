@@ -39,14 +39,14 @@ export const fetchProducts = createAsyncThunk(
         throw new Error("Invalid data format recieved.");
       }
       return data;
-    } catch (error: any) {
-      console.log("Error fetching products:", error?.message);
-      rejectWithValue(error?.message);
+    } catch (error) {
+      console.log("Error fetching products:", error);
+      rejectWithValue(error instanceof Error ? error.message : "Failed to fetch products");
     }
   }
 );
 
-export const createProduct = createAsyncThunk('product/createProduct', async(formData: FormData, {rejectWithValue, getState}) => {
+export const createProduct = createAsyncThunk('product/createProduct', async(formData: FormData, {rejectWithValue}) => {
   try {
     const response = await fetch(`${process.env.NEXT_PUBLIC_BACKEND_URI}/products/create-product`, {
       method: "POST",
@@ -62,11 +62,10 @@ export const createProduct = createAsyncThunk('product/createProduct', async(for
     if(!data || !data.data){
       throw new Error("Invalid data format recieved.");
     }
-    console.log("created prioduct data--->", data);
     return data.data;
-  } catch (error:any) {
+  } catch (error) {
     console.log("Error creating product: ", error);
-    rejectWithValue(error?.message);
+    rejectWithValue(error instanceof Error ? error.message : "Failed to create product");
   }
 });
 
@@ -80,13 +79,11 @@ export const updateProduct = createAsyncThunk('product/updateProduct', async({pa
     if(!response.ok){
       throw new Error("Failed to update product");
     }
-
     const data = await response.json();
-    console.log("updated data--->", data);
     return data.data;
-  } catch (error: any) {
+  } catch (error) {
     console.log("Error updating product: ", error);
-    rejectWithValue(error?.message);
+    rejectWithValue(error instanceof Error ? error.message : "Failed to update product");
   }
 });
 
@@ -107,17 +104,16 @@ export const deleteProduct = createAsyncThunk<
         const errorData = await response.json();
         throw new Error(errorData.message || "Failed to delete product");
       }
-      const data = await response.json();
-      // console.log("Deleted data --->", data);
+      await response.json();
     } else {
       // If response is not a standard Response object, assume it's already parsed
       console.log("Deleted data --->", response);
     }
     
     return { id: productId, status: 200 };
-  } catch (error: any) {
+  } catch (error) {
     console.log("Error deleting product: ", error);
-    return rejectWithValue(error.message || "Failed to delete product");
+    return rejectWithValue(error instanceof Error ? error.message : "Failed to delete product");
   }
 });
 
@@ -130,9 +126,9 @@ export const getProductById = createAsyncThunk('product/getProductById', async(p
     }
     const data = await response.json();
     return data.data;
-  } catch (error: any) {
+  } catch (error) {
     console.log("Error fetching product: ", error);
-    rejectWithValue(error?.message);
+    rejectWithValue(error instanceof Error ? error.message : "Failed to get product");
   }
 });
 
@@ -146,7 +142,7 @@ export const productSlice = createSlice({
         state.loading = true;
         state.error = null;
       })
-      .addCase(fetchProducts.fulfilled, (state, action: PayloadAction<any>) => {
+      .addCase(fetchProducts.fulfilled, (state, action) => {
         state.loading = false;
         state.error = null;
         const products = action.payload.data?.products;

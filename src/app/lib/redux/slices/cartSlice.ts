@@ -34,9 +34,9 @@ export const fetchCart = createAsyncThunk(
       }
       const data = await response.json();
       return data.data;
-    } catch (error: any) {
-      console.error("Error fetching cart:", error.message);
-      return rejectWithValue(error.message);
+    } catch (error) {
+      console.error("Error fetching cart:", error);
+      return rejectWithValue(error instanceof Error ? error.message : "Failed to fetch cart");
     }
   }
 );
@@ -60,9 +60,9 @@ export const addToCart = createAsyncThunk(
       if (!response.ok) throw new Error("Failed to add product to cart.");
       const data = await response.json();
       return data.data;
-    } catch (error: any) {
-      console.error("Error adding product to cart:", error.message);
-      return rejectWithValue(error.message);
+    } catch (error) {
+      console.error("Error adding product to cart:", error);
+      return rejectWithValue(error instanceof Error ? error.message : "Failed to add product to cart");
     }
   }
 );
@@ -86,9 +86,9 @@ export const updateCartItem = createAsyncThunk(
       if (!response.ok) throw new Error("Failed to update the cart item.");
       const data = await response.json();
       return data.data;
-    } catch (error: any) {
-      console.error("Error updating the cart item:", error.message);
-      return rejectWithValue(error.message);
+    } catch (error) {
+      console.error("Error updating the cart item:", error);
+      return rejectWithValue(error instanceof Error ? error.message : "Failed to update the cart item");
     }
   }
 );
@@ -116,9 +116,9 @@ export const removeFromCart = createAsyncThunk(
         );
       }
       return data.data.updatedCart.id;
-    } catch (error: any) {
-      console.error("Error removing item from the cart:", error.message);
-      return rejectWithValue(error.message);
+    } catch (error) {
+      console.error("Error removing item from the cart:", error);
+      return rejectWithValue(error instanceof Error ? error.message : "Failed to remove item from the cart");
     }
   }
 );
@@ -137,9 +137,9 @@ export const clearCart = createAsyncThunk(
       if (!response.ok) throw new Error("Failed to clear the cart");
       const data = await response.json();
       return data;
-    } catch (error: any) {
-      console.error("Error clearing the cart:", error.message);
-      return rejectWithValue(error.message);
+    } catch (error) {
+      console.error("Error clearing the cart:", error);
+      return rejectWithValue(error instanceof Error ? error.message : "Failed to clear the cart");
     }
   }
 );

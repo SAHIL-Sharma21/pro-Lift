@@ -37,9 +37,9 @@ export const createCategory = createAsyncThunk<
     );
     const data = await response.json();
     return data.data;
-  } catch (error: any) {
-    console.log("Error creating category: ", error?.message);
-    return rejectWithValue(error?.message);
+  } catch (error) {
+    console.log("Error creating category: ", error);
+    return rejectWithValue(error instanceof Error ? error.message : "Failed to create category");
   }
 });
 
@@ -61,9 +61,9 @@ export const updateCategory = createAsyncThunk<
       );
       const data = await response.json();
       return data.data;
-    } catch (error: any) {
-      console.log("Error updating category: ", error?.message);
-      return rejectWithValue(error?.message);
+    } catch (error) {
+      console.log("Error updating category: ", error);
+      return rejectWithValue(error instanceof Error ? error.message : "Failed to update category");
     }
   }
 );
@@ -85,9 +85,9 @@ export const deleteCategory = createAsyncThunk<
       );
       const data = await response.json();
       return data.data;
-    } catch (error: any) {
-      console.log("Error deleting category: ", error?.message);
-      return rejectWithValue(error?.message);
+    } catch (error) {
+      console.log("Error deleting category: ", error);
+      return rejectWithValue(error instanceof Error ? error.message : "Failed to delete category");
     }
   }
 );
@@ -107,9 +107,9 @@ export const getAllCategories = createAsyncThunk<
     );
     const data = await response.json();
     return data.data;
-  } catch (error: any) {
-    console.log("Error getting all categories: ", error?.message);
-    return rejectWithValue(error?.message);
+  } catch (error) {
+    console.log("Error getting all categories: ", error);
+    return rejectWithValue(error instanceof Error ? error.message : "Failed to get all categories");
   }
 });
 
@@ -130,9 +130,9 @@ export const getCategoryById = createAsyncThunk<
       );
       const data = await response.json();
       return data.data;
-    } catch (error: any) {
-      console.log("Error getting category by id: ", error?.message);
-      return rejectWithValue(error?.message);
+    } catch (error) {
+      console.log("Error getting category by id: ", error);
+      return rejectWithValue(error instanceof Error ? error.message : "Failed to get category by id");
     }
   }
 );
