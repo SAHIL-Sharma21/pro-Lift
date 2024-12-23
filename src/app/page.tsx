@@ -9,7 +9,7 @@ import {
   CardTitle,
 } from "@/components/ui/card";
 import { Input } from "@/components/ui/input";
-import { ArrowRight, ShoppingCart, Star, Check } from "lucide-react";
+import { ArrowRight, ShoppingCart, Star, Check, Loader2 } from "lucide-react";
 import Image from "next/image";
 import Link from "next/link";
 import { useProduct } from "./hooks/useProduct";
@@ -139,7 +139,10 @@ export default function Home() {
           </motion.div>
           {productLoading ? (
             <motion.div className="text-center text-gray-300" variants={fadeIn}>
-              Loading products...
+              <div className="flex items-center justify-center">
+                <Loader2 className="mr-2 h-5 w-5 animate-spin text-blue-400" />
+                Loading...
+              </div>
             </motion.div>
           ) : (
             <motion.div
