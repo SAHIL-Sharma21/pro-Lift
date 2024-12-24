@@ -15,7 +15,7 @@ import { debounce } from "lodash";
 import { MinusCircle, PlusCircle, ShoppingCart, Trash2 } from "lucide-react";
 import Image from "next/image";
 import { useRouter } from "next/navigation";
-import React, { useCallback, useEffect, useState } from "react";
+import React, { useCallback, useEffect } from "react";
 
 const SidebarCart = ({
   isOpen,
@@ -100,23 +100,20 @@ const SidebarCart = ({
   const handleRemoveItem = async (cartItemId: string) => {
     if (cart) {
       try {
-        const response = await removeItemFromCart(cartItemId);
-        if (response.meta.requestStatus === "fulfilled") {
+        const result = await removeItemFromCart(cartItemId);
+        if (result.success) {
           toast({
             title: "Product removed from cart",
             description: "The product has been removed from your cart.",
             variant: "default",
             className: "bg-green-100 border-green-400 text-green-900",
           });
+          await getCart();
         } else {
-          toast({
-            title: "Failed to remove product from cart",
-            description: "Please try again later.",
-            variant: "destructive",
-          });
+          throw new Error("Failed to remove product from cart");
         }
-        await getCart();
       } catch (error) {
+        console.error("Error removing item from cart:", error);
         toast({
           title: "Failed to remove product from cart",
           description: error instanceof Error ? error.message : "Please try again later.",

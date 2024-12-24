@@ -48,13 +48,18 @@ export const useCart = () => {
   );
 
   const removeItemFromCart = useCallback(
-   async (cartItemId: string) => {
+    async (cartItemId: string) => {
       try {
-        const data= await dispatch(removeFromCart(cartItemId)).unwrap();
-        await getCart();
-        return data;
+        const resultAction = await dispatch(removeFromCart(cartItemId));
+        if (removeFromCart.fulfilled.match(resultAction)) {
+          // If the action was fulfilled, return a success object
+          return { success: true, data: resultAction.payload };
+        } else {
+          // If the action was rejected, throw an error
+          throw new Error(resultAction.error.message || "Failed to remove item from cart");
+        }
       } catch (error) {
-        console.error(error instanceof Error ? error.message : "Failed to remove item from the cart");
+        console.error("Error removing item from cart:", error);
         throw error;
       }
     },

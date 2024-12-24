@@ -146,22 +146,22 @@ function ProductPage() {
         setLocalCartLoading(true);
         try {
           const response = await removeItemFromCart(cartItem.id);
-          if (response.meta.requestStatus === "fulfilled") {
+          if(response.success){
             toast({
               title: "Product removed from cart",
               description: "The product has been removed from your cart.",
               variant: "default",
               className: "bg-green-100 border-green-400 text-green-900",
-            });
-          } else {
+            })
+            await getCart();
+            setQuantity(1);
+          }else {
             toast({
               title: "Failed to remove product from cart",
               description: "Please try again later.",
               variant: "destructive",
             });
           }
-          await getCart();
-          setQuantity(1);
         } catch (error) {
           console.error("Failed to remove product from cart:", error);
           toast({

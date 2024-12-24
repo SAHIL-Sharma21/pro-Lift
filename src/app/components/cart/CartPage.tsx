@@ -43,21 +43,17 @@ const CartPage = () => {
       if (cartItemId) {
         try {
           const responee = await removeItemFromCart(cartItem?.id || "");
-          if (responee.meta.requestStatus === "fulfilled") {
+          if (responee.success) {
             toast({
               title: "Product removed from cart",
               description: "The product has been removed from your cart.",
               variant: "default",
               className: "bg-green-100 border-green-400 text-green-900",
             });
+            await getCart();
           } else {
-            toast({
-              title: "Failed to remove product from cart",
-              description: "Please try again later.",
-              variant: "destructive",
-            });
+            throw new Error("Failed to remove product from cart");
           }
-          await getCart();
         } catch (error) {
           toast({
             title: "Failed to remove product from cart",
