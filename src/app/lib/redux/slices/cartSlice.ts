@@ -1,5 +1,7 @@
 import { createAsyncThunk, createSlice, PayloadAction } from "@reduxjs/toolkit";
 import { Cart, CartItem } from "@/app/types/cart.types";
+import { apiCall } from "@/utils/apiCall";
+import { RootState } from "../store";
 
 interface CartState {
   cart: Cart | null;
@@ -19,14 +21,13 @@ const initialState: CartState = {
 
 export const fetchCart = createAsyncThunk(
   "cart/fetchCart",
-  async (_, { rejectWithValue }) => {
+  async (_, { rejectWithValue, getState }) => {
     try {
-      const response = await fetch(
-        `${process.env.NEXT_PUBLIC_BACKEND_URI}/cart/get-cart`,
-        {
-          credentials: "include",
-        }
-      );
+      const response = await apiCall({
+        url: `${process.env.NEXT_PUBLIC_BACKEND_URI}/cart/get-cart`,
+        method: "GET",
+      }, getState as () => RootState);
+
       if (!response.ok) {
         if (response.status === 400) {
           return { items: [], id: null };
@@ -34,6 +35,7 @@ export const fetchCart = createAsyncThunk(
         throw new Error("Failed to get the user cart");
       }
       const data = await response.json();
+      console.log(localStorage.getItem("cartId"));
       return data.data;
     } catch (error) {
       console.error("Error fetching cart:", error);
@@ -48,20 +50,21 @@ export const addToCart = createAsyncThunk(
   "cart/addToCart",
   async (
     { productId, quantity }: { productId: string; quantity: number },
-    { rejectWithValue }
+    { rejectWithValue, getState }
   ) => {
     try {
-      const response = await fetch(
-        `${process.env.NEXT_PUBLIC_BACKEND_URI}/cart/add`,
-        {
-          method: "POST",
-          headers: { "Content-Type": "application/json" },
-          body: JSON.stringify({ productId, quantity }),
-          credentials: "include",
-        }
-      );
+      const response = await apiCall({
+        url: `${process.env.NEXT_PUBLIC_BACKEND_URI}/cart/add`,
+        method: "POST",
+        body: { productId, quantity },
+      }, getState as () => RootState);
+
+
       if (!response.ok) throw new Error("Failed to add product to cart.");
       const data = await response.json();
+      if(data && data.data){
+        localStorage.setItem("cartId", data.data.cartId);
+      }
       return data.data;
     } catch (error) {
       console.error("Error adding product to cart:", error);
@@ -76,18 +79,14 @@ export const updateCartItem = createAsyncThunk(
   "cart/updateCartItem",
   async (
     { cartItemId, quantity }: { cartItemId: string; quantity: number },
-    { rejectWithValue }
+    { rejectWithValue, getState }
   ) => {
     try {
-      const response = await fetch(
-        `${process.env.NEXT_PUBLIC_BACKEND_URI}/cart/update-cart/${cartItemId}`,
-        {
-          method: "PATCH",
-          headers: { "Content-Type": "application/json" },
-          body: JSON.stringify({ quantity }),
-          credentials: "include",
-        }
-      );
+      const response = await apiCall({
+        url: `${process.env.NEXT_PUBLIC_BACKEND_URI}/cart/update-cart/${cartItemId}`,
+        method: "PATCH",
+        body: { quantity },
+      }, getState as () => RootState);
       if (!response.ok) throw new Error("Failed to update the cart item.");
       const data = await response.json();
       return data.data;
@@ -104,16 +103,12 @@ export const updateCartItem = createAsyncThunk(
 
 export const removeFromCart = createAsyncThunk(
   "cart/removeFromCart",
-  async (cartItemId: string, { rejectWithValue }) => {
+  async (cartItemId: string, { rejectWithValue, getState }) => {
     try {
-      const response = await fetch(
-        `${process.env.NEXT_PUBLIC_BACKEND_URI}/cart/delete-cart/${cartItemId}`,
-        {
-          method: "DELETE",
-          headers: { "Content-Type": "application/json" },
-          credentials: "include",
-        }
-      );
+      const response = await apiCall({
+        url: `${process.env.NEXT_PUBLIC_BACKEND_URI}/cart/delete-cart/${cartItemId}`,
+        method: "DELETE",
+      }, getState as () => RootState);
 
       const data = await response.json();
 
@@ -137,15 +132,12 @@ export const removeFromCart = createAsyncThunk(
 
 export const clearCart = createAsyncThunk(
   "cart/clearCart",
-  async (_, { rejectWithValue }) => {
+  async (_, { rejectWithValue, getState }) => {
     try {
-      const response = await fetch(
-        `${process.env.NEXT_PUBLIC_BACKEND_URI}/cart/empty-cart`,
-        {
-          method: "DELETE",
-          credentials: "include",
-        }
-      );
+      const response = await apiCall({
+        url: `${process.env.NEXT_PUBLIC_BACKEND_URI}/cart/empty-cart`,
+        method: "DELETE",
+      }, getState as () => RootState);
       if (!response.ok) throw new Error("Failed to clear the cart");
       const data = await response.json();
       return data;

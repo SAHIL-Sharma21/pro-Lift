@@ -11,6 +11,7 @@ interface ApiCallOptions {
 export const apiCall  = async(options: ApiCallOptions, getState: () => RootState) => {
     const state = getState();
     const token = state.auth.accessToken;
+    const cartId = localStorage.getItem("cartId");
 
     const headers: HeadersInit = {
         'Content-Type': 'application/json'
@@ -20,10 +21,15 @@ export const apiCall  = async(options: ApiCallOptions, getState: () => RootState
         headers["Authorization"] = `Bearer ${token}`
     }
 
+    if(cartId){
+        headers["X-Cart-Id"] = cartId;
+    }
+
     const response = await fetch(options.url, {
         method: options.method,
         headers: headers,
         body: options.body ? JSON.stringify(options.body) : undefined,
+        credentials: "include"
     });
 
     if(!response.ok){
