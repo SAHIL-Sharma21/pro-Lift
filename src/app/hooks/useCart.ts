@@ -21,7 +21,11 @@ export const useCart = () => {
   );
 
   const getCart = useCallback( async() => {
-      return dispatch(fetchCart());
+      try {
+        return dispatch(fetchCart()).unwrap();
+      } catch (error) {
+        console.error(error instanceof Error ? error.message : "Failed to fetch cart");
+      }
   }, [dispatch]);
 
   // cart is did not found.
@@ -44,8 +48,15 @@ export const useCart = () => {
   );
 
   const removeItemFromCart = useCallback(
-    (cartItemId: string) => {
-      return dispatch(removeFromCart(cartItemId));
+   async (cartItemId: string) => {
+      try {
+        const data= await dispatch(removeFromCart(cartItemId)).unwrap();
+        await getCart();
+        return data;
+      } catch (error) {
+        console.error(error instanceof Error ? error.message : "Failed to remove item from the cart");
+        throw error;
+      }
     },
     [dispatch]
   );

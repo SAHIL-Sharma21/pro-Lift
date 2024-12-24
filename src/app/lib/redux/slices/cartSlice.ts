@@ -28,14 +28,11 @@ export const fetchCart = createAsyncThunk(
         method: "GET",
       }, getState as () => RootState);
 
-      if (!response.ok) {
-        if (response.status === 400) {
-          return { items: [], id: null };
-        }
-        throw new Error("Failed to get the user cart");
-      }
       const data = await response.json();
-      console.log(localStorage.getItem("cartId"));
+
+      if(data.data === null || !data.data.items || data.data.items.length === 0){
+        return {items: [], id: null};
+      }
       return data.data;
     } catch (error) {
       console.error("Error fetching cart:", error);
@@ -62,7 +59,7 @@ export const addToCart = createAsyncThunk(
 
       if (!response.ok) throw new Error("Failed to add product to cart.");
       const data = await response.json();
-      if(data && data.data){
+      if(data && data.data && data.data.cartId){
         localStorage.setItem("cartId", data.data.cartId);
       }
       return data.data;
